@@ -40,6 +40,15 @@ const lang = {
   damage: '总伤害',
   count: '技能数',
   fireCount: '燃烧层数',
+
+  basicConfig: '基础设置',
+  cardsConfig: '丹青配置',
+  add: '新增',
+  delete: '删除',
+  mockConfig: '模拟设置',
+  preview: '面板预览',
+  mockResult: '模拟结果',
+  overflow: '超出限制，请选择丹青配置或减少可用丹青数值',
 }
 
 export default lang
