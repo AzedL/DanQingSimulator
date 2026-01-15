@@ -73,6 +73,8 @@ export class Damage {
     const total = map.total / length + basicDamage
     const result: DPSDetail[] = [{ key: 'total', dps: fixed(total), proportion: 100 }]
     for (let key in map) {
+      if (key === 'total') continue
+
       const dps = map[key] / length
       const proportion = (dps * 100) / total
       result.push({ key, dps: fixed(dps), proportion: fixed(proportion) })

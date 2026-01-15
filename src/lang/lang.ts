@@ -17,7 +17,7 @@ const lang = {
   autoMock: '自动模拟',
   duration: '战斗时间(s)',
   useRandom: '模拟随机',
-  useRandomTip: '勾选后，依据概率模拟部分丹青效果，而非使用期望计算',
+  useRandomTip: '勾选后依据概率模拟部分丹青效果，而非以期望计算，最终结果会产生波动',
 
   costRemain: '剩余可用丹青值',
   costRemainTip: '使用已选丹青和剩余可用丹青值自动模拟最佳组合',
