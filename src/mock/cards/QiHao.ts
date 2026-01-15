@@ -7,7 +7,7 @@ export class QiHao extends Card {
   private _cd: CoolDownTime
   private _cdTime: number
   private _damage: number
-  constructor(core: Core, level: number) {
+  constructor(core: Core, _: number) {
     const id: TCardIds = 'qiHao'
     const key = '齐昊'
     const data = dataBase[id]

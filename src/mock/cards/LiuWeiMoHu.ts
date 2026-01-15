@@ -5,7 +5,7 @@ import { Card } from './Card'
 export class LiuWeiMoHu extends Card {
   private _lock: boolean = false
   private _damage: number
-  constructor(core: Core, level: number) {
+  constructor(core: Core, _: number) {
     const id: TCardIds = 'liuWeiMoHu'
     const key = '六尾魔狐'
     super(core, id, key)

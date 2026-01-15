@@ -5,7 +5,7 @@ import { Card } from './Card'
 
 export class ZheShan extends Card {
   private _cd: CoolDownTime
-  constructor(core: Core, level: number) {
+  constructor(core: Core, _: number) {
     const id: TCardIds = 'zheShan'
     const key = '折扇'
     const data = dataBase[id]
