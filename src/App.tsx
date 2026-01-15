@@ -188,7 +188,7 @@ function App() {
 
   const currentCore = useMemo(() => {
     return isAutoMockResult ? autoMockCores[autoMockCurrent] : mockCore
-  }, [isAutoMock, mockCore, autoMockCores, autoMockCurrent])
+  }, [isAutoMockResult, mockCore, autoMockCores, autoMockCurrent])
   const chartElRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<any>(null)
   const draw = (data: number[]) => {
@@ -243,10 +243,10 @@ function App() {
   }, [chartData])
   // const set
   return (
-    <div className="root">
-      <div className="header">
-        <div className="items">
-          <div className="item">
+    <div className="mx-auto my-10 flex w-full max-w-270 flex-col items-center justify-center overflow-hidden px-5">
+      <div className="w-full rounded-[10px] bg-indigo-50 p-5 shadow-md gap-7.5">
+        <div className="flex flex-wrap items-center justify-start gap-7.5">
+          <div className="flex-1 min-w-45">
             <MyInput
               value={coreAttribute}
               onChange={setCoreAttribute}
@@ -256,7 +256,7 @@ function App() {
               width={180}
             ></MyInput>
           </div>
-          <div className="item">
+          <div className="flex-1 min-w-45">
             <MyInput
               value={basicDamage}
               onChange={setBasicDamage}
@@ -266,7 +266,7 @@ function App() {
               width={180}
             ></MyInput>
           </div>
-          <div className="item">
+          <div className="flex-1 min-w-45">
             <MySelect
               value={treasureLevel}
               onChange={setTreasureLevel}
@@ -277,21 +277,21 @@ function App() {
             ></MySelect>
           </div>
         </div>
-        <div className="grid buff">
+        <div className="grid mt-7.5 gap-5">
           <Label>{lang.buff}</Label>
-          <div className="buffs">
+          <div className="flex items-center justify-start gap-7.5">
             <MyCheckbox value={taXue} onChange={setTaXue} label={lang.taXue}></MyCheckbox>
             <MyCheckbox value={anJi} onChange={setAnJi} label={lang.anJi}></MyCheckbox>
           </div>
         </div>
       </div>
-      <div className="body">
-        <div className="cards">
-          <div className="titles">
-            <div className="title">
+      <div className="mt-5 flex w-full flex-wrap gap-5">
+        <div className="flex-2 flex min-h-full min-w-85 max-h-full flex-col gap-2.5 overflow-hidden rounded-[10px] bg-emerald-50 p-5 shadow-md">
+          <div className="flex w-full items-center justify-center gap-2.5">
+            <div className="flex-1">
               <Label>{lang.card}</Label>
             </div>
-            <div className="title">
+            <div className="flex-1">
               <Label>{lang.level}</Label>
             </div>
             <Button size="icon" onClick={handleAdd}>
@@ -300,7 +300,7 @@ function App() {
           </div>
           {cards.map(({ id, level }, index) => {
             return (
-              <div className="card" key={index}>
+              <div className="flex w-full items-center justify-center gap-2.5" key={index}>
                 <MySelect
                   value={id}
                   onChange={(v) => handleCardChange(index, v as TCardIds)}
@@ -322,12 +322,12 @@ function App() {
             )
           })}
         </div>
-        <div className="right">
-          <div className="actions">
+        <div className="flex-1 flex min-w-50 max-h-full flex-col gap-5">
+          <div className="flex h-60 w-full flex-col gap-5 rounded-[10px] bg-amber-50 p-5 shadow-md">
             <MyTabs value={currentTab} onChange={setCurrentTab} list={tabValues}></MyTabs>
             {!isAutoMock && (
-              <div className="mock">
-                <div className="item1">
+              <div className="flex flex-col gap-5">
+                <div>
                   <MyInput
                     value={duration}
                     onChange={setDuration}
@@ -336,7 +336,7 @@ function App() {
                     width={180}
                   ></MyInput>
                 </div>
-                <div className="item1">
+                <div>
                   <MyCheckbox
                     value={useRandom}
                     onChange={setUseRandom}
@@ -347,8 +347,8 @@ function App() {
               </div>
             )}
             {isAutoMock && (
-              <div className="mock">
-                <div className="item1">
+              <div className="flex flex-col gap-5">
+                <div>
                   <MyInput
                     value={costRemain}
                     onChange={setCostRemain}
@@ -358,7 +358,7 @@ function App() {
                     width={180}
                   ></MyInput>
                 </div>
-                <div className="item1">
+                <div>
                   <MyCheckbox
                     value={excludeYouMingQuan}
                     onChange={setExcludeYouMingQuan}
@@ -368,26 +368,26 @@ function App() {
               </div>
             )}
           </div>
-          <div className="results">
-            <div className="result">
+          <div className="flex h-41.5 w-full flex-col gap-2.5 rounded-[10px] bg-pink-50 p-5 shadow-md">
+            <div className="flex gap-2.5">
               <Label>{lang.totalCost}</Label>
               <p className="text-sm text-green-600 font-bold">{totalCost}</p>
             </div>
-            <div className="result">
+            <div className="flex gap-2.5">
               <Label>{lang.resultCoreAttribute}</Label>
               <p className="text-sm text-green-600 font-bold">{resultCoreAttribute}</p>
             </div>
-            <div className="result">
+            <div className="flex gap-2.5">
               <Label>{lang.resultAttackPower}</Label>
               <p className="text-sm text-green-600 font-bold">{resultAttackPower}</p>
             </div>
-            <div className="exec">
+            <div className="flex justify-end">
               <Button onClick={exec}>{lang.exec}</Button>
             </div>
           </div>
         </div>
       </div>
-      <div className="mockResult">
+      <div className="mt-5 flex min-h-90 w-full flex-col gap-5 rounded-[10px] bg-sky-50 p-5 shadow-md">
         <MyTabs value={currentTabResult} onChange={setCurrentTabResult} list={tabValues}></MyTabs>
         {!isAutoMockResult && (
           <>
@@ -396,19 +396,19 @@ function App() {
               onChange={setMergeSameNameDamage}
               label={lang.mergeSameNameDamage}
             ></MyCheckbox>
-            <div className="resultTable">
-              <div className="resultTableRow">
+            <div className="flex flex-col">
+              <div className="grid grid-cols-[4fr_1fr_1fr] gap-2.5 p-1.25">
                 <Label>{lang.damageName}</Label>
                 <Label>{lang.dps}</Label>
-                <Label>{lang.proportion}</Label>
+                <Label className="justify-self-end">{lang.proportion}</Label>
               </div>
               <Separator />
               {mockResult.map(({ key, dps, proportion }) => {
                 return (
-                  <div className="resultTableRow" key={key}>
+                  <div className="grid grid-cols-[4fr_1fr_1fr] gap-2.5 p-1.25" key={key}>
                     <Label>{lang[key as 'total'] || key}</Label>
                     <Label>{dps}</Label>
-                    <Label>{proportion + '%'}</Label>
+                    <Label className="justify-self-end">{proportion + '%'}</Label>
                   </div>
                 )
               })}
@@ -417,28 +417,28 @@ function App() {
         )}
         {isAutoMockResult && (
           <>
-            <div className="result">
+            <div className="flex gap-2.5">
               <Label>{lang.autoMockLength}</Label>
               <p className="text-sm text-muted-foreground">{autoMockLength}</p>
             </div>
-            <div className="resultTable">
-              <div className="resultTableRow2">
+            <div className="flex flex-col">
+              <div className="grid grid-cols-[5fr_1fr] gap-2.5 p-1.25">
                 <Label>{lang.cardsCombo}</Label>
-                <Label>{lang.dps}</Label>
+                <Label className="justify-self-end">{lang.dps}</Label>
               </div>
               <Separator />
               {autoMockResult.map(({ cards, dps }, index) => {
                 return (
                   <div
                     className={cn(
-                      'resultTableRow2 cursor-pointer hover:bg-slate-200',
+                      'grid grid-cols-[5fr_1fr] gap-2.5 p-1.25 cursor-pointer hover:bg-slate-200',
                       autoMockCurrent === index ? 'bg-slate-400' : ''
                     )}
                     key={cards}
                     onClick={() => setAutoMockCurrent(index)}
                   >
                     <Label className="cursor-pointer">{cards}</Label>
-                    <Label className="cursor-pointer">{dps}</Label>
+                    <Label className="cursor-pointer justify-self-end">{dps}</Label>
                   </div>
                 )
               })}
@@ -446,7 +446,7 @@ function App() {
           </>
         )}
       </div>
-      <div className="chartOptions">
+      <div className="mt-5 mr-auto flex w-full max-w-95 items-center justify-start gap-5">
         <MySelect
           value={chartOptions}
           onChange={(v) => {
@@ -460,8 +460,8 @@ function App() {
         ></MySelect>
         <MySelect value={currentKey} onChange={setCurrentKey} list={keys} maxWidth={180}></MySelect>
       </div>
-      <div className="grid chartContainer">
-        <div className="chart" ref={chartElRef}></div>
+      <div className="grid mt-2.5 min-h-90 w-full overflow-auto rounded-[10px] shadow-md">
+        <div className="h-full w-full" ref={chartElRef}></div>
       </div>
     </div>
   )
