@@ -52,11 +52,9 @@ export class Pulse {
   private handleSuiShou(count: number) {
     if (!this._suiShouValue) return
 
-    let c = 0
     const useRandom = this._core.coreOptions.useRandom
-    for (let i = 0; i < count; i++) {
-      c += handleProbability(this._suiShouValue, useRandom)
-    }
+    const c = handleProbability(this._suiShouValue, useRandom, count)
+
     this._core.fire.add(c * 3)
   }
   public add(count: number, ...rest: string[]) {

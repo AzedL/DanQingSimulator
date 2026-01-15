@@ -32,21 +32,17 @@ export class Ice {
     if (!this._linFengValue) return
 
     const key = '林峰'
-    let c = 0
     const useRandom = this._core.coreOptions.useRandom
-    for (let i = 0; i < count; i++) {
-      c += handleProbability(this._linFengValue, useRandom)
-    }
+    const c = handleProbability(this._linFengValue, useRandom, count)
+
     this._add(c, key)
   }
   private handleShangGuanCe(count: number) {
     if (!this._shangGuanCeValue) return
 
-    let c = 0
     const useRandom = this._core.coreOptions.useRandom
-    for (let i = 0; i < count; i++) {
-      c += handleProbability(this._shangGuanCeValue, useRandom)
-    }
+    const c = handleProbability(this._shangGuanCeValue, useRandom, count)
+
     this._core.fire.add(c)
   }
   public add(count: number, ...rest: string[]) {

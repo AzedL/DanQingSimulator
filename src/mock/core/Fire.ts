@@ -42,11 +42,9 @@ export class Fire {
   private handleLinFeng(count: number) {
     if (!this._linFengValue) return
 
-    let c = 0
     const useRandom = this._core.coreOptions.useRandom
-    for (let i = 0; i < count; i++) {
-      c += handleProbability(this._linFengValue, useRandom)
-    }
+    const c = handleProbability(this._linFengValue, useRandom, count)
+
     this._add(c)
   }
   private handleErWei(count: number) {
