@@ -44,7 +44,7 @@ export function normalizeMockOptions(mockOptions: MockOptions): CoreOptions {
 
 const normalizeCards = (cards: CardOptions[]) => {
   const map: Record<string, boolean> = {}
-  cards.filter(({ id }) => {
+  return cards.filter(({ id }) => {
     if (!dataBase[id]) return false
 
     if (map[id]) return false
@@ -52,7 +52,6 @@ const normalizeCards = (cards: CardOptions[]) => {
     map[id] = true
     return true
   })
-  return cards
 }
 
 const getCost = (cards: CardOptions[]) => {

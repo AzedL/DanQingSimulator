@@ -185,25 +185,84 @@ function App() {
   const draw = (data: number[]) => {
     let chart = chartRef.current
     if (!chart) {
-      chart = echarts.init(chartElRef.current, 'dark')
+      chart = echarts.init(chartElRef.current)
       chartRef.current = chart
     }
 
     chart.setOption({
+      backgroundColor: 'transparent',
+      textStyle: {
+        color: '#e2e8f0',
+      },
       xAxis: {
         type: 'category',
         data: data.map((_, i) => i + 1),
+        axisLine: {
+          lineStyle: {
+            color: '#475569',
+          },
+        },
+        axisLabel: {
+          color: '#94a3b8',
+        },
       },
       yAxis: {
         type: 'value',
+        axisLine: {
+          lineStyle: {
+            color: '#475569',
+          },
+        },
+        axisLabel: {
+          color: '#94a3b8',
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#334155',
+            type: 'dashed',
+          },
+        },
       },
       series: [
         {
           data,
           type: 'line',
           smooth: true,
+          lineStyle: {
+            color: '#60a5fa',
+            width: 3,
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                {
+                  offset: 0,
+                  color: 'rgba(96, 165, 250, 0.3)',
+                },
+                {
+                  offset: 1,
+                  color: 'rgba(96, 165, 250, 0.05)',
+                },
+              ],
+            },
+          },
+          itemStyle: {
+            color: '#60a5fa',
+          },
         },
       ],
+      tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        borderColor: '#334155',
+        textStyle: {
+          color: '#e2e8f0',
+        },
+      },
     })
   }
   const [chartOptions, setChartOptions] = useState<TChartOption>('dps')
@@ -232,7 +291,7 @@ function App() {
 
     draw(chartData)
   }, [chartData])
-  // const set
+
   return (
     <div className="mx-auto my-8 flex w-full max-w-7xl flex-col items-center justify-center overflow-hidden px-4 md:px-6">
       <div className="w-full rounded-xl bg-linear-to-br from-indigo-50 to-purple-50 p-6 shadow-lg border border-indigo-100">

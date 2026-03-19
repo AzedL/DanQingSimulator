@@ -6,7 +6,7 @@ export function normalizeOption(mockOptions: MockOptions) {
 }
 
 export function mock(coreOptions: CoreOptions) {
-  const core = new Core({ ...coreOptions })
+  const core = new Core(coreOptions)
   core.exec()
   return core
 }

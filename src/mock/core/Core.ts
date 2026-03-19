@@ -35,8 +35,9 @@ export class Core {
   cards: Card[] = []
 
   constructor(coreOptions: CoreOptions) {
-    this.coreOptions = coreOptions
-    this.options = getOptions(coreOptions)
+    const _coreOptions = { ...coreOptions }
+    this.coreOptions = _coreOptions
+    this.options = getOptions(_coreOptions)
     this.queue = new Queue()
     this.dps = new Damage(this)
     this.fire = new Fire(this)
