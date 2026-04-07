@@ -1,6 +1,6 @@
 import { getCards } from '../cards'
 import type { Card } from '../cards/Card'
-import type { TCardIds } from '../dataBase/dataBase'
+import type { CardId } from '@/domain/cards/cardIds'
 import { Damage } from './Damage'
 import { Fire } from './Fire'
 import { Ice } from './Ice'
@@ -9,7 +9,7 @@ import { Pulse } from './Pulse'
 import { Queue } from './Queue'
 
 export interface CardOptions {
-  id: TCardIds
+  id: CardId
   level: number
 }
 export interface CoreOptions {

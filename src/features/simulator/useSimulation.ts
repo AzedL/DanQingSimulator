@@ -1,8 +1,20 @@
 import { useMemo, useState } from 'react'
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import type { CardId } from '@/domain/cards/cardIds'
-import { mergeDamageBreakdown, deriveSimulationCoreOptions, runSimulation, type SimulationCore, type SimulationMockOptions } from '@/engine/Simulation'
-import { fixed, toNumber } from '@/mock/utils/math'
+import {
+  BASIC_CONFIG_DEFAULTS,
+  DEFAULT_CARD_LOADOUT,
+  SIMULATION_CONFIG_DEFAULTS,
+  AUTO_SIMULATION_DURATION,
+} from '@/domain/config/simulatorDefaults'
+import {
+  mergeDamageBreakdown,
+  deriveSimulationCoreOptions,
+  runSimulation,
+  type SimulationCore,
+  type SimulationMockOptions,
+} from '@/engine/Simulation'
+import { fixed, toNumber } from '@/kernel/utils/math'
 
 interface CardSelection {
   id: CardId | ''
@@ -10,24 +22,17 @@ interface CardSelection {
 }
 
 export function useSimulation() {
-  const [coreAttribute, setCoreAttribute] = useState('50000')
-  const [basicDamage, setBasicDamage] = useState('50000')
-  const [treasureLevel, setTreasureLevel] = useState('10')
-  const [taXue, setTaXue] = useState(false)
-  const [anJi, setAnJi] = useState(false)
-  const [cards, setCards] = useState<CardSelection[]>([
-    { id: 'yanHong', level: 6 },
-    { id: 'wenMin', level: 6 },
-    { id: 'linFeng', level: 6 },
-    { id: 'erWeiYaoHu', level: 6 },
-    { id: 'shangGuanCe', level: 6 },
-    { id: 'liuWeiMoHu', level: 6 },
-  ])
-  const [currentTab, setCurrentTab] = useState<'mock' | 'autoMock'>('mock')
-  const [duration, setDuration] = useState('600')
-  const [useRandom, setUseRandom] = useState(false)
-  const [costRemain, setCostRemain] = useState('0')
-  const [excludeYouMingQuan, setExcludeYouMingQuan] = useState(true)
+  const [coreAttribute, setCoreAttribute] = useState(BASIC_CONFIG_DEFAULTS.coreAttribute)
+  const [basicDamage, setBasicDamage] = useState(BASIC_CONFIG_DEFAULTS.basicDamage)
+  const [treasureLevel, setTreasureLevel] = useState(BASIC_CONFIG_DEFAULTS.treasureLevel)
+  const [taXue, setTaXue] = useState(BASIC_CONFIG_DEFAULTS.taXue)
+  const [anJi, setAnJi] = useState(BASIC_CONFIG_DEFAULTS.anJi)
+  const [cards, setCards] = useState<CardSelection[]>(DEFAULT_CARD_LOADOUT)
+  const [currentTab, setCurrentTab] = useState(SIMULATION_CONFIG_DEFAULTS.currentTab)
+  const [duration, setDuration] = useState(SIMULATION_CONFIG_DEFAULTS.duration)
+  const [useRandom, setUseRandom] = useState(SIMULATION_CONFIG_DEFAULTS.useRandom)
+  const [costRemain, setCostRemain] = useState(SIMULATION_CONFIG_DEFAULTS.costRemain)
+  const [excludeYouMingQuan, setExcludeYouMingQuan] = useState(SIMULATION_CONFIG_DEFAULTS.excludeYouMingQuan)
   const [manualCore, setManualCore] = useState<SimulationCore>()
   const [mergeSameNameDamage, setMergeSameNameDamage] = useState(false)
 
@@ -49,7 +54,7 @@ export function useSimulation() {
         taXue,
         anJi,
       },
-      duration: isAutoMock ? 600 : toNumber(duration),
+      duration: isAutoMock ? AUTO_SIMULATION_DURATION : toNumber(duration),
       useRandom: isAutoMock ? false : useRandom,
     }
   }, [anJi, basicDamage, cards, coreAttribute, duration, isAutoMock, taXue, treasureLevel, useRandom])
@@ -74,7 +79,7 @@ export function useSimulation() {
       current.map((card, i) => {
         if (i === index) return { ...card, id: value }
         return card
-      })
+      }),
     )
   }
 
@@ -83,7 +88,7 @@ export function useSimulation() {
       current.map((card, i) => {
         if (i === index) return { ...card, level: toNumber(value) }
         return card
-      })
+      }),
     )
   }
 

@@ -1,12 +1,12 @@
 import type { Core } from '../core/Core'
-import { type TCardIds } from '../dataBase/dataBase'
+import type { CardId } from '@/domain/cards/cardIds'
 import { Card } from './Card'
 
 export class LiuWeiMoHu extends Card {
   private _lock: boolean = false
   private _damage: number
   constructor(core: Core, _: number) {
-    const id: TCardIds = 'liuWeiMoHu'
+    const id: CardId = 'liuWeiMoHu'
     const key = '六尾魔狐'
     super(core, id, key)
 

@@ -1,5 +1,5 @@
-﻿import type { Core } from '../core/Core'
-import type { TCardIds } from '../dataBase/dataBase'
+import type { Core } from '../core/Core'
+import type { CardId } from '@/domain/cards/cardIds'
 import { CoolDownTime } from '../utils/CoolDownTime'
 import { Card } from './Card'
 import { getCooldown } from '@/domain/rules/deriveStats'
@@ -9,7 +9,7 @@ export class HanBingJian extends Card {
   private _cdTime: number
 
   constructor(core: Core, level: number) {
-    const id: TCardIds = 'hanBingJian'
+    const id: CardId = 'hanBingJian'
     const key = '寒冰剑'
     super(core, id, key)
 

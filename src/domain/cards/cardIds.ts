@@ -28,6 +28,3 @@ export type ActiveCardId =
   | 'liuWeiMoHu'
 
 export type CardId = PassiveCardId | ActiveCardId
-
-export type TCardIds = CardId
-export type TCardIds1 = ActiveCardId

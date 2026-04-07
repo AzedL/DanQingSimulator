@@ -1,11 +1,11 @@
 import type { Core } from '../core/Core'
-import { type TCardIds } from '../dataBase/dataBase'
+import type { CardId } from '@/domain/cards/cardIds'
 import { Card } from './Card'
 
 export class GlobalBoost extends Card {
   private _boostValue: number
   constructor(core: Core) {
-    const id: TCardIds = 'xueDiXiong'
+    const id: CardId = 'xueDiXiong'
     const key = '雪地熊'
     super(core, id, key)
 

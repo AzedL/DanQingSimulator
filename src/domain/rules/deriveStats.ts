@@ -1,8 +1,8 @@
-﻿import type { CardOptions, CoreOptions } from '@/mock/core/Core'
+import type { CardOptions, CoreOptions } from '@/kernel/core/Core'
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import type { CardId } from '@/domain/cards/cardIds'
 import { cardParams, getScaledValue } from '@/domain/cards/cardParams'
-import { fixed } from '@/mock/utils/math'
+import { fixed } from '@/kernel/utils/math'
 
 interface Buffs {
   taXue?: boolean

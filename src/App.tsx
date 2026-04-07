@@ -11,11 +11,10 @@ import {
   chartOptionValues,
   tabValues,
   treasureLevelValues,
-  type ChartMetric,
-  type SimulatorTab,
 } from '@/domain/config/simulatorUi'
 import { useChartSeries } from '@/features/chart/useChartSeries'
 import { useOptimizer } from '@/features/optimizer/useOptimizer'
+import { APP_VIEW_DEFAULTS } from '@/domain/config/simulatorDefaults'
 import { useSimulation } from '@/features/simulator/useSimulation'
 
 function App() {
@@ -26,9 +25,9 @@ function App() {
     simulation.simulationConfig.excludeYouMingQuan,
   )
 
-  const [currentTabResult, setCurrentTabResult] = useState<SimulatorTab>('mock')
-  const [chartOptions, setChartOptions] = useState<ChartMetric>('dps')
-  const [currentKey, setCurrentKey] = useState('total')
+  const [currentTabResult, setCurrentTabResult] = useState(APP_VIEW_DEFAULTS.currentTabResult)
+  const [chartOptions, setChartOptions] = useState(APP_VIEW_DEFAULTS.chartOptions)
+  const [currentKey, setCurrentKey] = useState(APP_VIEW_DEFAULTS.currentKey)
 
   const currentCore = useMemo(() => {
     return currentTabResult === 'autoMock' ? optimizer.autoMockCores[optimizer.autoMockCurrent] : simulation.manualCore

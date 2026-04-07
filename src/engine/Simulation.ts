@@ -1,8 +1,8 @@
-import type { DPSDetail } from '@/mock/core/Damage'
-import type { CoreOptions } from '@/mock/core/Core'
-import { Core } from '@/mock/core/Core'
-import { fixed } from '@/mock/utils/math'
-import { split } from '@/mock/utils/key'
+import type { DPSDetail } from '@/kernel/core/Damage'
+import type { CoreOptions } from '@/kernel/core/Core'
+import { Core } from '@/kernel/core/Core'
+import { fixed } from '@/kernel/utils/math'
+import { split } from '@/kernel/utils/key'
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import { deriveCoreOptions, type MockOptions } from '@/domain/rules/deriveStats'
 

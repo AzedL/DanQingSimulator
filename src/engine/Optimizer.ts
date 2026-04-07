@@ -1,6 +1,6 @@
 import { AutoMock } from '@/autoMock/AutoMock'
 import type { CardId } from '@/domain/cards/cardIds'
-import { toNumber } from '@/mock/utils/math'
+import { toNumber } from '@/kernel/utils/math'
 import type { SimulationCore, SimulationMockOptions } from './Simulation'
 
 export interface AutoOptimizationResult {

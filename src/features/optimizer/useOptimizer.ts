@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import { runAutoOptimization } from '@/engine/Optimizer'
 import type { SimulationCore, SimulationMockOptions } from '@/engine/Simulation'
-import { fixed } from '@/mock/utils/math'
+import { fixed } from '@/kernel/utils/math'
 
 export function useOptimizer(options: SimulationMockOptions, costRemain: string, excludeYouMingQuan: boolean) {
   const [autoMockLength, setAutoMockLength] = useState(0)

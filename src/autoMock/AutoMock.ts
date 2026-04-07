@@ -1,9 +1,10 @@
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import type { CardId } from '@/domain/cards/cardIds'
 import { deriveSimulationCoreOptions, runSimulation, type SimulationCore, type SimulationMockOptions } from '@/engine/Simulation'
+import { AUTO_MOCK_MAX_COMBINATIONS, AUTO_MOCK_TOP_RESULT_COUNT } from '@/domain/config/simulatorDefaults'
 
 export class AutoMock {
-  private _MAX = 9999
+  private _MAX = AUTO_MOCK_MAX_COMBINATIONS
   private _options: SimulationMockOptions | null = null
   private _list: CardId[][] = []
   private _result: SimulationCore[] = []
@@ -52,7 +53,7 @@ export class AutoMock {
   }
 
   public getResult() {
-    return this._result.slice(0, 10)
+    return this._result.slice(0, AUTO_MOCK_TOP_RESULT_COUNT)
   }
 
   public getListLength() {

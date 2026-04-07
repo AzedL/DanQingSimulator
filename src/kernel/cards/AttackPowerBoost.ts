@@ -1,17 +1,17 @@
 import type { Core } from '../core/Core'
-import { type TCardIds } from '../dataBase/dataBase'
+import type { CardId } from '@/domain/cards/cardIds'
 import { Card } from './Card'
 
-export class AttributeBoost extends Card {
+export class AttackPowerBoost extends Card {
   private _boostValue: number
   constructor(core: Core) {
-    const id: TCardIds = 'xiaoHuan'
-    const key = '属性增益(海龟/小环/风筝)'
+    const id: CardId = 'zhouYiXian'
+    const key = '攻击力增益(周一仙/猛虎/仙人布幡)'
     super(core, id, key)
 
     const basicDamage = this._core.coreOptions.basicDamage
-    const { attackPowerBoostValue, attributeBoostValue } = this._core.options
-    this._boostValue = (attributeBoostValue - 1) * basicDamage * attackPowerBoostValue
+    const { attackPowerBoostValue } = this._core.options
+    this._boostValue = (attackPowerBoostValue - 1) * basicDamage
   }
 
   action() {

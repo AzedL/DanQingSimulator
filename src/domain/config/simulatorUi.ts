@@ -21,8 +21,8 @@ export const cardLevelValues = Array.from({ length: 7 }).map((_, i) => {
 })
 
 export const tabValues: { value: SimulatorTab; label: string }[] = [
-  { label: lang.mock, value: 'mock' },
   { label: lang.autoMock, value: 'autoMock' },
+  { label: lang.mock, value: 'mock' },
 ]
 
 export const chartOptionValues: { value: ChartMetric; label: string }[] = [

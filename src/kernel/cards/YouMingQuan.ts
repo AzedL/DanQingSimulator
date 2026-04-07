@@ -1,18 +1,18 @@
-﻿import type { Core } from '../core/Core'
-import type { TCardIds } from '../dataBase/dataBase'
+import type { Core } from '../core/Core'
+import type { CardId } from '@/domain/cards/cardIds'
 import { CoolDownTime } from '../utils/CoolDownTime'
 import { Card } from './Card'
 import { getCooldown } from '@/domain/rules/deriveStats'
 
-export class ZheShan extends Card {
+export class YouMingQuan extends Card {
   private _cd: CoolDownTime
 
-  constructor(core: Core, _: number) {
-    const id: TCardIds = 'zheShan'
-    const key = '折扇'
+  constructor(core: Core, level: number) {
+    const id: CardId = 'youMingQuan'
+    const key = '幽冥犬'
     super(core, id, key)
 
-    this._cd = new CoolDownTime(getCooldown(id, 0))
+    this._cd = new CoolDownTime(getCooldown(id, level), true)
   }
 
   action() {
@@ -23,7 +23,7 @@ export class ZheShan extends Card {
   }
 
   settle() {
-    this._core.pulse.add(1, this._key)
+    this._core.fire.add(1)
   }
 
   reset() {

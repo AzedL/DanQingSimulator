@@ -1,12 +1,12 @@
 import type { Core } from '../core/Core'
-import type { TCardIds } from '../dataBase/dataBase'
+import type { CardId } from '@/domain/cards/cardIds'
 
 export abstract class Card {
-  _id: TCardIds
+  _id: CardId
   _key: string
   _core: Core
 
-  constructor(core: Core, id: TCardIds, key: string) {
+  constructor(core: Core, id: CardId, key: string) {
     this._id = id
     this._key = key
     this._core = core
