@@ -1,4 +1,4 @@
-import { dataBase } from '../dataBase/dataBase'
+﻿import { cardParams } from '@/domain/cards/cardParams'
 import { CoolDownTime } from '../utils/CoolDownTime'
 import { min } from '../utils/math'
 import { handleProbability } from '../utils/probability'
@@ -22,15 +22,14 @@ export class Fire {
     this._damage = core.options.fireDamage
     this._linFengValue = core.options.linFengValueFire
     this._erWeiDamage = core.options.erWeiDamage
-
-    const data = dataBase['xingHongJuYi']
-    this._maxCount = data.values[3]
+    this._maxCount = cardParams.xingHongJuYi.maxCount
     this._cd = new CoolDownTime(3)
   }
 
   public get count() {
     return this._count
   }
+
   public get countList() {
     return this._countList
   }
@@ -39,20 +38,22 @@ export class Fire {
     this._count = min(this._count + count, this._maxCount)
     this.handleErWei(count)
   }
+
   private handleLinFeng(count: number) {
     if (!this._linFengValue) return
 
     const useRandom = this._core.coreOptions.useRandom
     const c = handleProbability(this._linFengValue, useRandom, count)
-
     this._add(c)
   }
+
   private handleErWei(count: number) {
     if (!this._erWeiDamage) return
 
     const key = '引燃'
     this._core.dps.add(this._erWeiDamage * count, count, key)
   }
+
   public add(count: number) {
     this._add(count)
     this.handleLinFeng(count)

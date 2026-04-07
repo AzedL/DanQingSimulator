@@ -1,18 +1,18 @@
-import type { Core } from '../core/Core'
-import { dataBase, type TCardIds } from '../dataBase/dataBase'
+﻿import type { Core } from '../core/Core'
+import type { TCardIds } from '../dataBase/dataBase'
 import { CoolDownTime } from '../utils/CoolDownTime'
 import { Card } from './Card'
+import { getCooldown } from '@/domain/rules/deriveStats'
 
 export class XingHongJuYi extends Card {
   private _cd: CoolDownTime
+
   constructor(core: Core, _: number) {
     const id: TCardIds = 'xingHongJuYi'
     const key = '猩红巨蚁'
-    const data = dataBase[id]
     super(core, id, key)
 
-    const cd = data.values[2]
-    this._cd = new CoolDownTime(cd, true)
+    this._cd = new CoolDownTime(getCooldown(id, 0), true)
   }
 
   action() {

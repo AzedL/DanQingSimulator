@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+﻿import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface Props<T> {
   value: T
@@ -6,7 +6,7 @@ interface Props<T> {
   list: { value: T; label: string }[]
 }
 
-const MyTabs = <T extends string>({ value, onChange, list }: Props<T>) => {
+export default function TabsField<T extends string>({ value, onChange, list }: Props<T>) {
   return (
     <div className="flex w-full max-w-sm flex-col gap-6">
       <Tabs value={value} onValueChange={(v) => onChange(v as T)}>
@@ -23,5 +23,3 @@ const MyTabs = <T extends string>({ value, onChange, list }: Props<T>) => {
     </div>
   )
 }
-
-export default MyTabs

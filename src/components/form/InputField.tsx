@@ -1,7 +1,7 @@
+﻿import { useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { useEffect, useRef } from 'react'
 
 interface Props {
   value: string
@@ -15,8 +15,19 @@ interface Props {
   minWidth?: number
 }
 
-const MyInput = ({ value, onChange, label, tip, placeholder, type, width, maxWidth, minWidth }: Props) => {
+export default function InputField({
+  value,
+  onChange,
+  label,
+  tip,
+  placeholder,
+  type,
+  width,
+  maxWidth,
+  minWidth,
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     const inputEl = inputRef.current
     if (!inputEl) return
@@ -28,9 +39,7 @@ const MyInput = ({ value, onChange, label, tip, placeholder, type, width, maxWid
     inputEl.addEventListener('wheel', handleWheel, { passive: false })
 
     return () => {
-      if (inputEl) {
-        inputEl.removeEventListener('wheel', handleWheel)
-      }
+      inputEl.removeEventListener('wheel', handleWheel)
     }
   }, [])
 
@@ -46,9 +55,9 @@ const MyInput = ({ value, onChange, label, tip, placeholder, type, width, maxWid
         ref={inputRef}
         className={cn(
           'w-full',
-          width && `w-[${width}px]`,
-          maxWidth && `max-w-[${maxWidth}px]`,
-          minWidth && `min-w-[${minWidth}px]`
+          width && 'w-[' + width + 'px]',
+          maxWidth && 'max-w-[' + maxWidth + 'px]',
+          minWidth && 'min-w-[' + minWidth + 'px]'
         )}
         type={type}
         placeholder={placeholder}
@@ -58,5 +67,3 @@ const MyInput = ({ value, onChange, label, tip, placeholder, type, width, maxWid
     </div>
   )
 }
-
-export default MyInput

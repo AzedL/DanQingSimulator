@@ -1,17 +1,15 @@
-import { mock, normalizeOption } from '../mock'
-import type { Core } from '../mock/core/Core'
-import { dataBase, type TCardIds } from '../mock/dataBase/dataBase'
-import type { MockOptions } from '../mock/utils/normalizeMockOptions'
+import { cardCatalog } from '@/domain/cards/cardCatalog'
+import type { CardId } from '@/domain/cards/cardIds'
+import { deriveSimulationCoreOptions, runSimulation, type SimulationCore, type SimulationMockOptions } from '@/engine/Simulation'
 
 export class AutoMock {
   private _MAX = 9999
-  private _options: MockOptions | null = null
-  private _list: TCardIds[][] = []
-  private _result: Core[] = []
+  private _options: SimulationMockOptions | null = null
+  private _list: CardId[][] = []
+  private _result: SimulationCore[] = []
   private _executed = false
-  constructor() {}
 
-  public getCardsCombo(totalCost: number, options: MockOptions, excludes: TCardIds[] = []) {
+  public getCardsCombo(totalCost: number, options: SimulationMockOptions, excludes: CardId[] = []) {
     this.reset()
 
     const exist = options.cards.map((card) => card.id)
@@ -60,6 +58,7 @@ export class AutoMock {
   public getListLength() {
     return this._list.length
   }
+
   public isOverMax() {
     return this._list.length > this._MAX
   }
@@ -72,32 +71,30 @@ export class AutoMock {
   }
 }
 
-const getOptionByCardsCombo = (cardsCombo: TCardIds[], options: MockOptions): MockOptions => {
+const getOptionByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions): SimulationMockOptions => {
   const cards = cardsCombo.map((cardId) => ({ id: cardId, level: 6 }))
   const newCards = [...options.cards, ...cards]
   return { ...options, cards: newCards }
 }
-const mockByCardsCombo = (cardsCombo: TCardIds[], options: MockOptions) => {
-  const mockOptions = normalizeOption(getOptionByCardsCombo(cardsCombo, options))
-  return mock(mockOptions)
+
+const mockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions) => {
+  const coreOptions = deriveSimulationCoreOptions(getOptionByCardsCombo(cardsCombo, options))
+  return runSimulation(coreOptions).core
 }
 
-const getCardsComboByCost = (totalCost: number, excludes: TCardIds[]) => {
+const getCardsComboByCost = (totalCost: number, excludes: CardId[]) => {
   if (totalCost <= 0) return []
 
   const data = getData(excludes)
   return getComboByCost(data, totalCost)
 }
-const getData = (excludes: TCardIds[]) => {
-  const data: { id: TCardIds; cost: number }[] = []
-  for (let id in dataBase) {
-    if (excludes.includes(id as TCardIds)) continue
 
-    const card = dataBase[id as TCardIds]
-    data.push({ id: card.id, cost: card.cost })
-  }
-  return data
+const getData = (excludes: CardId[]) => {
+  return Object.values(cardCatalog)
+    .filter((card) => !excludes.includes(card.id))
+    .map((card) => ({ id: card.id, cost: card.cost }))
 }
+
 function getComboByCost<T>(data: { id: T; cost: number }[], totalCost: number) {
   const result: T[][] = []
   const n = data.length
@@ -120,16 +117,13 @@ function getComboByCost<T>(data: { id: T; cost: number }[], totalCost: number) {
 
       if (currentSum + item.cost <= totalCost) {
         currentIds.push(item.id)
-
         backtrack(i + 1, currentSum + item.cost, currentIds)
-
         currentIds.pop()
       }
     }
   }
 
   data.sort((a, b) => a.cost - b.cost)
-
   backtrack(0, 0, [])
 
   return result
