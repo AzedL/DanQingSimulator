@@ -29,8 +29,8 @@ export interface AppViewDefaults {
 }
 
 export const AUTO_SIMULATION_DURATION = 600
-export const AUTO_MOCK_MAX_COMBINATIONS = 9999
-export const AUTO_MOCK_TOP_RESULT_COUNT = 10
+export const AUTO_MOCK_MAX_COMBINATIONS = 29999
+export const AUTO_MOCK_TOP_RESULT_COUNT = 20
 
 export const BASIC_CONFIG_DEFAULTS: BasicConfigDefaults = {
   coreAttribute: '50000',
@@ -50,7 +50,7 @@ export const SIMULATION_CONFIG_DEFAULTS: SimulationConfigDefaults = {
   currentTab: 'autoMock',
   duration: '600',
   useRandom: false,
-  costRemain: '0',
+  costRemain: '14',
   excludeYouMingQuan: true,
 }
 

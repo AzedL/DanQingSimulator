@@ -1,24 +1,27 @@
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import type { CardId } from '@/domain/cards/cardIds'
-import { deriveSimulationCoreOptions, runSimulation, type SimulationCore, type SimulationMockOptions } from '@/engine/Simulation'
+import {
+  deriveSimulationCoreOptions,
+  runSimulation,
+  type SimulationCore,
+  type SimulationMockOptions,
+} from '@/engine/Simulation'
 import { AUTO_MOCK_MAX_COMBINATIONS, AUTO_MOCK_TOP_RESULT_COUNT } from '@/domain/config/simulatorDefaults'
 
 export class AutoMock {
   private _MAX = AUTO_MOCK_MAX_COMBINATIONS
-  private _options: SimulationMockOptions | null = null
-  private _list: CardId[][] = []
+  private _options: SimulationMockOptions
+  private _data: { id: CardId; cost: number }[] = []
+  private _totalCost = 0
+  private _comboCount = 0
   private _result: SimulationCore[] = []
   private _executed = false
 
-  public getCardsCombo(totalCost: number, options: SimulationMockOptions, excludes: CardId[] = []) {
-    this.reset()
-
-    const exist = options.cards.map((card) => card.id)
-    const list = getCardsComboByCost(totalCost, [...exist, ...excludes])
+  constructor(totalCost: number, options: SimulationMockOptions, excludes: CardId[] = []) {
     this._options = options
-    this._list = list
-
-    return list.length
+    this._totalCost = totalCost
+    this._data = getData([...options.cards.map((card) => card.id), ...excludes])
+    this._comboCount = countCardsComboByCost(totalCost, this._data)
   }
 
   public exec() {
@@ -26,26 +29,23 @@ export class AutoMock {
       return this.getResult()
     }
 
-    const options = this._options
-    if (!options) {
-      return []
-    }
-
-    let list = this._list
-    if (!list.length) {
-      list = [[]]
-    }
-
-    if (list.length > this._MAX) {
+    if (this._comboCount > this._MAX) {
       console.log('超出上限')
-      list = [[]]
+      this._result = [mockByCardsCombo([], this._options)]
+      this._executed = true
+      return this.getResult()
     }
 
-    const result = list
-      .map((cardsCombo) => {
-        return mockByCardsCombo(cardsCombo, options)
-      })
-      .sort((a, b) => b.dps.getDPS() - a.dps.getDPS())
+    const result: SimulationCore[] = []
+    let hasCombo = false
+    iterateCardsComboByCost(this._totalCost, this._data, (cardsCombo) => {
+      hasCombo = true
+      pushTopResult(result, mockByCardsCombo(cardsCombo, this._options), AUTO_MOCK_TOP_RESULT_COUNT)
+    })
+
+    if (!hasCombo) {
+      result.push(mockByCardsCombo([], this._options))
+    }
 
     this._executed = true
     this._result = result
@@ -53,22 +53,15 @@ export class AutoMock {
   }
 
   public getResult() {
-    return this._result.slice(0, AUTO_MOCK_TOP_RESULT_COUNT)
+    return this._result
   }
 
-  public getListLength() {
-    return this._list.length
+  public getLength() {
+    return this._comboCount
   }
 
   public isOverMax() {
-    return this._list.length > this._MAX
-  }
-
-  public reset() {
-    this._options = null
-    this._list = []
-    this._result = []
-    this._executed = false
+    return this._comboCount > this._MAX
   }
 }
 
@@ -83,49 +76,65 @@ const mockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions) 
   return runSimulation(coreOptions).core
 }
 
-const getCardsComboByCost = (totalCost: number, excludes: CardId[]) => {
-  if (totalCost <= 0) return []
-
-  const data = getData(excludes)
-  return getComboByCost(data, totalCost)
-}
-
 const getData = (excludes: CardId[]) => {
   return Object.values(cardCatalog)
     .filter((card) => !excludes.includes(card.id))
     .map((card) => ({ id: card.id, cost: card.cost }))
 }
 
-function getComboByCost<T>(data: { id: T; cost: number }[], totalCost: number) {
-  const result: T[][] = []
-  const n = data.length
+function countCardsComboByCost<T>(totalCost: number, data: { id: T; cost: number }[]) {
+  let count = 0
+  iterateComboByCost(data, totalCost, () => {
+    count++
+  })
+  return count
+}
+
+function iterateCardsComboByCost<T>(totalCost: number, data: { id: T; cost: number }[], onCombo: (combo: T[]) => void) {
+  iterateComboByCost(data, totalCost, onCombo)
+}
+
+function iterateComboByCost<T>(data: { id: T; cost: number }[], totalCost: number, onCombo: (combo: T[]) => void) {
+  if (totalCost <= 0) return
+
+  const sortedData = [...data].sort((a, b) => a.cost - b.cost)
+  const n = sortedData.length
 
   function backtrack(start: number, currentSum: number, currentIds: T[]) {
     if (currentSum === totalCost) {
-      result.push([...currentIds])
-      return
-    }
-
-    if (currentSum > totalCost || start >= n) {
+      onCombo([...currentIds])
       return
     }
 
     for (let i = start; i < n; i++) {
-      const item = data[i]
-      if (currentIds.includes(item.id)) {
-        continue
+      const item = sortedData[i]
+      const nextSum = currentSum + item.cost
+      if (nextSum > totalCost) {
+        break
       }
 
-      if (currentSum + item.cost <= totalCost) {
-        currentIds.push(item.id)
-        backtrack(i + 1, currentSum + item.cost, currentIds)
-        currentIds.pop()
-      }
+      currentIds.push(item.id)
+      backtrack(i + 1, nextSum, currentIds)
+      currentIds.pop()
     }
   }
 
-  data.sort((a, b) => a.cost - b.cost)
   backtrack(0, 0, [])
+}
 
-  return result
+function pushTopResult(result: SimulationCore[], candidate: SimulationCore, limit: number) {
+  const candidateDps = candidate.dps.getDPS()
+  if (result.length >= limit && candidateDps <= result[result.length - 1].dps.getDPS()) {
+    return
+  }
+
+  let index = 0
+  while (index < result.length && result[index].dps.getDPS() >= candidateDps) {
+    index++
+  }
+
+  result.splice(index, 0, candidate)
+  if (result.length > limit) {
+    result.pop()
+  }
 }
