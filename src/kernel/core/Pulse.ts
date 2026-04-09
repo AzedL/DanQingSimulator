@@ -1,4 +1,5 @@
 import { join } from '../utils/key'
+import { min } from '../utils/math'
 import { handleProbability } from '../utils/probability'
 import type { Core } from './Core'
 
@@ -7,6 +8,10 @@ export class Pulse {
   private _core: Core
   private _damage: number = 0
 
+  private _liuHeJingValue = 0
+  private _liuHeJingChance = 0
+  private _liuHeJingCurrent = 0
+  private _liuHeJingLocked = false
   private _shenMuTouDamage = 0
   private _suiShouValue = 0
 
@@ -17,6 +22,8 @@ export class Pulse {
   constructor(core: Core) {
     this._core = core
     this._damage = core.options.pulseDamage
+    this._liuHeJingValue = core.options.liuHeJingValue
+    this._liuHeJingChance = core.options.liuHeJingChance
     this._shenMuTouDamage = core.options.shenMuTouDamage
     this._suiShouValue = core.options.suiShouValue
 
@@ -57,11 +64,40 @@ export class Pulse {
 
     this._core.fire.add(c * 3)
   }
+  private handleLiuHeJing(count: number) {
+    if (!this._liuHeJingValue || !this._liuHeJingChance || this._liuHeJingCurrent >= 1) return
+
+    const useRandom = this._core.coreOptions.useRandom
+    if (useRandom) {
+      const c = handleProbability(this._liuHeJingChance, useRandom, count)
+      this._liuHeJingCurrent = min(this._liuHeJingCurrent + c, 1)
+    } else {
+      const c = 1 - (1 - this._liuHeJingChance) ** count
+      this._liuHeJingCurrent = min(1 - (1 - this._liuHeJingCurrent) * (1 - c), 1)
+    }
+
+    if (this._liuHeJingLocked) return
+    this._liuHeJingLocked = true
+
+    const key = '脉冲回响'
+    const damage = this._damage * this._liuHeJingValue
+    ;[1, 2, 3, 4, 5, 6].forEach((delay) => {
+      this._core.queue.enqueue(() => {
+        const _damage = damage * this._liuHeJingCurrent
+        this._core.dps.add(_damage, 1, key)
+        if (delay === 6) {
+          this._liuHeJingCurrent = 0
+          this._liuHeJingLocked = false
+        }
+      }, delay)
+    })
+  }
   public add(count: number, ...rest: string[]) {
     const key = join(...rest)
     this._add(count, key)
     this.handleShenMuTou(count)
     this.handleSuiShou(count)
+    this.handleLiuHeJing(count)
   }
 
   public settle() {
@@ -86,6 +122,8 @@ export class Pulse {
     this._lastCountMap = {}
     this._countMap = {}
     this._countMapList = []
+    this._liuHeJingCurrent = 0
+    this._liuHeJingLocked = false
 
     this.addPulseByShenMuTou()
   }

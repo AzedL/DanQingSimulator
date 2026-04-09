@@ -10,6 +10,7 @@ export class Ice {
 
   private _linFengValue = 0
   private _shangGuanCeValue = 0
+  private _zhengDaLiValue = 0
 
   private _lastCountMap: Record<string, number> = {}
   private _countMap: Record<string, number> = {}
@@ -20,6 +21,7 @@ export class Ice {
     this._damage = core.options.iceDamage
     this._linFengValue = core.options.linFengValueIce
     this._shangGuanCeValue = core.options.shangGuanCeValue
+    this._zhengDaLiValue = core.options.zhengDaLiValue
   }
 
   private _add(count: number, key: string) {
@@ -85,8 +87,17 @@ export class Ice {
     this._countMapList.push({ ...this._countMap, total })
   }
 
+  public settleZhengDaLiDamage(damage: number, count: number, key: string) {
+    if (!this._zhengDaLiValue) return
+
+    const keyZhengDaLi = '碎裂'
+    this._core.dps.add(damage * this._zhengDaLiValue, count, keyZhengDaLi, key)
+  }
+
   private settleDamage(count: number, key: string) {
-    this._core.dps.add(this._damage * count, count, this._key, key)
+    const damage = this._damage * count
+    this._core.dps.add(damage, count, this._key, key)
+    this.settleZhengDaLiDamage(damage, count, this._key)
   }
 
   public reset() {

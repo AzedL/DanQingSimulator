@@ -1,7 +1,7 @@
 import type { CardOptions, CoreOptions } from '@/kernel/core/Core'
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import type { CardId } from '@/domain/cards/cardIds'
-import { cardParams, getScaledValue } from '@/domain/cards/cardParams'
+import { cardParams, getChanceValue, getScaledValue } from '@/domain/cards/cardParams'
 import { fixed } from '@/kernel/utils/math'
 
 interface Buffs {
@@ -23,6 +23,11 @@ export interface Options {
   attackPowerBoostValue: number
   attributeBoostValue: number
   globalBoostValue: number
+  huoFuValue: number
+  gongJianValue: number
+  zhengDaLiValue: number
+  liuHeJingValue: number
+  liuHeJingChance: number
   zuoGuiValue: number
   iceDamage: number
   pulseDamage: number
@@ -74,9 +79,14 @@ export function getOptions(coreOptions: CoreOptions): Options {
   const attributeBoostValue = fixed(getAttributeBoostValue(coreOptions), 4)
   const globalBoostValue = fixed(getGlobalBoostValue(coreOptions), 4)
 
+  const huoFuValue = fixed(getPassiveValue(coreOptions, 'huoFu'))
+  const gongJianValue = fixed(getPassiveValue(coreOptions, 'gongJian'))
+  const zhengDaLiValue = fixed(getPassiveValue(coreOptions, 'zhengDaLi'))
+  const liuHeJingValue = fixed(getPassiveValue(coreOptions, 'liuHeJing'))
+  const liuHeJingChance = fixed(getChanceValue('liuHeJing'))
   const zuoGuiValue = fixed(getPassiveValue(coreOptions, 'zuoGui'))
   const iceDamage = fixed(getLegacyBaseDamageRatio(coreOptions, 'yanHong') * (1 + zuoGuiValue))
-  const pulseDamage = fixed(getLegacyBaseDamageRatio(coreOptions, 'zheShan') * (1 + zuoGuiValue))
+  const pulseDamage = fixed(getLegacyBaseDamageRatio(coreOptions, 'zheShan') * (1 + zuoGuiValue) * (1 + gongJianValue))
   const fireDamage = fixed(getLegacyBaseDamageRatio(coreOptions, 'xingHongJuYi') * (1 + zuoGuiValue))
   const erWeiDamage = fixed(getDamageRatio(coreOptions, 'erWeiYaoHu'))
   const shenMuTouDamage = fixed(getDamageRatio(coreOptions, 'shenMuTou'))
@@ -90,6 +100,11 @@ export function getOptions(coreOptions: CoreOptions): Options {
     attackPowerBoostValue,
     attributeBoostValue,
     globalBoostValue,
+    huoFuValue,
+    gongJianValue,
+    zhengDaLiValue,
+    liuHeJingValue,
+    liuHeJingChance,
     zuoGuiValue,
     iceDamage,
     pulseDamage,

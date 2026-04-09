@@ -40,7 +40,9 @@ export class QiHao extends Card {
     const key = '玄冰风暴'
     ;[1, 2].forEach((delay) => {
       this._core.queue.enqueue(() => {
-        this._core.dps.add(this._damage / 2, 10, key)
+        const damage = this._damage / 2
+        this._core.dps.add(damage, 10, key)
+        this._core.ice.settleZhengDaLiDamage(damage, 10, key)
       }, delay)
     })
   }

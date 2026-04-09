@@ -9,6 +9,7 @@ export class Fire {
   private _core: Core
   private _damage: number = 0
 
+  private _huoFuValue = 0
   private _linFengValue = 0
   private _erWeiDamage = 0
 
@@ -20,6 +21,7 @@ export class Fire {
   constructor(core: Core) {
     this._core = core
     this._damage = core.options.fireDamage
+    this._huoFuValue = core.options.huoFuValue
     this._linFengValue = core.options.linFengValueFire
     this._erWeiDamage = core.options.erWeiDamage
     this._maxCount = cardParams.xingHongJuYi.maxCount
@@ -70,7 +72,7 @@ export class Fire {
     const isReady = this._cd.settle()
     if (isReady) this.settleDamage()
 
-    this._cd.tick()
+    this._cd.tick(1 + this._huoFuValue)
   }
 
   private settleDamage() {

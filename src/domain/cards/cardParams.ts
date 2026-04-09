@@ -6,10 +6,14 @@ interface Scale2 {
 }
 
 export interface CardParams {
+  huoFu: Scale2
   erWeiYaoHu: Scale2
   shenMuTou: Scale2
+  liuHeJing: { chance: number } & Scale2
   linFeng: Scale2
   shangGuanCe: Scale2
+  zhengDaLi: Scale2
+  gongJian: Scale2
   suiShou: Scale2
   zuoGui: Scale2
   yanHong: Scale2 & { cooldown: number }
@@ -31,10 +35,14 @@ export interface CardParams {
 }
 
 export const cardParams: CardParams = {
+  huoFu: { base: 0.4, perLevel: 0.1 },
   erWeiYaoHu: { base: 0.28, perLevel: 0.02 },
   shenMuTou: { base: 0.7, perLevel: 0.05 },
+  liuHeJing: { chance: 0.5, base: 1.4, perLevel: 0.1 },
   linFeng: { base: 0.7, perLevel: 0.05 },
   shangGuanCe: { base: 0.38, perLevel: 0.02 },
+  zhengDaLi: { base: 0.19, perLevel: 0.01 },
+  gongJian: { base: 0.35, perLevel: 0.025 },
   suiShou: { base: 0.7, perLevel: 0.05 },
   zuoGui: { base: 0.28, perLevel: 0.02 },
   yanHong: { base: 0.28, perLevel: 0.02, cooldown: 6 },
@@ -60,5 +68,11 @@ export function getScaledValue(cardId: CardId, level: number) {
   if ('base' in params && 'perLevel' in params) {
     return params.base + params.perLevel * level
   }
+  return 0
+}
+
+export function getChanceValue(cardId: CardId) {
+  const params = cardParams[cardId]
+  if ('chance' in params) return params.chance
   return 0
 }

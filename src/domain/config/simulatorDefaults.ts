@@ -28,13 +28,13 @@ export interface AppViewDefaults {
   currentKey: string
 }
 
-export const AUTO_SIMULATION_DURATION = 600
-export const AUTO_MOCK_MAX_COMBINATIONS = 29999
+export const AUTO_SIMULATION_DURATION = 300
+export const AUTO_MOCK_MAX_COMBINATIONS = 49999
 export const AUTO_MOCK_TOP_RESULT_COUNT = 20
 
 export const BASIC_CONFIG_DEFAULTS: BasicConfigDefaults = {
-  coreAttribute: '50000',
-  basicDamage: '80000',
+  coreAttribute: '60000',
+  basicDamage: '100000',
   treasureLevel: '10',
   taXue: false,
   anJi: false,
