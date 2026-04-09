@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { cardCatalog } from '@/domain/cards/cardCatalog'
-import { runAutoOptimization } from '@/engine/Optimizer'
+import { runAutoMock } from '@/engine/autoMock'
 import type { SimulationCore, SimulationMockOptions } from '@/engine/Simulation'
 import { fixed } from '@/kernel/utils/math'
 
-export function useOptimizer(options: SimulationMockOptions, costRemain: string, excludeYouMingQuan: boolean) {
+export function useAutoMock(options: SimulationMockOptions, costRemain: string, excludeYouMingQuan: boolean) {
   const [autoMockLength, setAutoMockLength] = useState(0)
   const [autoMockLengthOverflow, setAutoMockLengthOverflow] = useState(false)
   const [autoMockCurrent, setAutoMockCurrent] = useState(0)
@@ -20,7 +20,7 @@ export function useOptimizer(options: SimulationMockOptions, costRemain: string,
   }, [autoMockCores])
 
   function execAutoMock() {
-    const result = runAutoOptimization(options, costRemain, excludeYouMingQuan)
+    const result = runAutoMock(options, costRemain, excludeYouMingQuan)
 
     setAutoMockLength(result.length)
     setAutoMockLengthOverflow(result.overflow)

@@ -1,5 +1,5 @@
 ﻿import { cardParams } from '@/domain/cards/cardParams'
-import { CoolDownTime } from '../utils/CoolDownTime'
+import { CooldownTime } from '../utils/CooldownTime'
 import { min } from '../utils/math'
 import { handleProbability } from '../utils/probability'
 import type { Core } from './Core'
@@ -15,7 +15,7 @@ export class Fire {
   private _count = 0
   private _countList: number[] = []
   private _maxCount = 12
-  private _cd: CoolDownTime
+  private _cd: CooldownTime
 
   constructor(core: Core) {
     this._core = core
@@ -23,7 +23,7 @@ export class Fire {
     this._linFengValue = core.options.linFengValueFire
     this._erWeiDamage = core.options.erWeiDamage
     this._maxCount = cardParams.xingHongJuYi.maxCount
-    this._cd = new CoolDownTime(3)
+    this._cd = new CooldownTime(3)
   }
 
   public get count() {

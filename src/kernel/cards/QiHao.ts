@@ -1,11 +1,11 @@
 import type { Core } from '../core/Core'
 import type { CardId } from '@/domain/cards/cardIds'
-import { CoolDownTime } from '../utils/CoolDownTime'
+import { CooldownTime } from '../utils/CooldownTime'
 import { Card } from './Card'
 import { getCooldown } from '@/domain/rules/deriveStats'
 
 export class QiHao extends Card {
-  private _cd: CoolDownTime
+  private _cd: CooldownTime
   private _cdTime: number
   private _damage: number
 
@@ -16,7 +16,7 @@ export class QiHao extends Card {
 
     this._damage = this._core.options.qiHaoDamage
     this._cdTime = getCooldown(id, 0)
-    this._cd = new CoolDownTime(this._cdTime, true)
+    this._cd = new CooldownTime(this._cdTime, true)
   }
 
   action() {

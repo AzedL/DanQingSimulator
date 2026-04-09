@@ -13,13 +13,13 @@ import {
   treasureLevelValues,
 } from '@/domain/config/simulatorUi'
 import { useChartSeries } from '@/features/chart/useChartSeries'
-import { useOptimizer } from '@/features/optimizer/useOptimizer'
+import { useAutoMock } from '@/features/autoMock/useAutoMock'
 import { APP_VIEW_DEFAULTS } from '@/domain/config/simulatorDefaults'
 import { useSimulation } from '@/features/simulator/useSimulation'
 
 function App() {
   const simulation = useSimulation()
-  const optimizer = useOptimizer(
+  const autoMock = useAutoMock(
     simulation.options,
     simulation.simulationConfig.costRemain,
     simulation.simulationConfig.excludeYouMingQuan,
@@ -30,14 +30,14 @@ function App() {
   const [currentKey, setCurrentKey] = useState(APP_VIEW_DEFAULTS.currentKey)
 
   const currentCore = useMemo(() => {
-    return currentTabResult === 'autoMock' ? optimizer.autoMockCores[optimizer.autoMockCurrent] : simulation.manualCore
-  }, [currentTabResult, optimizer.autoMockCores, optimizer.autoMockCurrent, simulation.manualCore])
+    return currentTabResult === 'autoMock' ? autoMock.autoMockCores[autoMock.autoMockCurrent] : simulation.manualCore
+  }, [currentTabResult, autoMock.autoMockCores, autoMock.autoMockCurrent, simulation.manualCore])
 
   const { keys, chartData } = useChartSeries(currentCore, chartOptions, currentKey)
 
   function handleExecute() {
     if (simulation.simulationConfig.isAutoMock) {
-      optimizer.execAutoMock()
+      autoMock.execAutoMock()
       setCurrentTabResult('autoMock')
       return
     }
@@ -88,11 +88,11 @@ function App() {
         mergeSameNameDamage={simulation.mergeSameNameDamage}
         setMergeSameNameDamage={simulation.setMergeSameNameDamage}
         mockResult={simulation.mockResult}
-        autoMockLength={optimizer.autoMockLength}
-        autoMockLengthOverflow={optimizer.autoMockLengthOverflow}
-        autoMockCurrent={optimizer.autoMockCurrent}
-        setAutoMockCurrent={optimizer.setAutoMockCurrent}
-        autoMockResult={optimizer.autoMockResult}
+        autoMockLength={autoMock.autoMockLength}
+        autoMockLengthOverflow={autoMock.autoMockLengthOverflow}
+        autoMockCurrent={autoMock.autoMockCurrent}
+        setAutoMockCurrent={autoMock.setAutoMockCurrent}
+        autoMockResult={autoMock.autoMockResult}
       />
 
       <ChartPanel

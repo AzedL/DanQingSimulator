@@ -1,4 +1,4 @@
-export class CoolDownTime {
+export class CooldownTime {
   private _currentTime: number
   private _time: number
   private _isReady: boolean = false

@@ -3,17 +3,17 @@ import type { CardId } from '@/domain/cards/cardIds'
 import { toNumber } from '@/kernel/utils/math'
 import type { SimulationCore, SimulationMockOptions } from './Simulation'
 
-export interface AutoOptimizationResult {
+export interface AutoMockResult {
   length: number
   overflow: boolean
   cores: SimulationCore[]
 }
 
-export function runAutoOptimization(
+export function runAutoMock(
   options: SimulationMockOptions,
   costRemain: string,
   excludeYouMingQuan: boolean,
-): AutoOptimizationResult {
+): AutoMockResult {
   const autoMockCost = toNumber(costRemain)
   const exclude: CardId[] = excludeYouMingQuan ? ['youMingQuan'] : []
   const autoMock = new AutoMock(autoMockCost, options, exclude)

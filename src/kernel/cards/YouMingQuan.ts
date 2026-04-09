@@ -1,18 +1,18 @@
 import type { Core } from '../core/Core'
 import type { CardId } from '@/domain/cards/cardIds'
-import { CoolDownTime } from '../utils/CoolDownTime'
+import { CooldownTime } from '../utils/CooldownTime'
 import { Card } from './Card'
 import { getCooldown } from '@/domain/rules/deriveStats'
 
 export class YouMingQuan extends Card {
-  private _cd: CoolDownTime
+  private _cd: CooldownTime
 
   constructor(core: Core, level: number) {
     const id: CardId = 'youMingQuan'
     const key = '幽冥犬'
     super(core, id, key)
 
-    this._cd = new CoolDownTime(getCooldown(id, level), true)
+    this._cd = new CooldownTime(getCooldown(id, level), true)
   }
 
   action() {

@@ -1,11 +1,11 @@
 import type { Core } from '../core/Core'
 import type { CardId } from '@/domain/cards/cardIds'
-import { CoolDownTime } from '../utils/CoolDownTime'
+import { CooldownTime } from '../utils/CooldownTime'
 import { Card } from './Card'
 import { getCooldown } from '@/domain/rules/deriveStats'
 
 export class HanBingJian extends Card {
-  private _cd: CoolDownTime
+  private _cd: CooldownTime
   private _cdTime: number
 
   constructor(core: Core, level: number) {
@@ -14,7 +14,7 @@ export class HanBingJian extends Card {
     super(core, id, key)
 
     this._cdTime = getCooldown(id, level)
-    this._cd = new CoolDownTime(this._cdTime, false, 0)
+    this._cd = new CooldownTime(this._cdTime, false, 0)
   }
 
   action() {
