@@ -7,6 +7,7 @@ import {
   type SimulationMockOptions,
 } from '@/engine/Simulation'
 import { AUTO_MOCK_MAX_COMBINATIONS, AUTO_MOCK_TOP_RESULT_COUNT } from '@/domain/config/simulatorDefaults'
+import { max } from '@/kernel/utils/math'
 
 export interface LightMockResult {
   cardsCombo: CardId[]
@@ -28,7 +29,7 @@ export class AutoMock {
     this._options = options
     this._totalCost = totalCost
     this._data = getData([...options.cards.map((card) => card.id), ...excludes])
-    this._comboCount = Math.max(countCardsComboByCost(totalCost, this._data), 1)
+    this._comboCount = max(countCardsComboByCost(totalCost, this._data), 1)
   }
 
   public exec() {

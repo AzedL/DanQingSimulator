@@ -83,12 +83,23 @@
 
 `AutoMock` 当前采用流式 top N，而不是全量排序后截断。
 
+当前实现已进一步收口为“两阶段”：
+
+- `getTop()` 负责轻量 top 筛选
+- `exec()` 负责将 top 结果回放成完整模拟结果
+
 后续如果继续优化，仍要保留这些边界：
 
 - `AutoMock` 保留类设计，不改成纯函数
 - 组合数 `length` 必须准确，不能用近似值
 - `overflow` 判断必须依赖准确组合数
 - 组合数超限时，当前行为仍保持兼容旧逻辑：回退执行一次基础 mock，而不是返回空结果
+
+当前空组合兼容语义也已收口到 `AutoMock` 自己身上：
+
+- `getLength()` 至少保留一个空组合候选
+- `getTop()` 至少返回一个空组合候选
+- 空组合轻量候选当前直接写为 `{ cardsCombo: [], dps: 0 }`
 
 当前项目里，DFS 计数组合的成本低，主要瓶颈仍然是完整模拟执行。
 
@@ -162,6 +173,17 @@
 - `src/autoMock/AutoMock.ts`
 - `src/kernel/utils/CooldownTime.ts`
 
+其中当前自动模拟主流程可按下面顺序理解：
+
+- `src/autoMock/AutoMock.ts`
+  - 轻量 top 筛选与完整结果回放
+- `src/engine/autoMock.ts`
+  - `runAutoMockGetTop(...)`
+  - `runAutoMockCoresByTop(...)`
+  - `runAutoMock(...)`
+- `src/features/autoMock/useAutoMock.ts`
+  - 当前自动模拟搜索已搬到 Web Worker
+
 ## 需要追溯历史时看哪里
 
 - 想看分层重构主背景：查 `sessions/2.md`
@@ -170,3 +192,4 @@
 - 想看命名统一收口：查 `sessions/4.md`
 - 想看新卡接入与 `六合镜` 非随机近似修正：查 `sessions/5.md`
 - 想看基础设置属性收益接入、默认值收口和攻击力推导修正：查 `sessions/6.md`
+- 想看 `AutoMock` 轻量 top / Web Worker / 空组合兼容语义这轮收口：查 `sessions/7.md`
