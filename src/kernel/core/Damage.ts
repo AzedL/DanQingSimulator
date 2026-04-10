@@ -16,6 +16,8 @@ export class Damage {
   private _countMap: Record<string, number> = {}
   private _damageMapList: Record<'total' | string, number>[] = []
   private _countMapList: Record<string, number>[] = []
+  private _tickCount = 0
+  private _totalDamage = 0
 
   constructor(core: Core) {
     this._core = core
@@ -26,6 +28,7 @@ export class Damage {
 
     this._damageMap[key] = (this._damageMap[key] || 0) + damage
     this._countMap[key] = (this._countMap[key] || 0) + count
+    this._totalDamage += damage
   }
   public add(damage: number, count: number, ...rest: string[]) {
     const key = join(...rest)
@@ -33,6 +36,12 @@ export class Damage {
   }
 
   public settle() {
+    this._tickCount++
+
+    if (this._core.coreOptions.useLightMode) {
+      return
+    }
+
     let total = 0
     let countTotal = 0
     for (let key in this._damageMap) {
@@ -48,18 +57,20 @@ export class Damage {
     this._countMap = {}
     this._damageMapList = []
     this._countMapList = []
+    this._tickCount = 0
+    this._totalDamage = 0
   }
 
   public getDamage() {
-    return fixed(this._damageMapList.at(-1)?.total || 0)
+    return fixed(this._damageMapList.at(-1)?.total ?? this._totalDamage)
   }
   public getDamageList() {
     return this._damageMapList.map((damage) => fixed(damage.total))
   }
   public getDPS() {
-    if (!this._damageMapList.length) return 0
+    if (!this._tickCount) return 0
     const { basicDamage } = this._core.coreOptions
-    return fixed(this.getDamage() / this._damageMapList.length + basicDamage)
+    return fixed(this.getDamage() / this._tickCount + basicDamage)
   }
   public getDPSList() {
     const { basicDamage } = this._core.coreOptions
@@ -68,8 +79,8 @@ export class Damage {
 
   public getDetail() {
     const { basicDamage, _basicDamage } = this._core.coreOptions
-    const map = this._damageMapList.at(-1) || { total: 0 }
-    const length = this._damageMapList.length || 1
+    const length = this._tickCount || 1
+    const map = this._damageMapList.at(-1) || { ...this._damageMap, total: this._totalDamage }
     const total = map.total / length + basicDamage
     const result: DPSDetail[] = [{ key: 'total', dps: fixed(total), proportion: 100 }]
     for (let key in map) {

@@ -30,6 +30,7 @@ export interface CoreOptions {
   attributeValues?: AttributeValues
   duration: number
   useRandom: boolean
+  useLightMode?: boolean
 }
 
 export class Core {

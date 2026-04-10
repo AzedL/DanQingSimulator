@@ -8,6 +8,11 @@ import {
 } from '@/engine/Simulation'
 import { AUTO_MOCK_MAX_COMBINATIONS, AUTO_MOCK_TOP_RESULT_COUNT } from '@/domain/config/simulatorDefaults'
 
+interface LightMockResult {
+  cardsCombo: CardId[]
+  dps: number
+}
+
 export class AutoMock {
   private _MAX = AUTO_MOCK_MAX_COMBINATIONS
   private _options: SimulationMockOptions
@@ -36,19 +41,21 @@ export class AutoMock {
       return this.getResult()
     }
 
-    const result: SimulationCore[] = []
+    const result: LightMockResult[] = []
     let hasCombo = false
     iterateCardsComboByCost(this._totalCost, this._data, (cardsCombo) => {
       hasCombo = true
-      pushTopResult(result, mockByCardsCombo(cardsCombo, this._options), AUTO_MOCK_TOP_RESULT_COUNT)
+      pushTopResult(result, lightMockByCardsCombo(cardsCombo, this._options), AUTO_MOCK_TOP_RESULT_COUNT)
     })
 
     if (!hasCombo) {
-      result.push(mockByCardsCombo([], this._options))
+      this._result = [mockByCardsCombo([], this._options)]
+      this._executed = true
+      return this.getResult()
     }
 
+    this._result = result.map((lightMockResult) => mockByCardsCombo(lightMockResult.cardsCombo, this._options))
     this._executed = true
-    this._result = result
     return this.getResult()
   }
 
@@ -71,9 +78,25 @@ const getOptionByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOpti
   return { ...options, cards: newCards }
 }
 
-const mockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions) => {
+const mockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions): SimulationCore => {
+  return runMockByCardsCombo(cardsCombo, options)
+}
+
+const lightMockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions): LightMockResult => {
+  const core = runMockByCardsCombo(cardsCombo, options, true)
+  return {
+    cardsCombo,
+    dps: core.dps.getDPS(),
+  }
+}
+
+const runMockByCardsCombo = (
+  cardsCombo: CardId[],
+  options: SimulationMockOptions,
+  useLightMode = false,
+): SimulationCore => {
   const coreOptions = deriveSimulationCoreOptions(getOptionByCardsCombo(cardsCombo, options))
-  return runSimulation(coreOptions).core
+  return runSimulation({ ...coreOptions, useLightMode }).core
 }
 
 const getData = (excludes: CardId[]) => {
@@ -122,14 +145,13 @@ function iterateComboByCost<T>(data: { id: T; cost: number }[], totalCost: numbe
   backtrack(0, 0, [])
 }
 
-function pushTopResult(result: SimulationCore[], candidate: SimulationCore, limit: number) {
-  const candidateDps = candidate.dps.getDPS()
-  if (result.length >= limit && candidateDps <= result[result.length - 1].dps.getDPS()) {
+function pushTopResult(result: LightMockResult[], candidate: LightMockResult, limit: number) {
+  if (result.length >= limit && candidate.dps <= result[result.length - 1].dps) {
     return
   }
 
   let index = 0
-  while (index < result.length && result[index].dps.getDPS() >= candidateDps) {
+  while (index < result.length && result[index].dps >= candidate.dps) {
     index++
   }
 

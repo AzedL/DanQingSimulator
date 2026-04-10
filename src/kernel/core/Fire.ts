@@ -62,7 +62,9 @@ export class Fire {
   }
 
   public settle() {
-    this._countList.push(this._count)
+    if (!this._core.coreOptions.useLightMode) {
+      this._countList.push(this._count)
+    }
 
     if (!this._count) {
       this._cd.reset()
