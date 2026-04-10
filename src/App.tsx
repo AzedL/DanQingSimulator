@@ -36,8 +36,9 @@ function App() {
 
   function handleExecute() {
     if (simulation.simulationConfig.isAutoMock) {
-      autoMock.execAutoMock()
-      setCurrentTabResult('autoMock')
+      autoMock.execAutoMock(() => {
+        setCurrentTabResult('autoMock')
+      })
       return
     }
 
@@ -76,6 +77,7 @@ function App() {
           totalCost={simulation.preview.totalCost}
           resultCoreAttribute={simulation.preview.resultCoreAttribute}
           resultAttackPower={simulation.preview.resultAttackPower}
+          isExecuting={simulation.simulationConfig.isAutoMock ? autoMock.isAutoMockRunning : false}
           onExecute={handleExecute}
         />
       </div>

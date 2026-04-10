@@ -32,7 +32,7 @@ export interface AppViewDefaults {
 }
 
 export const AUTO_SIMULATION_DURATION = 300
-export const AUTO_MOCK_MAX_COMBINATIONS = 49999
+export const AUTO_MOCK_MAX_COMBINATIONS = 99999
 export const AUTO_MOCK_TOP_RESULT_COUNT = 20
 export const DEFAULT_CORE_ATTRIBUTE_EXTRA_GAIN = 0.08
 export const DEFAULT_ATTRIBUTE_YIELD = 0.008

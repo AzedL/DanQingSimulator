@@ -31,6 +31,7 @@ const lang = {
   resultCoreAttribute: '最终核心属性',
   resultAttackPower: '最终攻击力',
   exec: '模拟',
+  executing: '模拟中...',
 
   mergeSameNameDamage: '合并同名伤害',
   autoMockLength: '自动模拟丹青组合数',

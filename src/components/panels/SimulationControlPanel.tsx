@@ -22,6 +22,7 @@ interface Props {
   totalCost: number
   resultCoreAttribute: number
   resultAttackPower: number
+  isExecuting: boolean
   onExecute: () => void
 }
 
@@ -77,9 +78,10 @@ export default function SimulationControlPanel(props: Props) {
         <div className="mt-2 flex justify-end">
           <Button
             className="bg-linear-to-r from-pink-500 to-rose-500 px-6 py-2 font-medium text-white hover:from-pink-600 hover:to-rose-600"
+            disabled={props.isExecuting}
             onClick={props.onExecute}
           >
-            {lang.exec}
+            {props.isExecuting ? lang.executing : lang.exec}
           </Button>
         </div>
       </div>

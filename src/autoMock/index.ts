@@ -1,1 +1,1 @@
-export { AutoMock } from './AutoMock'
+export { AutoMock, mockByCardsCombo, type LightMockResult } from './AutoMock'

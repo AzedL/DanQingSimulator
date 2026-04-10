@@ -8,7 +8,7 @@ import {
 } from '@/engine/Simulation'
 import { AUTO_MOCK_MAX_COMBINATIONS, AUTO_MOCK_TOP_RESULT_COUNT } from '@/domain/config/simulatorDefaults'
 
-interface LightMockResult {
+export interface LightMockResult {
   cardsCombo: CardId[]
   dps: number
 }
@@ -19,6 +19,8 @@ export class AutoMock {
   private _data: { id: CardId; cost: number }[] = []
   private _totalCost = 0
   private _comboCount = 0
+  private _top: LightMockResult[] = []
+  private _topReady = false
   private _result: SimulationCore[] = []
   private _executed = false
 
@@ -26,7 +28,7 @@ export class AutoMock {
     this._options = options
     this._totalCost = totalCost
     this._data = getData([...options.cards.map((card) => card.id), ...excludes])
-    this._comboCount = countCardsComboByCost(totalCost, this._data)
+    this._comboCount = Math.max(countCardsComboByCost(totalCost, this._data), 1)
   }
 
   public exec() {
@@ -34,29 +36,36 @@ export class AutoMock {
       return this.getResult()
     }
 
+    const top = this.getTop()
+    this._result = top.map((lightMockResult) => mockByCardsCombo(lightMockResult.cardsCombo, this._options))
+    this._executed = true
+    return this.getResult()
+  }
+
+  public getTop() {
+    if (this._topReady) {
+      return this._top
+    }
+
     if (this._comboCount > this._MAX) {
       console.log('超出上限')
-      this._result = [mockByCardsCombo([], this._options)]
-      this._executed = true
-      return this.getResult()
+      this._top = [createEmptyLightMockResult()]
+      this._topReady = true
+      return this._top
     }
 
     const result: LightMockResult[] = []
-    let hasCombo = false
     iterateCardsComboByCost(this._totalCost, this._data, (cardsCombo) => {
-      hasCombo = true
       pushTopResult(result, lightMockByCardsCombo(cardsCombo, this._options), AUTO_MOCK_TOP_RESULT_COUNT)
     })
 
-    if (!hasCombo) {
-      this._result = [mockByCardsCombo([], this._options)]
-      this._executed = true
-      return this.getResult()
+    if (!result.length) {
+      result.push(createEmptyLightMockResult())
     }
 
-    this._result = result.map((lightMockResult) => mockByCardsCombo(lightMockResult.cardsCombo, this._options))
-    this._executed = true
-    return this.getResult()
+    this._top = result
+    this._topReady = true
+    return this._top
   }
 
   public getResult() {
@@ -72,13 +81,7 @@ export class AutoMock {
   }
 }
 
-const getOptionByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions): SimulationMockOptions => {
-  const cards = cardsCombo.map((cardId) => ({ id: cardId, level: 6 }))
-  const newCards = [...options.cards, ...cards]
-  return { ...options, cards: newCards }
-}
-
-const mockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions): SimulationCore => {
+export const mockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions): SimulationCore => {
   return runMockByCardsCombo(cardsCombo, options)
 }
 
@@ -88,6 +91,19 @@ const lightMockByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOpti
     cardsCombo,
     dps: core.dps.getDPS(),
   }
+}
+
+const createEmptyLightMockResult = (): LightMockResult => {
+  return {
+    cardsCombo: [],
+    dps: 0,
+  }
+}
+
+const getOptionByCardsCombo = (cardsCombo: CardId[], options: SimulationMockOptions): SimulationMockOptions => {
+  const cards = cardsCombo.map((cardId) => ({ id: cardId, level: 6 }))
+  const newCards = [...options.cards, ...cards]
+  return { ...options, cards: newCards }
 }
 
 const runMockByCardsCombo = (
