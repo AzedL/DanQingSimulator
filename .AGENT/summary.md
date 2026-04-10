@@ -50,8 +50,11 @@
 - 新代码优先依赖 `domain / engine / features / components`，不要回流到旧兼容层
 - 已删除的旧兼容层不应恢复
 - 默认模拟相关配置已集中到 `src/domain/config`
+- 基础设置默认值与规则兜底值已继续向 `src/domain/config/simulatorDefaults.ts` 收口
 - `src/App.tsx` 应保持页面编排层角色，不要重新塞回大量业务逻辑
-- `coreOptions.attackPower` 在规则推导中允许被修改，这是有意设计
+- 基础设置中的属性收益使用百分比输入，但规则层按小数计算；`huiXin / zhuanJing / tiaoXi` 当前分别对应 `小环 / 海龟 / 风筝`
+- 允许小数百分比输入的字段不要复用整数解析；当前 `toNumber` 与 `toInt` 已分流，属性收益走浮点，其余基础输入默认走整数
+- `attackPower` 当前应在 `deriveCoreOptions` 中完成最终值推导，`getOptions` 不应再修改 `coreOptions`
 - 自动模拟相关命名已统一为 `autoMock`，不再继续使用 `optimizer / optimization`
 - `CooldownTime` 已作为冷却时间类名统一使用
 - `火蝠`、`弓箭` 这类纯数值卡优先作为 `options` 卡落在 `deriveStats.ts`
@@ -166,3 +169,4 @@
 - 想看 `AutoMock` 性能优化过程：查 `sessions/3.md`
 - 想看命名统一收口：查 `sessions/4.md`
 - 想看新卡接入与 `六合镜` 非随机近似修正：查 `sessions/5.md`
+- 想看基础设置属性收益接入、默认值收口和攻击力推导修正：查 `sessions/6.md`
