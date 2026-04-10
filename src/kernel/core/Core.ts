@@ -24,6 +24,7 @@ export interface CoreOptions {
   coreAttribute: number
   _coreAttribute: number
   attackPower: number
+  _attackPowerBoostValue: number
   basicDamage: number
   _basicDamage: number
   attributeValues?: AttributeValues

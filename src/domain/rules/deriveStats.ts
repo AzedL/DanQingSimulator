@@ -79,6 +79,8 @@ export function deriveCoreOptions(mockOptions: MockOptions): CoreOptions {
 
   const { taXue = false, anJi = false } = buffs
   const buffValue = anJi ? ANJI_VALUE : taXue ? TAXUE_VALUE : 1
+  const attackPowerBoostValue = fixed(getAttackPowerBoostValue(cards), 4)
+  const attackPower = fixed(getAttackPower(newCoreAttribute, buffValue) * attackPowerBoostValue)
 
   const newBasicDamage = fixed(basicDamage * (newCoreAttribute / coreAttribute))
 
@@ -87,7 +89,8 @@ export function deriveCoreOptions(mockOptions: MockOptions): CoreOptions {
     cost: getCost(cards),
     coreAttribute: newCoreAttribute,
     _coreAttribute: coreAttribute,
-    attackPower: fixed(getAttackPower(newCoreAttribute, buffValue)),
+    attackPower,
+    _attackPowerBoostValue: attackPowerBoostValue,
     basicDamage: newBasicDamage,
     _basicDamage: basicDamage,
     attributeValues,
@@ -97,8 +100,7 @@ export function deriveCoreOptions(mockOptions: MockOptions): CoreOptions {
 }
 
 export function getOptions(coreOptions: CoreOptions): Options {
-  const attackPowerBoostValue = fixed(getAttackPowerBoostValue(coreOptions), 4)
-  coreOptions.attackPower = coreOptions.attackPower * attackPowerBoostValue
+  const attackPowerBoostValue = coreOptions._attackPowerBoostValue
   const attributeBoostValue = fixed(getAttributeBoostValue(coreOptions), 4)
   const globalBoostValue = fixed(getGlobalBoostValue(coreOptions), 4)
 
@@ -179,7 +181,7 @@ function getAttackPower(newCoreAttribute: number, buff: number) {
   return (newCoreAttribute / 5) * buff
 }
 
-function getAttackPowerBoostValue(coreOptions: CoreOptions) {
+function getAttackPowerBoostValue(cards: CardOptions[]) {
   let valueZhouYiXian = 0
   let valueMengHu = 0
   let valueXianRenBuFan = 0
@@ -187,7 +189,7 @@ function getAttackPowerBoostValue(coreOptions: CoreOptions) {
   let animalCount = 0
   let utensilCount = 0
 
-  coreOptions.cards.forEach(({ id, level }) => {
+  cards.forEach(({ id, level }) => {
     const card = cardCatalog[id]
     if (card.group === 'human') humanCount++
     else if (card.group === 'animal') animalCount++
