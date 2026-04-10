@@ -15,5 +15,9 @@ export function max(...nums: number[]) {
 }
 
 export function toNumber(str: string) {
+  return parseFloat(str) || 0
+}
+
+export function toInt(str: string) {
   return parseInt(str) || 0
 }

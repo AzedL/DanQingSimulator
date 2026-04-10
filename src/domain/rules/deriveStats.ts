@@ -1,6 +1,11 @@
 import type { CardOptions, CoreOptions } from '@/kernel/core/Core'
 import { cardCatalog } from '@/domain/cards/cardCatalog'
 import type { CardId } from '@/domain/cards/cardIds'
+import {
+  DEFAULT_ATTRIBUTE_YIELD,
+  DEFAULT_CORE_ATTRIBUTE_EXTRA_GAIN,
+  SIMULATION_CONFIG_DEFAULTS,
+} from '@/domain/config/simulatorDefaults'
 import { cardParams, getChanceValue, getScaledValue } from '@/domain/cards/cardParams'
 import { fixed } from '@/kernel/utils/math'
 
@@ -9,11 +14,18 @@ interface Buffs {
   anJi?: boolean
 }
 
+interface AttributeValues {
+  huiXin?: number
+  zhuanJing?: number
+  tiaoXi?: number
+}
+
 export interface MockOptions {
   cards: CardOptions[]
   coreAttribute: number
   basicDamage: number
-  treasureLevel?: number
+  coreAttributeExtraGain?: number
+  attributeValues?: AttributeValues
   buffs?: Buffs
   duration: number
   useRandom?: boolean
@@ -46,14 +58,24 @@ const TAXUE_VALUE = 1.031
 const ANJI_VALUE = 1.0523
 const CORE_ATTR_A = 224.4
 const CORE_ATTR_B = 11.1
-const TREASURE_LEVEL_VALUE = 0.004
-const ATTRIBUTE_VALUE = 0.008
-const ATTRIBUTE_CARDS: CardId[] = ['haiGui', 'xiaoHuan', 'fengZheng']
+const ATTRIBUTE_CARD_VALUES: Record<'haiGui' | 'xiaoHuan' | 'fengZheng', keyof AttributeValues> = {
+  haiGui: 'zhuanJing',
+  xiaoHuan: 'huiXin',
+  fengZheng: 'tiaoXi',
+}
 
 export function deriveCoreOptions(mockOptions: MockOptions): CoreOptions {
-  const { coreAttribute, basicDamage, treasureLevel = 10, buffs = {}, duration, useRandom = false } = mockOptions
+  const {
+    coreAttribute,
+    basicDamage,
+    coreAttributeExtraGain = DEFAULT_CORE_ATTRIBUTE_EXTRA_GAIN,
+    attributeValues,
+    buffs = {},
+    duration,
+    useRandom = SIMULATION_CONFIG_DEFAULTS.useRandom,
+  } = mockOptions
   const cards = normalizeCards(mockOptions.cards)
-  const newCoreAttribute = fixed(getCoreAttribute(cards, coreAttribute, treasureLevel))
+  const newCoreAttribute = fixed(getCoreAttribute(cards, coreAttribute, coreAttributeExtraGain))
 
   const { taXue = false, anJi = false } = buffs
   const buffValue = anJi ? ANJI_VALUE : taXue ? TAXUE_VALUE : 1
@@ -68,6 +90,7 @@ export function deriveCoreOptions(mockOptions: MockOptions): CoreOptions {
     attackPower: fixed(getAttackPower(newCoreAttribute, buffValue)),
     basicDamage: newBasicDamage,
     _basicDamage: basicDamage,
+    attributeValues,
     duration,
     useRandom,
   }
@@ -136,20 +159,20 @@ function getCost(cards: CardOptions[]) {
   }, 0)
 }
 
-function getCoreAttribute(cards: CardOptions[], coreAttribute: number, treasureLevel: number) {
+function getCoreAttribute(cards: CardOptions[], coreAttribute: number, coreAttributeExtraGain: number) {
   const result = cards.reduce((res, cur) => {
-    return res + getCardCoreAttribute(cur, treasureLevel)
+    return res + getCardCoreAttribute(cur, coreAttributeExtraGain)
   }, coreAttribute)
 
   const muJian = cards.find(({ id }) => id === 'muJian')
   if (!muJian) return result
 
   const value = getScaledValue(muJian.id, muJian.level)
-  return result + (result * value) / 100 / (1 + TREASURE_LEVEL_VALUE * treasureLevel)
+  return result + (result * value) / 100 / (1 + coreAttributeExtraGain)
 }
-function getCardCoreAttribute(card: CardOptions, treasureLevel: number) {
+function getCardCoreAttribute(card: CardOptions, coreAttributeExtraGain: number) {
   const { id, level } = card
-  return (CORE_ATTR_A + CORE_ATTR_B * level) * cardCatalog[id].cost * (1 + TREASURE_LEVEL_VALUE * treasureLevel)
+  return (CORE_ATTR_A + CORE_ATTR_B * level) * cardCatalog[id].cost * (1 + coreAttributeExtraGain)
 }
 
 function getAttackPower(newCoreAttribute: number, buff: number) {
@@ -181,12 +204,21 @@ function getAttackPowerBoostValue(coreOptions: CoreOptions) {
 function getAttributeBoostValue(coreOptions: CoreOptions) {
   let result = 1
   coreOptions.cards.forEach(({ id, level }) => {
-    if (ATTRIBUTE_CARDS.includes(id)) {
-      const value = getScaledValue(id, level)
-      result = result * (1 + (ATTRIBUTE_VALUE * value) / 400)
-    }
+    const attributeKey = getAttributeValueKey(id)
+    if (!attributeKey) return
+
+    const value = getScaledValue(id, level)
+    const attributeValue = coreOptions.attributeValues?.[attributeKey] ?? DEFAULT_ATTRIBUTE_YIELD
+    result = result * (1 + (attributeValue * value) / 400)
   })
   return result
+}
+
+function getAttributeValueKey(cardId: CardId) {
+  if (cardId in ATTRIBUTE_CARD_VALUES) {
+    return ATTRIBUTE_CARD_VALUES[cardId as keyof typeof ATTRIBUTE_CARD_VALUES]
+  }
+  return null
 }
 
 function getGlobalBoostValue(coreOptions: CoreOptions) {

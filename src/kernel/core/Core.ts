@@ -8,6 +8,12 @@ import { getOptions, type Options } from './options'
 import { Pulse } from './Pulse'
 import { Queue } from './Queue'
 
+interface AttributeValues {
+  huiXin?: number
+  zhuanJing?: number
+  tiaoXi?: number
+}
+
 export interface CardOptions {
   id: CardId
   level: number
@@ -20,6 +26,7 @@ export interface CoreOptions {
   attackPower: number
   basicDamage: number
   _basicDamage: number
+  attributeValues?: AttributeValues
   duration: number
   useRandom: boolean
 }

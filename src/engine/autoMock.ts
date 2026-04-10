@@ -1,6 +1,6 @@
 import { AutoMock } from '@/autoMock'
 import type { CardId } from '@/domain/cards/cardIds'
-import { toNumber } from '@/kernel/utils/math'
+import { toInt } from '@/kernel/utils/math'
 import type { SimulationCore, SimulationMockOptions } from './Simulation'
 
 export interface AutoMockResult {
@@ -14,7 +14,7 @@ export function runAutoMock(
   costRemain: string,
   excludeYouMingQuan: boolean,
 ): AutoMockResult {
-  const autoMockCost = toNumber(costRemain)
+  const autoMockCost = toInt(costRemain)
   const exclude: CardId[] = excludeYouMingQuan ? ['youMingQuan'] : []
   const autoMock = new AutoMock(autoMockCost, options, exclude)
   const length = autoMock.getLength()

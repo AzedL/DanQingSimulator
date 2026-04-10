@@ -4,7 +4,10 @@ import type { ChartMetric, SimulatorTab } from '@/domain/config/simulatorUi'
 export interface BasicConfigDefaults {
   coreAttribute: string
   basicDamage: string
-  treasureLevel: string
+  coreAttributeExtraGain: string
+  huiXin: string
+  zhuanJing: string
+  tiaoXi: string
   taXue: boolean
   anJi: boolean
 }
@@ -31,11 +34,16 @@ export interface AppViewDefaults {
 export const AUTO_SIMULATION_DURATION = 300
 export const AUTO_MOCK_MAX_COMBINATIONS = 49999
 export const AUTO_MOCK_TOP_RESULT_COUNT = 20
+export const DEFAULT_CORE_ATTRIBUTE_EXTRA_GAIN = 0.08
+export const DEFAULT_ATTRIBUTE_YIELD = 0.008
 
 export const BASIC_CONFIG_DEFAULTS: BasicConfigDefaults = {
   coreAttribute: '60000',
   basicDamage: '100000',
-  treasureLevel: '10',
+  coreAttributeExtraGain: String(DEFAULT_CORE_ATTRIBUTE_EXTRA_GAIN * 100),
+  huiXin: String(DEFAULT_ATTRIBUTE_YIELD * 100),
+  zhuanJing: String(DEFAULT_ATTRIBUTE_YIELD * 100),
+  tiaoXi: String(DEFAULT_ATTRIBUTE_YIELD * 100),
   taXue: false,
   anJi: false,
 }

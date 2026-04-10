@@ -8,6 +8,7 @@ interface Props {
   onChange: (value: string) => void
   label?: string
   tip?: string
+  suffix?: string
   placeholder?: string
   type?: React.HTMLInputTypeAttribute
   width?: number
@@ -20,6 +21,7 @@ export default function InputField({
   onChange,
   label,
   tip,
+  suffix,
   placeholder,
   type,
   width,
@@ -51,19 +53,27 @@ export default function InputField({
           {!!tip && <p className="text-muted-foreground text-sm">{tip}</p>}
         </div>
       )}
-      <Input
-        ref={inputRef}
-        className={cn(
-          'w-full',
-          width && 'w-[' + width + 'px]',
-          maxWidth && 'max-w-[' + maxWidth + 'px]',
-          minWidth && 'min-w-[' + minWidth + 'px]'
+      <div className="relative">
+        <Input
+          ref={inputRef}
+          className={cn(
+            'w-full',
+            !!suffix && 'pr-10',
+            width && 'w-[' + width + 'px]',
+            maxWidth && 'max-w-[' + maxWidth + 'px]',
+            minWidth && 'min-w-[' + minWidth + 'px]'
+          )}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {!!suffix && (
+          <span className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm">
+            {suffix}
+          </span>
         )}
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      </div>
     </div>
   )
 }

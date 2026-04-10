@@ -1,7 +1,6 @@
-﻿import lang from '@/lang/lang'
+import lang from '@/lang/lang'
 import CheckboxField from '@/components/form/CheckboxField'
 import InputField from '@/components/form/InputField'
-import SelectField from '@/components/form/SelectField'
 import { Label } from '@/components/ui/label'
 
 interface Props {
@@ -9,13 +8,18 @@ interface Props {
   setCoreAttribute: (value: string) => void
   basicDamage: string
   setBasicDamage: (value: string) => void
-  treasureLevel: string
-  setTreasureLevel: (value: string) => void
+  coreAttributeExtraGain: string
+  setCoreAttributeExtraGain: (value: string) => void
+  huiXin: string
+  setHuiXin: (value: string) => void
+  zhuanJing: string
+  setZhuanJing: (value: string) => void
+  tiaoXi: string
+  setTiaoXi: (value: string) => void
   taXue: boolean
   setTaXue: (value: boolean) => void
   anJi: boolean
   setAnJi: (value: boolean) => void
-  treasureLevelValues: { label: string; value: string }[]
 }
 
 export default function BasicConfigPanel(props: Props) {
@@ -42,13 +46,46 @@ export default function BasicConfigPanel(props: Props) {
           />
         </div>
         <div className="min-w-48 flex-1">
-          <SelectField
-            value={props.treasureLevel}
-            onChange={props.setTreasureLevel}
-            label={lang.treasureLevel}
-            tip={lang.treasureLevelTip}
-            list={props.treasureLevelValues}
+          <InputField
+            value={props.coreAttributeExtraGain}
+            onChange={props.setCoreAttributeExtraGain}
+            label={lang.coreAttributeExtraGain}
+            tip={lang.coreAttributeExtraGainTip}
+            type="number"
+            suffix="%"
           />
+        </div>
+      </div>
+      <div className="mt-6 grid gap-4">
+        <Label className="text-base font-medium text-indigo-800">{lang.attributeYield}</Label>
+        <div className="flex flex-wrap items-center justify-start gap-6">
+          <div className="min-w-48 flex-1">
+            <InputField
+              value={props.huiXin}
+              onChange={props.setHuiXin}
+              label={lang.huiXinYield}
+              type="number"
+              suffix="%"
+            />
+          </div>
+          <div className="min-w-48 flex-1">
+            <InputField
+              value={props.zhuanJing}
+              onChange={props.setZhuanJing}
+              label={lang.zhuanJingYield}
+              type="number"
+              suffix="%"
+            />
+          </div>
+          <div className="min-w-48 flex-1">
+            <InputField
+              value={props.tiaoXi}
+              onChange={props.setTiaoXi}
+              label={lang.tiaoXiYield}
+              type="number"
+              suffix="%"
+            />
+          </div>
         </div>
       </div>
       <div className="mt-6 grid gap-4">
@@ -61,4 +98,3 @@ export default function BasicConfigPanel(props: Props) {
     </div>
   )
 }
-

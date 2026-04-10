@@ -23,7 +23,7 @@ function buildOptions(defaultCards, defaults) {
     cards: defaultCards,
     coreAttribute: Number(defaults.coreAttribute),
     basicDamage: Number(defaults.basicDamage),
-    treasureLevel: Number(defaults.treasureLevel),
+    coreAttributeExtraGain: Number(defaults.coreAttributeExtraGain) / 100,
     buffs: {
       taXue: defaults.taXue,
       anJi: defaults.anJi,

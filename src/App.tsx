@@ -10,7 +10,6 @@ import {
   cardsList,
   chartOptionValues,
   tabValues,
-  treasureLevelValues,
 } from '@/domain/config/simulatorUi'
 import { useChartSeries } from '@/features/chart/useChartSeries'
 import { useAutoMock } from '@/features/autoMock/useAutoMock'
@@ -48,7 +47,7 @@ function App() {
 
   return (
     <div className="mx-auto my-8 flex w-full max-w-7xl flex-col items-center justify-center overflow-hidden px-4 md:px-6">
-      <BasicConfigPanel {...simulation.basicConfig} treasureLevelValues={treasureLevelValues} />
+      <BasicConfigPanel {...simulation.basicConfig} />
 
       <div className="mt-6 flex w-full flex-wrap gap-6">
         <CardLoadoutPanel

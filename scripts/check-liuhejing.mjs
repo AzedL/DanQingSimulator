@@ -6,7 +6,7 @@ const RANDOM_RUNS = 20
 const BASE_OPTIONS = {
   coreAttribute: 60000,
   basicDamage: 90000,
-  treasureLevel: 10,
+  coreAttributeExtraGain: 0.08,
   buffs: {
     taXue: false,
     anJi: false,

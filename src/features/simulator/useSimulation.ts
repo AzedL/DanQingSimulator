@@ -14,7 +14,7 @@ import {
   type SimulationCore,
   type SimulationMockOptions,
 } from '@/engine/Simulation'
-import { fixed, toNumber } from '@/kernel/utils/math'
+import { fixed, toInt, toNumber } from '@/kernel/utils/math'
 
 interface CardSelection {
   id: CardId | ''
@@ -24,7 +24,10 @@ interface CardSelection {
 export function useSimulation() {
   const [coreAttribute, setCoreAttribute] = useState(BASIC_CONFIG_DEFAULTS.coreAttribute)
   const [basicDamage, setBasicDamage] = useState(BASIC_CONFIG_DEFAULTS.basicDamage)
-  const [treasureLevel, setTreasureLevel] = useState(BASIC_CONFIG_DEFAULTS.treasureLevel)
+  const [coreAttributeExtraGain, setCoreAttributeExtraGain] = useState(BASIC_CONFIG_DEFAULTS.coreAttributeExtraGain)
+  const [huiXin, setHuiXin] = useState(BASIC_CONFIG_DEFAULTS.huiXin)
+  const [zhuanJing, setZhuanJing] = useState(BASIC_CONFIG_DEFAULTS.zhuanJing)
+  const [tiaoXi, setTiaoXi] = useState(BASIC_CONFIG_DEFAULTS.tiaoXi)
   const [taXue, setTaXue] = useState(BASIC_CONFIG_DEFAULTS.taXue)
   const [anJi, setAnJi] = useState(BASIC_CONFIG_DEFAULTS.anJi)
   const [cards, setCards] = useState<CardSelection[]>(DEFAULT_CARD_LOADOUT)
@@ -41,23 +44,41 @@ export function useSimulation() {
     cards.reduce((total, card) => {
       if (!card.id) return total
       return total + cardCatalog[card.id].cost
-    }, 0) + (isAutoMock ? toNumber(costRemain) : 0)
+    }, 0) + (isAutoMock ? toInt(costRemain) : 0)
 
   const options = useMemo<SimulationMockOptions>(() => {
     const normalizedCards = cards.filter((card): card is { id: CardId; level: number } => !!card.id)
     return {
       cards: normalizedCards,
-      coreAttribute: toNumber(coreAttribute),
-      basicDamage: toNumber(basicDamage),
-      treasureLevel: toNumber(treasureLevel),
+      coreAttribute: toInt(coreAttribute),
+      basicDamage: toInt(basicDamage),
+      coreAttributeExtraGain: toInt(coreAttributeExtraGain) / 100,
+      attributeValues: {
+        huiXin: toNumber(huiXin) / 100,
+        zhuanJing: toNumber(zhuanJing) / 100,
+        tiaoXi: toNumber(tiaoXi) / 100,
+      },
       buffs: {
         taXue,
         anJi,
       },
-      duration: isAutoMock ? AUTO_SIMULATION_DURATION : toNumber(duration),
+      duration: isAutoMock ? AUTO_SIMULATION_DURATION : toInt(duration),
       useRandom: isAutoMock ? false : useRandom,
     }
-  }, [anJi, basicDamage, cards, coreAttribute, duration, isAutoMock, taXue, treasureLevel, useRandom])
+  }, [
+    anJi,
+    basicDamage,
+    cards,
+    coreAttributeExtraGain,
+    coreAttribute,
+    duration,
+    huiXin,
+    isAutoMock,
+    taXue,
+    tiaoXi,
+    useRandom,
+    zhuanJing,
+  ])
 
   const coreOptions = useMemo(() => deriveSimulationCoreOptions(options), [options])
   const mockResult = useMemo(() => {
@@ -86,7 +107,7 @@ export function useSimulation() {
   function handleLevelChange(index: number, value: string) {
     setCards((current) =>
       current.map((card, i) => {
-        if (i === index) return { ...card, level: toNumber(value) }
+        if (i === index) return { ...card, level: toInt(value) }
         return card
       }),
     )
@@ -109,8 +130,14 @@ export function useSimulation() {
       setCoreAttribute,
       basicDamage,
       setBasicDamage,
-      treasureLevel,
-      setTreasureLevel,
+      coreAttributeExtraGain,
+      setCoreAttributeExtraGain,
+      huiXin,
+      setHuiXin,
+      zhuanJing,
+      setZhuanJing,
+      tiaoXi,
+      setTiaoXi,
       taXue,
       setTaXue,
       anJi,

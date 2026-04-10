@@ -12,10 +12,6 @@ export const cardsList: { value: CardId; label: string }[] = orderedCardCatalog.
   }
 })
 
-export const treasureLevelValues = Array.from({ length: 11 }).map((_, i) => {
-  return { label: String(i), value: String(i) }
-})
-
 export const cardLevelValues = Array.from({ length: 7 }).map((_, i) => {
   return { label: String(i), value: String(i) }
 })
