@@ -52,7 +52,7 @@ export function useSimulation() {
       cards: normalizedCards,
       coreAttribute: toInt(coreAttribute),
       basicDamage: toInt(basicDamage),
-      coreAttributeExtraGain: toInt(coreAttributeExtraGain) / 100,
+      coreAttributeExtraGain: toNumber(coreAttributeExtraGain) / 100,
       attributeValues: {
         huiXin: toNumber(huiXin) / 100,
         zhuanJing: toNumber(zhuanJing) / 100,
