@@ -5,12 +5,13 @@ export class CooldownTime {
   private _isDefaultReady: boolean = false
   private _defaultTick: number = 1
 
+  // when isDefaultReady is false, it becomes ready for the first time at second time + 1.
   constructor(time: number, isDefaultReady = false, defaultTick = 1) {
     this._time = time
     this._isDefaultReady = isDefaultReady
     this._defaultTick = defaultTick
 
-    this._currentTime = time - (isDefaultReady ? 0 : defaultTick)
+    this._currentTime = time
     this._isReady = isDefaultReady
   }
 
@@ -37,7 +38,7 @@ export class CooldownTime {
   }
 
   public reset() {
-    this._currentTime = this._time - (this._isDefaultReady ? 0 : this._defaultTick)
+    this._currentTime = this._time
     this._isReady = this._isDefaultReady
   }
 }
