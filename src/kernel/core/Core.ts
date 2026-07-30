@@ -1,87 +1,72 @@
 import { getCards } from '../cards'
-import type { Card } from '../cards/Card'
-import type { CardId } from '@/domain/cards/cardIds'
+import { isActiveCard, type ActiveCard, type Card, type CardId } from '../cards/Card'
 import { Damage } from './Damage'
 import { Fire } from './Fire'
 import { Ice } from './Ice'
-import { getOptions, type Options } from './options'
-import { Pulse } from './Pulse'
 import { Queue } from './Queue'
-
-interface AttributeValues {
-  huiXin?: number
-  zhuanJing?: number
-  tiaoXi?: number
-}
+import { Thunder } from './Thunder'
+import { Wood } from './Wood'
 
 export interface CardOptions {
   id: CardId
   level: number
 }
+
 export interface CoreOptions {
   cards: CardOptions[]
-  cost: number
-  coreAttribute: number
-  _coreAttribute: number
-  attackPower: number
-  _attackPowerBoostValue: number
-  basicDamage: number
-  _basicDamage: number
-  attributeValues?: AttributeValues
   duration: number
+  burstDps: number
+  sustainedDps: number
   useRandom: boolean
   useLightMode?: boolean
 }
 
 export class Core {
-  coreOptions: CoreOptions
-  options: Options
-  queue: Queue
-  dps: Damage
-  fire: Fire
-  ice: Ice
-  pulse: Pulse
-  cards: Card[] = []
+  readonly coreOptions: CoreOptions
+  readonly queue: Queue
+  readonly damage: Damage
+  readonly fire: Fire
+  readonly ice: Ice
+  readonly thunder: Thunder
+  readonly wood: Wood
+  readonly cardsMap = new Map<CardId, Card>()
+  readonly actions: ActiveCard[] = []
 
   constructor(coreOptions: CoreOptions) {
     this.coreOptions = coreOptions
-    this.options = getOptions(coreOptions)
     this.queue = new Queue()
-    this.dps = new Damage(this)
-    this.fire = new Fire(this)
-    this.pulse = new Pulse(this)
-    this.ice = new Ice(this)
-    this.cards = getCards(this)
+    this.damage = new Damage(this)
+    this.fire = new Fire(this.damage)
+    this.ice = new Ice(this.damage)
+    this.thunder = new Thunder(this.damage)
+    this.wood = new Wood(this.damage)
+
+    getCards(this).forEach((card) => {
+      this.cardsMap.set(card.id, card)
+      if (isActiveCard(card)) this.actions.push(card)
+    })
   }
 
   exec() {
-    const duration = this.coreOptions.duration
-    for (let t = 0; t < duration; t++) {
-      tick(this)
+    for (let time = 0; time < this.coreOptions.duration; time++) {
+      this.tick()
     }
   }
 
   reset() {
     this.queue.reset()
-    this.dps.reset()
+    this.damage.reset()
     this.fire.reset()
-    this.pulse.reset()
     this.ice.reset()
-    this.cards.forEach((card) => {
-      card.reset()
-    })
+    this.thunder.reset()
+    this.wood.reset()
+    this.cardsMap.forEach((card) => card.reset())
   }
-}
 
-const tick = (core: Core) => {
-  core.queue.process()
-
-  core.cards.forEach((card) => {
-    card.action()
-  })
-
-  core.ice.settle()
-  core.pulse.settle()
-  core.fire.settle()
-  core.dps.settle()
+  private tick() {
+    this.queue.process(0.5)
+    this.actions.forEach((card) => card.tick())
+    this.queue.process(0.5)
+    this.damage.commitTick()
+  }
 }

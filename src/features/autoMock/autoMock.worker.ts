@@ -1,20 +1,22 @@
-import { runAutoMockGetTop } from '@/engine/autoMock'
-import type { SimulationMockOptions } from '@/engine/Simulation'
-import type { LightMockResult } from '@/autoMock'
+import type { CardId, CoreOptions } from '../../kernel'
+import {
+  runAutoMock,
+  type AutoMockResult,
+} from './autoMock'
 
 interface AutoMockWorkerRequest {
   requestId: number
-  options: SimulationMockOptions
-  costRemain: string
-  excludeYouMingQuan: boolean
+  coreOptions: CoreOptions
+  targetCardIds: CardId[]
+  resultCardIds: CardId[]
+  additionalValue: number
+  maxCombinations: number
+  topCount: number
 }
 
-interface AutoMockWorkerSuccess {
+interface AutoMockWorkerSuccess extends AutoMockResult {
   requestId: number
   type: 'success'
-  length: number
-  overflow: boolean
-  items: LightMockResult[]
 }
 
 interface AutoMockWorkerError {
@@ -24,21 +26,15 @@ interface AutoMockWorkerError {
 }
 
 self.onmessage = (event: MessageEvent<AutoMockWorkerRequest>) => {
-  const { requestId, options, costRemain, excludeYouMingQuan } = event.data
+  const { requestId, ...input } = event.data
 
   try {
-    const result = runAutoMockGetTop(options, costRemain, excludeYouMingQuan)
+    const result = runAutoMock(input)
     const response: AutoMockWorkerSuccess = {
       requestId,
       type: 'success',
-      length: result.length,
-      overflow: result.overflow,
-      items: result.top.map((item) => ({
-        cardsCombo: item.cardsCombo,
-        dps: item.dps,
-      })),
+      ...result,
     }
-
     self.postMessage(response)
   } catch (error) {
     const response: AutoMockWorkerError = {
@@ -46,9 +42,12 @@ self.onmessage = (event: MessageEvent<AutoMockWorkerRequest>) => {
       type: 'error',
       message: error instanceof Error ? error.message : String(error),
     }
-
     self.postMessage(response)
   }
 }
 
-export type { AutoMockWorkerRequest, AutoMockWorkerSuccess, AutoMockWorkerError }
+export type {
+  AutoMockWorkerError,
+  AutoMockWorkerRequest,
+  AutoMockWorkerSuccess,
+}

@@ -1,56 +1,101 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { cardCatalog } from '@/domain/cards/cardCatalog'
-import { runAutoMockCoresByTop } from '@/engine/autoMock'
-import type { SimulationCore, SimulationMockOptions } from '@/engine/Simulation'
-import { fixed } from '@/kernel/utils/math'
-import type { AutoMockWorkerError, AutoMockWorkerSuccess } from './autoMock.worker'
+import type { CardId, CardOptions, CoreOptions } from '@/kernel'
+import { toInt } from '@/kernel/utils/math'
+import {
+  lingYunList,
+  skillList,
+  type CardGroup,
+} from '@/features/config/simulatorUi'
+import {
+  AUTO_MOCK_MAX_COMBINATIONS,
+  AUTO_MOCK_TOP_RESULT_COUNT,
+} from '@/features/config/simulatorDefaults'
+import type { AutoMockItem } from './autoMock'
+import type {
+  AutoMockWorkerError,
+  AutoMockWorkerSuccess,
+} from './autoMock.worker'
 
-export function useAutoMock(options: SimulationMockOptions, costRemain: string, excludeYouMingQuan: boolean) {
-  const [autoMockLength, setAutoMockLength] = useState(0)
-  const [autoMockLengthOverflow, setAutoMockLengthOverflow] = useState(false)
+const cardNames = new Map(
+  [...skillList, ...lingYunList].map((card) => [
+    card.value,
+    card.label,
+  ]),
+)
+const skillIds = new Set(skillList.map((card) => card.value))
+
+export interface AutoMockViewItem {
+  cards: string
+  dps: number
+  cardOptions: CardOptions[]
+  skillGroup: CardGroup
+}
+
+export function useAutoMock(
+  coreOptions: CoreOptions,
+  targetCardIds: CardId[],
+  additionalValue: string,
+) {
+  const [autoMockLengthOverflow, setAutoMockLengthOverflow] =
+    useState(false)
   const [autoMockCurrent, setAutoMockCurrent] = useState(0)
-  const [autoMockCores, setAutoMockCores] = useState<SimulationCore[]>([])
+  const [items, setItems] = useState<AutoMockItem[]>([])
   const [isAutoMockRunning, setIsAutoMockRunning] = useState(false)
   const workerRef = useRef<Worker | null>(null)
   const requestIdRef = useRef(0)
-  const optionsRef = useRef(options)
   const onDoneRef = useRef<(() => void) | undefined>(undefined)
 
-  const autoMockResult = useMemo(() => {
-    return autoMockCores.map((core) => {
-      return {
-        cards: core.coreOptions.cards.map((card) => cardCatalog[card.id].name).join('+'),
-        dps: fixed(core.dps.getDPS()),
-      }
-    })
-  }, [autoMockCores])
+  const autoMockResult = useMemo<AutoMockViewItem[]>(
+    () =>
+      items.map((item) => {
+        const skill = skillList.find((card) =>
+          item.cards.some((itemCard) => itemCard.id === card.value),
+        )!
+
+        return {
+          cards: item.cards
+            .map(
+              (card) =>
+                skillIds.has(card.id)
+                  ? cardNames.get(card.id) ?? card.id
+                  : `${cardNames.get(card.id) ?? card.id}${card.level}级`,
+            )
+            .join(' + '),
+          dps: item.dps,
+          cardOptions: item.cards.filter(
+            (card) => !skillIds.has(card.id),
+          ),
+          skillGroup: skill.group,
+        }
+      }),
+    [items],
+  )
 
   useEffect(() => {
-    optionsRef.current = options
-  }, [options])
-
-  useEffect(() => {
-    const worker = new Worker(new URL('./autoMock.worker.ts', import.meta.url), { type: 'module' })
+    const worker = new Worker(
+      new URL('./autoMock.worker.ts', import.meta.url),
+      { type: 'module' },
+    )
     workerRef.current = worker
 
-    worker.onmessage = (event: MessageEvent<AutoMockWorkerSuccess | AutoMockWorkerError>) => {
+    worker.onmessage = (
+      event: MessageEvent<
+        AutoMockWorkerSuccess | AutoMockWorkerError
+      >,
+    ) => {
       const message = event.data
-      if (message.requestId !== requestIdRef.current) {
-        return
-      }
+      if (message.requestId !== requestIdRef.current) return
 
+      setIsAutoMockRunning(false)
       if (message.type === 'error') {
         console.error(message.message)
-        setIsAutoMockRunning(false)
         onDoneRef.current = undefined
         return
       }
 
-      setAutoMockLength(message.length)
       setAutoMockLengthOverflow(message.overflow)
-      setAutoMockCores(runAutoMockCoresByTop(message.items, optionsRef.current))
+      setItems(message.items)
       setAutoMockCurrent(0)
-      setIsAutoMockRunning(false)
       onDoneRef.current?.()
       onDoneRef.current = undefined
     }
@@ -63,29 +108,29 @@ export function useAutoMock(options: SimulationMockOptions, costRemain: string, 
 
   function execAutoMock(onDone?: () => void) {
     const worker = workerRef.current
-    if (!worker) {
-      return
-    }
+    if (!worker) return
 
     const requestId = requestIdRef.current + 1
     requestIdRef.current = requestId
     onDoneRef.current = onDone
     setIsAutoMockRunning(true)
-
     worker.postMessage({
       requestId,
-      options,
-      costRemain,
-      excludeYouMingQuan,
+      coreOptions,
+      targetCardIds,
+      resultCardIds: [...skillList, ...lingYunList].map(
+        (card) => card.value,
+      ),
+      additionalValue: toInt(additionalValue),
+      maxCombinations: AUTO_MOCK_MAX_COMBINATIONS,
+      topCount: AUTO_MOCK_TOP_RESULT_COUNT,
     })
   }
 
   return {
-    autoMockLength,
     autoMockLengthOverflow,
     autoMockCurrent,
     setAutoMockCurrent,
-    autoMockCores,
     autoMockResult,
     isAutoMockRunning,
     execAutoMock,

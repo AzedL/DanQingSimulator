@@ -6,9 +6,7 @@ interface QueueItem {
 export class Queue {
   private _queue: QueueItem[] = []
 
-  constructor() {}
-
-  public enqueue(task: () => void, delay = 0) {
+  enqueue(task: () => void, delay = 0) {
     if (delay <= 0) {
       task()
       return
@@ -17,18 +15,18 @@ export class Queue {
     this._queue.push({ task, delay })
   }
 
-  public process() {
+  process(time: number) {
     if (!this._queue.length) return
 
     const queue = this._queue
     this._queue = []
+
     queue.forEach(({ task, delay }) => {
-      let newDelay = delay - 1
-      this.enqueue(task, newDelay)
+      this.enqueue(task, delay - time)
     })
   }
 
-  public reset() {
+  reset() {
     this._queue = []
   }
 }

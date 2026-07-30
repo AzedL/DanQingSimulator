@@ -1,94 +1,27 @@
-﻿import { cardParams } from '@/domain/cards/cardParams'
-import { CooldownTime } from '../utils/CooldownTime'
-import { min } from '../utils/math'
-import { handleProbability } from '../utils/probability'
-import type { Core } from './Core'
+import type { Damage } from './Damage'
 
 export class Fire {
-  private _key = '燃烧'
-  private _core: Core
-  private _damage: number = 0
+  private readonly _damage: Damage
+  private _boost = 0
 
-  private _huoFuValue = 0
-  private _linFengValue = 0
-  private _erWeiDamage = 0
-
-  private _count = 0
-  private _countList: number[] = []
-  private _maxCount = 12
-  private _cd: CooldownTime
-
-  constructor(core: Core) {
-    this._core = core
-    this._damage = core.options.fireDamage
-    this._huoFuValue = core.options.huoFuValue
-    this._linFengValue = core.options.linFengValueFire
-    this._erWeiDamage = core.options.erWeiDamage
-    this._maxCount = cardParams.xingHongJuYi.maxCount
-    this._cd = new CooldownTime(3)
+  constructor(damage: Damage) {
+    this._damage = damage
   }
 
-  public get count() {
-    return this._count
+  add(damage: number, count: number, ...keys: string[]) {
+    const value = damage * (1 + this._damage.boost) * (1 + this._boost)
+    this._damage.add(value, count, ...keys)
   }
 
-  public get countList() {
-    return this._countList
+  addBoost(boost: number) {
+    this._boost += boost
   }
 
-  private _add(count: number) {
-    this._count = min(this._count + count, this._maxCount)
-    this.handleErWei(count)
+  removeBoost(boost: number) {
+    this._boost -= boost
   }
 
-  private handleLinFeng(count: number) {
-    if (!this._linFengValue) return
-
-    const useRandom = this._core.coreOptions.useRandom
-    const c = handleProbability(this._linFengValue, useRandom, count)
-    this._add(c)
-  }
-
-  private handleErWei(count: number) {
-    if (!this._erWeiDamage) return
-
-    const key = '引燃'
-    this._core.dps.add(this._erWeiDamage * count, count, key)
-  }
-
-  public add(count: number) {
-    this._add(count)
-    this.handleLinFeng(count)
-  }
-
-  public settle() {
-    if (!this._core.coreOptions.useLightMode) {
-      this._countList.push(this._count)
-    }
-
-    if (!this._count) {
-      this._cd.reset()
-      return
-    }
-
-    const isReady = this._cd.settle()
-    if (isReady) this.settleDamage()
-
-    this._cd.tick(1 + this._huoFuValue)
-  }
-
-  private settleDamage() {
-    this._core.dps.add(this._damage * this._count, 1, this._key)
-  }
-
-  public resetCount() {
-    this._count = 0
-    this._cd.reset()
-  }
-
-  public reset() {
-    this._count = 0
-    this._countList = []
-    this._cd.reset()
+  reset() {
+    this._boost = 0
   }
 }

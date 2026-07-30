@@ -1,6 +1,4 @@
-﻿import { useEffect, useRef } from 'react'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useEffect, useId, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -28,48 +26,47 @@ export default function InputField({
   maxWidth,
   minWidth,
 }: Props) {
+  const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const inputEl = inputRef.current
     if (!inputEl) return
 
-    const handleWheel: EventListener = (e) => {
-      e.preventDefault()
+    const handleWheel: EventListener = (event) => {
+      event.preventDefault()
     }
 
     inputEl.addEventListener('wheel', handleWheel, { passive: false })
-
-    return () => {
-      inputEl.removeEventListener('wheel', handleWheel)
-    }
+    return () => inputEl.removeEventListener('wheel', handleWheel)
   }, [])
 
   return (
-    <div className="grid w-full max-w-sm items-center gap-2">
+    <div className="grid w-full items-center gap-2">
       {!!label && (
         <div className="grid gap-2">
-          <Label>{label}</Label>
-          {!!tip && <p className="text-muted-foreground text-sm">{tip}</p>}
+          <label htmlFor={id} className="text-sm font-medium leading-none">
+            {label}
+          </label>
+          {!!tip && <p className="text-sm opacity-65">{tip}</p>}
         </div>
       )}
       <div className="relative">
-        <Input
+        <input
+          id={id}
           ref={inputRef}
           className={cn(
-            'w-full',
+            'form-control px-3 text-base placeholder:text-slate-400 md:text-sm',
             !!suffix && 'pr-10',
-            width && 'w-[' + width + 'px]',
-            maxWidth && 'max-w-[' + maxWidth + 'px]',
-            minWidth && 'min-w-[' + minWidth + 'px]'
           )}
+          style={{ width, maxWidth, minWidth }}
           type={type}
           placeholder={placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(event) => onChange(event.target.value)}
         />
         {!!suffix && (
-          <span className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm">
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm opacity-65">
             {suffix}
           </span>
         )}

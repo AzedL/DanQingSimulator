@@ -1,108 +1,27 @@
-import { join } from '../utils/key'
-import { max } from '../utils/math'
-import { handleProbability } from '../utils/probability'
-import type { Core } from './Core'
+import type { Damage } from './Damage'
 
 export class Ice {
-  private _key = '冰箭'
-  private _core: Core
-  private _damage: number = 0
+  private readonly _damage: Damage
+  private _boost = 0
 
-  private _linFengValue = 0
-  private _shangGuanCeValue = 0
-  private _zhengDaLiValue = 0
-
-  private _lastCountMap: Record<string, number> = {}
-  private _countMap: Record<string, number> = {}
-  private _countMapList: Record<'total' & string, number>[] = []
-
-  constructor(core: Core) {
-    this._core = core
-    this._damage = core.options.iceDamage
-    this._linFengValue = core.options.linFengValueIce
-    this._shangGuanCeValue = core.options.shangGuanCeValue
-    this._zhengDaLiValue = core.options.zhengDaLiValue
+  constructor(damage: Damage) {
+    this._damage = damage
   }
 
-  private _add(count: number, key: string) {
-    this._countMap[key] = this._countMap[key] || 0
-    this._countMap[key] += count
-
-    this.handleShangGuanCe(count)
-  }
-  private handleLinFeng(count: number) {
-    if (!this._linFengValue) return
-
-    const key = '林峰'
-    const useRandom = this._core.coreOptions.useRandom
-    const c = handleProbability(this._linFengValue, useRandom, count)
-
-    this._add(c, key)
-  }
-  private handleShangGuanCe(count: number) {
-    if (!this._shangGuanCeValue) return
-
-    const useRandom = this._core.coreOptions.useRandom
-    const c = handleProbability(this._shangGuanCeValue, useRandom, count)
-
-    this._core.fire.add(c)
-  }
-  public add(count: number, ...rest: string[]) {
-    const key = join(...rest)
-    this._add(count, key)
-    this.handleLinFeng(count)
+  add(damage: number, count: number, ...keys: string[]) {
+    const value = damage * (1 + this._damage.boost) * (1 + this._boost)
+    this._damage.add(value, count, ...keys)
   }
 
-  public getIncrement() {
-    let total = 0
-    for (let key in this._countMap) {
-      const current = this._countMap[key] || 0
-      const last = this._lastCountMap[key] || 0
-      const count = current - last
-      total += count
-    }
-    return total
+  addBoost(boost: number) {
+    this._boost += boost
   }
 
-  public getIncrementInTime(time = 10) {
-    let total = 0
-    for (let key in this._countMap) {
-      const count = this._countMap[key] || 0
-      total += count
-    }
-    return total - (this._countMapList[max(-1, this._countMapList.length - time)]?.total || 0)
+  removeBoost(boost: number) {
+    this._boost -= boost
   }
 
-  public settle() {
-    let total = 0
-    for (let key in this._countMap) {
-      const current = this._countMap[key] || 0
-      total += current
-      const last = this._lastCountMap[key] || 0
-      const count = current - last
-      if (count) this.settleDamage(count, key)
-    }
-
-    this._lastCountMap = { ...this._countMap }
-    this._countMapList.push({ ...this._countMap, total })
-  }
-
-  public settleZhengDaLiDamage(damage: number, count: number, key: string) {
-    if (!this._zhengDaLiValue) return
-
-    const keyZhengDaLi = '碎裂'
-    this._core.dps.add(damage * this._zhengDaLiValue, count, keyZhengDaLi, key)
-  }
-
-  private settleDamage(count: number, key: string) {
-    const damage = this._damage * count
-    this._core.dps.add(damage, count, this._key, key)
-    this.settleZhengDaLiDamage(damage, count, this._key)
-  }
-
-  public reset() {
-    this._lastCountMap = {}
-    this._countMap = {}
-    this._countMapList = []
+  reset() {
+    this._boost = 0
   }
 }

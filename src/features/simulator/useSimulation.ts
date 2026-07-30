@@ -1,180 +1,316 @@
 import { useMemo, useState } from 'react'
-import { cardCatalog } from '@/domain/cards/cardCatalog'
-import type { CardId } from '@/domain/cards/cardIds'
+import {
+  CARD_IDS,
+  Core,
+  type CardId,
+  type CardOptions,
+  type CoreOptions,
+  type DamageOutput,
+} from '@/kernel'
+import { toInt, toNumber } from '@/kernel/utils/math'
 import {
   BASIC_CONFIG_DEFAULTS,
-  DEFAULT_CARD_LOADOUT,
   SIMULATION_CONFIG_DEFAULTS,
-  AUTO_SIMULATION_DURATION,
-} from '@/domain/config/simulatorDefaults'
+} from '@/features/config/simulatorDefaults'
 import {
-  mergeDamageBreakdown,
-  deriveSimulationCoreOptions,
-  runSimulation,
-  type SimulationCore,
-  type SimulationMockOptions,
-} from '@/engine/Simulation'
-import { fixed, toInt, toNumber } from '@/kernel/utils/math'
+  skillCardIds,
+  type CardGroup,
+  type CardSelectOption,
+} from '@/features/config/simulatorUi'
+import {
+  buildDamageDetails,
+  mergeDamageDetails,
+} from './result'
 
 interface CardSelection {
   id: CardId | ''
   level: number
 }
 
+interface ManualResult {
+  options: CoreOptions
+  output: DamageOutput
+}
+
 export function useSimulation() {
-  const [coreAttribute, setCoreAttribute] = useState(BASIC_CONFIG_DEFAULTS.coreAttribute)
-  const [basicDamage, setBasicDamage] = useState(BASIC_CONFIG_DEFAULTS.basicDamage)
-  const [coreAttributeExtraGain, setCoreAttributeExtraGain] = useState(BASIC_CONFIG_DEFAULTS.coreAttributeExtraGain)
-  const [huiXin, setHuiXin] = useState(BASIC_CONFIG_DEFAULTS.huiXin)
-  const [zhuanJing, setZhuanJing] = useState(BASIC_CONFIG_DEFAULTS.zhuanJing)
-  const [tiaoXi, setTiaoXi] = useState(BASIC_CONFIG_DEFAULTS.tiaoXi)
-  const [taXue, setTaXue] = useState(BASIC_CONFIG_DEFAULTS.taXue)
-  const [anJi, setAnJi] = useState(BASIC_CONFIG_DEFAULTS.anJi)
-  const [cards, setCards] = useState<CardSelection[]>(DEFAULT_CARD_LOADOUT)
-  const [currentTab, setCurrentTab] = useState(SIMULATION_CONFIG_DEFAULTS.currentTab)
-  const [duration, setDuration] = useState(SIMULATION_CONFIG_DEFAULTS.duration)
-  const [useRandom, setUseRandom] = useState(SIMULATION_CONFIG_DEFAULTS.useRandom)
-  const [costRemain, setCostRemain] = useState(SIMULATION_CONFIG_DEFAULTS.costRemain)
-  const [excludeYouMingQuan, setExcludeYouMingQuan] = useState(SIMULATION_CONFIG_DEFAULTS.excludeYouMingQuan)
-  const [manualCore, setManualCore] = useState<SimulationCore>()
+  const [burstDps, setBurstDps] = useState(
+    BASIC_CONFIG_DEFAULTS.burstDps,
+  )
+  const [sustainedDps, setSustainedDps] = useState(
+    BASIC_CONFIG_DEFAULTS.sustainedDps,
+  )
+  const [danQingCards, setDanQingCards] = useState<CardSelection[]>([
+    { id: CARD_IDS.xingHongJuYi, level: 6 },
+    { id: CARD_IDS.mengHu, level: 6 },
+    { id: CARD_IDS.suiShou, level: 6 },
+    { id: CARD_IDS.erWeiYaoHu, level: 6 },
+    { id: CARD_IDS.liuWeiMoHu, level: 6 },
+  ])
+  const [lingYunCards, setLingYunCards] = useState<CardSelection[]>([
+    { id: '', level: 1 },
+  ])
+  const [currentTab, setCurrentTab] = useState(
+    SIMULATION_CONFIG_DEFAULTS.currentTab,
+  )
+  const [skillGroup, setSkillGroup] = useState(
+    SIMULATION_CONFIG_DEFAULTS.skillGroup,
+  )
+  const [duration, setDuration] = useState(
+    SIMULATION_CONFIG_DEFAULTS.duration,
+  )
+  const [useRandom, setUseRandom] = useState(
+    SIMULATION_CONFIG_DEFAULTS.useRandom,
+  )
+  const [autoMockGroup, setAutoMockGroup] = useState(
+    SIMULATION_CONFIG_DEFAULTS.autoMockGroup,
+  )
+  const [availableTianGongValue, setAvailableTianGongValue] =
+    useState(SIMULATION_CONFIG_DEFAULTS.availableTianGongValue)
+  const [manualResult, setManualResult] = useState<ManualResult>()
   const [mergeSameNameDamage, setMergeSameNameDamage] = useState(false)
 
   const isAutoMock = currentTab === 'autoMock'
-  const totalCost =
-    cards.reduce((total, card) => {
-      if (!card.id) return total
-      return total + cardCatalog[card.id].cost
-    }, 0) + (isAutoMock ? toInt(costRemain) : 0)
-
-  const options = useMemo<SimulationMockOptions>(() => {
-    const normalizedCards = cards.filter((card): card is { id: CardId; level: number } => !!card.id)
-    return {
-      cards: normalizedCards,
-      coreAttribute: toInt(coreAttribute),
-      basicDamage: toInt(basicDamage),
-      coreAttributeExtraGain: toNumber(coreAttributeExtraGain) / 100,
-      attributeValues: {
-        huiXin: toNumber(huiXin) / 100,
-        zhuanJing: toNumber(zhuanJing) / 100,
-        tiaoXi: toNumber(tiaoXi) / 100,
-      },
-      buffs: {
-        taXue,
-        anJi,
-      },
-      duration: isAutoMock ? AUTO_SIMULATION_DURATION : toInt(duration),
+  const simulationCards = useMemo(
+    () =>
+      [
+        {
+          id: skillCardIds[
+            isAutoMock ? autoMockGroup : skillGroup
+          ],
+          level: 0,
+        },
+        ...danQingCards,
+        ...lingYunCards.filter((card) => card.level > 0),
+      ]
+        .filter((card): card is CardOptions => card.id !== '')
+        .map(({ id, level }) => ({ id, level })),
+    [
+      autoMockGroup,
+      danQingCards,
+      isAutoMock,
+      lingYunCards,
+      skillGroup,
+    ],
+  )
+  const coreOptions = useMemo<CoreOptions>(
+    () => ({
+      cards: simulationCards,
+      duration: toInt(duration),
+      burstDps: toNumber(burstDps),
+      sustainedDps: toNumber(sustainedDps),
       useRandom: isAutoMock ? false : useRandom,
-    }
-  }, [
-    anJi,
-    basicDamage,
-    cards,
-    coreAttributeExtraGain,
-    coreAttribute,
-    duration,
-    huiXin,
-    isAutoMock,
-    taXue,
-    tiaoXi,
-    useRandom,
-    zhuanJing,
-  ])
-
-  const coreOptions = useMemo(() => deriveSimulationCoreOptions(options), [options])
+    }),
+    [
+      burstDps,
+      duration,
+      isAutoMock,
+      simulationCards,
+      sustainedDps,
+      useRandom,
+    ],
+  )
   const mockResult = useMemo(() => {
-    if (!manualCore) return []
-    const detail = manualCore.dps.getDetail().sort((a, b) => b.dps - a.dps)
-    return mergeSameNameDamage ? mergeDamageBreakdown(detail) : detail
-  }, [manualCore, mergeSameNameDamage])
+    if (!manualResult) return []
+    const detail = buildDamageDetails(
+      manualResult.output,
+      manualResult.options,
+    )
+    const result = mergeSameNameDamage
+      ? mergeDamageDetails(detail)
+      : detail
+    const total = result.find((item) => item.key === 'total')
+    const items = result
+      .filter((item) => item.key !== 'total')
+      .sort((a, b) => b.dps - a.dps)
+    return total ? [total, ...items] : items
+  }, [manualResult, mergeSameNameDamage])
 
-  function handleAdd() {
-    setCards((current) => [...current, { id: '', level: 6 }])
+  function addDanQing() {
+    setDanQingCards((current) => [
+      ...current,
+      { id: '', level: 6 },
+    ])
   }
 
-  function handleDelete(index: number) {
-    setCards((current) => current.filter((_, i) => i !== index))
+  function addLingYun() {
+    setLingYunCards((current) => [
+      ...current,
+      { id: '', level: 1 },
+    ])
   }
 
-  function handleCardChange(index: number, value: CardId) {
-    setCards((current) =>
-      current.map((card, i) => {
-        if (i === index) return { ...card, id: value }
-        return card
-      }),
+  function deleteDanQing(index: number) {
+    setDanQingCards((current) =>
+      current.filter((_, currentIndex) => currentIndex !== index),
     )
   }
 
-  function handleLevelChange(index: number, value: string) {
-    setCards((current) =>
-      current.map((card, i) => {
-        if (i === index) return { ...card, level: toInt(value) }
-        return card
-      }),
+  function deleteLingYun(index: number) {
+    setLingYunCards((current) =>
+      current.filter((_, currentIndex) => currentIndex !== index),
     )
   }
 
-  function getCardList(id: string, cardsList: { value: CardId; label: string }[]) {
+  function changeDanQing(index: number, value: CardId) {
+    setDanQingCards((current) =>
+      current.map((card, currentIndex) =>
+        currentIndex === index ? { ...card, id: value } : card,
+      ),
+    )
+  }
+
+  function changeLingYun(index: number, value: CardId) {
+    setLingYunCards((current) =>
+      current.map((card, currentIndex) =>
+        currentIndex === index ? { ...card, id: value } : card,
+      ),
+    )
+  }
+
+  function changeDanQingLevel(index: number, value: string) {
+    setDanQingCards((current) =>
+      current.map((card, currentIndex) =>
+        currentIndex === index
+          ? { ...card, level: toInt(value) }
+          : card,
+      ),
+    )
+  }
+
+  function changeLingYunLevel(index: number, value: string) {
+    setLingYunCards((current) =>
+      current.map((card, currentIndex) =>
+        currentIndex === index
+          ? { ...card, level: toInt(value) }
+          : card,
+      ),
+    )
+  }
+
+  function selectDanQingGroup(ids: CardId[]) {
+    setDanQingCards(ids.map((id) => ({ id, level: 6 })))
+  }
+
+  function selectLingYunGroup(ids: CardId[]) {
+    setLingYunCards(ids.map((id) => ({ id, level: 5 })))
+  }
+
+  function changeAllDanQingLevels(level: number) {
+    setDanQingCards((current) =>
+      current.map((card) => ({ ...card, level })),
+    )
+  }
+
+  function changeAllLingYunLevels(level: number) {
+    setLingYunCards((current) =>
+      current.map((card) => ({ ...card, level })),
+    )
+  }
+
+  function getCardList(
+    cards: CardSelection[],
+    id: string,
+    cardsList: CardSelectOption[],
+  ) {
     const ids = cards.map((card) => card.id)
-    return cardsList.filter((card) => card.value === id || !ids.includes(card.value))
+    return cardsList.filter(
+      (card) => card.value === id || !ids.includes(card.value),
+    )
   }
 
   function execMock() {
-    const simulation = runSimulation(coreOptions)
-    setManualCore(simulation.core)
-    return simulation.core
+    const options = { ...coreOptions, useLightMode: false }
+    executeMock(options)
+  }
+
+  function applyAutoMockResult(
+    cards: CardOptions[],
+    group: CardGroup,
+  ) {
+    const nextLingYunCards = cards.map(({ id, level }) => ({
+      id,
+      level,
+    }))
+    const nextCards = [
+      { id: skillCardIds[group], level: 0 },
+      ...danQingCards
+        .filter((card): card is CardOptions => card.id !== '')
+        .map(({ id, level }) => ({ id, level })),
+      ...nextLingYunCards,
+    ]
+    const options: CoreOptions = {
+      cards: nextCards,
+      duration: toInt(duration),
+      burstDps: toNumber(burstDps),
+      sustainedDps: toNumber(sustainedDps),
+      useRandom,
+      useLightMode: false,
+    }
+
+    setLingYunCards(nextLingYunCards)
+    setSkillGroup(group)
+    setCurrentTab('mock')
+    executeMock(options)
+  }
+
+  function executeMock(options: CoreOptions) {
+    const core = new Core(options)
+    core.exec()
+    setManualResult({ options, output: core.damage.output() })
   }
 
   return {
     basicConfig: {
-      coreAttribute,
-      setCoreAttribute,
-      basicDamage,
-      setBasicDamage,
-      coreAttributeExtraGain,
-      setCoreAttributeExtraGain,
-      huiXin,
-      setHuiXin,
-      zhuanJing,
-      setZhuanJing,
-      tiaoXi,
-      setTiaoXi,
-      taXue,
-      setTaXue,
-      anJi,
-      setAnJi,
+      burstDps,
+      setBurstDps,
+      sustainedDps,
+      setSustainedDps,
     },
     cardsConfig: {
-      cards,
-      handleAdd,
-      handleDelete,
-      handleCardChange,
-      handleLevelChange,
-      getCardList,
+      danQingCards,
+      lingYunCards,
+      simulationCards,
+      addDanQing,
+      addLingYun,
+      deleteDanQing,
+      deleteLingYun,
+      changeDanQing,
+      changeLingYun,
+      changeDanQingLevel,
+      changeLingYunLevel,
+      selectDanQingGroup,
+      selectLingYunGroup,
+      changeAllDanQingLevels,
+      changeAllLingYunLevels,
+      getDanQingList: (
+        id: string,
+        cardsList: CardSelectOption[],
+      ) => getCardList(danQingCards, id, cardsList),
+      getLingYunList: (
+        id: string,
+        cardsList: CardSelectOption[],
+      ) => getCardList(lingYunCards, id, cardsList),
     },
     simulationConfig: {
       currentTab,
       setCurrentTab,
       isAutoMock,
+      skillGroup,
+      setSkillGroup,
       duration,
       setDuration,
       useRandom,
       setUseRandom,
-      costRemain,
-      setCostRemain,
-      excludeYouMingQuan,
-      setExcludeYouMingQuan,
+      autoMockGroup,
+      setAutoMockGroup,
+      availableTianGongValue,
+      setAvailableTianGongValue,
     },
-    preview: {
-      totalCost,
-      resultCoreAttribute: coreOptions.coreAttribute,
-      resultAttackPower: fixed(coreOptions.attackPower),
-    },
-    options,
     coreOptions,
-    manualCore,
     mockResult,
     mergeSameNameDamage,
     setMergeSameNameDamage,
     execMock,
+    applyAutoMockResult,
   }
 }
