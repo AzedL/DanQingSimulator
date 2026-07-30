@@ -84,7 +84,7 @@ export default function ResultPanel(props: Props) {
           </div>
           {props.autoMockLengthOverflow && (
             <div className="px-3">
-              <span className="font-medium text-red-500">{lang.overflow}</span>
+              <span className="text-sm font-medium text-red-500">{lang.overflow}</span>
             </div>
           )}
           <div className="flex flex-col overflow-hidden rounded-lg bg-white/50 text-sm">

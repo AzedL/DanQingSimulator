@@ -4,6 +4,7 @@ import BasicConfigPanel from '@/components/panels/BasicConfigPanel'
 import CardLoadoutPanel from '@/components/panels/CardLoadoutPanel'
 import ResultPanel from '@/components/panels/ResultPanel'
 import SimulationControlPanel from '@/components/panels/SimulationControlPanel'
+import AutoMockSettingsDialog from '@/components/dialogs/AutoMockSettingsDialog'
 import {
   danQingLevelValues,
   danQingList,
@@ -13,17 +14,28 @@ import {
   tabValues,
 } from '@/features/config/simulatorUi'
 import { useAutoMock } from '@/features/autoMock/useAutoMock'
+import { mergeAutoMockCardIds } from '@/features/autoMock/autoMockSettings'
 import { APP_VIEW_DEFAULTS } from '@/features/config/simulatorDefaults'
 import { useSimulation } from '@/features/simulator/useSimulation'
+import type { CardId } from '@/kernel'
 
 function App() {
   const simulation = useSimulation()
-  const autoMockCardIds = lingYunList
+  const [autoMockWhitelistEnabled, setAutoMockWhitelistEnabled] =
+    useState(false)
+  const [autoMockWhitelistCardIds, setAutoMockWhitelistCardIds] =
+    useState<CardId[]>([])
+  const groupAutoMockCardIds = lingYunList
     .filter(
       (card) =>
         card.group === simulation.simulationConfig.autoMockGroup,
     )
     .map((card) => card.value)
+  const autoMockCardIds = mergeAutoMockCardIds(
+    groupAutoMockCardIds,
+    autoMockWhitelistEnabled,
+    autoMockWhitelistCardIds,
+  )
   const autoMock = useAutoMock(
     simulation.coreOptions,
     autoMockCardIds,
@@ -173,6 +185,13 @@ function App() {
           by 日暮戈薇@一剑诛仙
         </a>
       </footer>
+
+      <AutoMockSettingsDialog
+        whitelistEnabled={autoMockWhitelistEnabled}
+        setWhitelistEnabled={setAutoMockWhitelistEnabled}
+        whitelistCardIds={autoMockWhitelistCardIds}
+        setWhitelistCardIds={setAutoMockWhitelistCardIds}
+      />
     </div>
   )
 }

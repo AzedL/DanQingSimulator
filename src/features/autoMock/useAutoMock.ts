@@ -8,9 +8,9 @@ import {
   type CardGroup,
 } from '@/features/config/simulatorUi'
 import {
-  AUTO_MOCK_MAX_COMBINATIONS,
   AUTO_MOCK_TOP_RESULT_COUNT,
 } from '@/features/config/simulatorDefaults'
+import { getAutoMockMaxCombinations } from './autoMockSettings'
 import type { AutoMockItem } from './autoMock'
 import type {
   AutoMockWorkerError,
@@ -141,7 +141,7 @@ export function useAutoMock(
         (card) => card.value,
       ),
       additionalValue: toInt(additionalValue),
-      maxCombinations: AUTO_MOCK_MAX_COMBINATIONS,
+      maxCombinations: getAutoMockMaxCombinations(),
       topCount: AUTO_MOCK_TOP_RESULT_COUNT,
     })
   }
