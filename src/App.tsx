@@ -154,6 +154,9 @@ function App() {
         autoMockCurrent={autoMock.autoMockCurrent}
         setAutoMockCurrent={autoMock.setAutoMockCurrent}
         autoMockResult={autoMock.autoMockResult}
+        autoMockDanQingCombination={
+          autoMock.autoMockDanQingCombination
+        }
         onAutoMockResultDoubleClick={(cards, skillGroup) => {
           simulation.applyAutoMockResult(cards, skillGroup)
           setCurrentTabResult('mock')

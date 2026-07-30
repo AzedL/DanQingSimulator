@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CardId, CardOptions, CoreOptions } from '@/kernel'
 import { toInt } from '@/kernel/utils/math'
 import {
+  danQingList,
   lingYunList,
   skillList,
   type CardGroup,
@@ -23,6 +24,9 @@ const cardNames = new Map(
   ]),
 )
 const skillIds = new Set(skillList.map((card) => card.value))
+const danQingNames = new Map(
+  danQingList.map((card) => [card.value, card.label]),
+)
 
 export interface AutoMockViewItem {
   cards: string
@@ -40,10 +44,15 @@ export function useAutoMock(
     useState(false)
   const [autoMockCurrent, setAutoMockCurrent] = useState(0)
   const [items, setItems] = useState<AutoMockItem[]>([])
+  const [
+    autoMockDanQingCombination,
+    setAutoMockDanQingCombination,
+  ] = useState('')
   const [isAutoMockRunning, setIsAutoMockRunning] = useState(false)
   const workerRef = useRef<Worker | null>(null)
   const requestIdRef = useRef(0)
   const onDoneRef = useRef<(() => void) | undefined>(undefined)
+  const pendingDanQingCombinationRef = useRef('')
 
   const autoMockResult = useMemo<AutoMockViewItem[]>(
     () =>
@@ -96,6 +105,9 @@ export function useAutoMock(
       setAutoMockLengthOverflow(message.overflow)
       setItems(message.items)
       setAutoMockCurrent(0)
+      setAutoMockDanQingCombination(
+        pendingDanQingCombinationRef.current,
+      )
       onDoneRef.current?.()
       onDoneRef.current = undefined
     }
@@ -113,6 +125,13 @@ export function useAutoMock(
     const requestId = requestIdRef.current + 1
     requestIdRef.current = requestId
     onDoneRef.current = onDone
+    pendingDanQingCombinationRef.current = coreOptions.cards
+      .filter((card) => danQingNames.has(card.id))
+      .map(
+        (card) =>
+          `${danQingNames.get(card.id)}${card.level}级`,
+      )
+      .join(' + ')
     setIsAutoMockRunning(true)
     worker.postMessage({
       requestId,
@@ -132,6 +151,7 @@ export function useAutoMock(
     autoMockCurrent,
     setAutoMockCurrent,
     autoMockResult,
+    autoMockDanQingCombination,
     isAutoMockRunning,
     execAutoMock,
   }

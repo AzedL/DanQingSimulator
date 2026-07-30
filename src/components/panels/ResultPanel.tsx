@@ -21,6 +21,7 @@ interface Props {
   autoMockCurrent: number
   setAutoMockCurrent: (index: number) => void
   autoMockResult: AutoMockViewItem[]
+  autoMockDanQingCombination: string
   onAutoMockResultDoubleClick: (
     cards: CardOptions[],
     skillGroup: CardGroup,
@@ -72,6 +73,15 @@ export default function ResultPanel(props: Props) {
       )}
       {isAutoMockResult && (
         <>
+          <div className="overflow-hidden px-3 py-1.5 text-sky-800">
+            <p
+              className="h-6 truncate whitespace-nowrap text-sm leading-6"
+              title={`丹青组合：${props.autoMockDanQingCombination || '无'}`}
+            >
+              <span className="font-medium">丹青组合：</span>
+              {props.autoMockDanQingCombination || '无'}
+            </p>
+          </div>
           {props.autoMockLengthOverflow && (
             <div className="px-3">
               <span className="font-medium text-red-500">{lang.overflow}</span>
