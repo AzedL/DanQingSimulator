@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Core, type CardOptions } from '../../core/Core'
+import {
+  getTianGongDamageBoost,
+  TIAN_GONG_CARD_IDS,
+} from '..'
 import type { CardId } from '../Card'
 import { CARD_IDS } from '../cardIds'
 import { ErWeiYaoHu } from './dq/ErWeiYaoHu'
@@ -32,7 +36,15 @@ function card<T>(core: Core, id: CardId) {
 }
 
 function damage(core: Core, key: string) {
-  return core.damage.output().damageMap[key] ?? 0
+  const value = core.damage.output().damageMap[key] ?? 0
+  if (key === '本体伤害扣减') return value
+
+  return Number(
+    (
+      value /
+      (1 + getTianGongDamageBoost(core, TIAN_GONG_CARD_IDS.fire))
+    ).toFixed(9),
+  )
 }
 
 function count(core: Core, key: string) {
@@ -103,7 +115,7 @@ describe('天火丹青', () => {
 
     expect(damage(core, '引燃')).toBe(3696 * 2)
     expect(count(core, '引燃')).toBe(2)
-    expect(damage(core, '燃烧')).toBe(2209 * 2 + 2209 * 1.05)
+    expect(damage(core, '燃烧')).toBeCloseTo(2209 * 2 + 2209 * 1.05)
     expect(count(core, '燃烧')).toBe(3)
     expect(card<XingHongJuYi>(core, CARD_IDS.xingHongJuYi).burnLayers).toBe(2)
   })
@@ -294,7 +306,7 @@ describe('天火灵韵', () => {
     for (let index = 0; index < 6; index++) burning.onSkillDamage()
     core.exec()
 
-    expect(damage(core, '烈焰焚身')).toBe(1082 * 2.5 * 12 * 12)
+    expect(damage(core, '烈焰焚身')).toBeCloseTo(1082 * 2.5 * 12 * 12)
     expect(count(core, '烈焰焚身')).toBe(12 * 12)
   })
 

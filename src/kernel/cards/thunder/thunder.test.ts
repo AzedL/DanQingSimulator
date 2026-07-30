@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Core, type CardOptions } from '../../core/Core'
+import {
+  getTianGongDamageBoost,
+  TIAN_GONG_CARD_IDS,
+} from '..'
 import type { CardId } from '../Card'
 import { CARD_IDS } from '../cardIds'
 import { LeiPoJing } from './dq/LeiPoJing'
@@ -32,7 +36,20 @@ function card<T>(core: Core, id: CardId) {
 }
 
 function damage(core: Core, key: string) {
-  return core.damage.output().damageMap[key] ?? 0
+  const value = core.damage.output().damageMap[key] ?? 0
+  if (
+    key === '本体伤害扣减' ||
+    key === '本体伤害增幅' ||
+    key === '测试-持续中' ||
+    key === '测试-结束后'
+  ) return value
+
+  return Number(
+    (
+      value /
+      (1 + getTianGongDamageBoost(core, TIAN_GONG_CARD_IDS.thunder))
+    ).toFixed(9),
+  )
 }
 
 function count(core: Core, key: string) {
@@ -190,7 +207,7 @@ describe('神雷丹青', () => {
 
     core.exec()
 
-    expect(damage(core, '连锁闪电')).toBe(9660 * 1.42)
+    expect(damage(core, '连锁闪电')).toBeCloseTo(9660 * 1.42)
     expect(damage(core, '静电过载')).toBe(16100)
   })
 

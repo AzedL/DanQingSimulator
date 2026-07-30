@@ -1,4 +1,4 @@
-import { getCards } from '../cards'
+import { applyTianGongDamageBoosts, getCards } from '../cards'
 import { isActiveCard, type ActiveCard, type Card, type CardId } from '../cards/Card'
 import { Damage } from './Damage'
 import { Fire } from './Fire'
@@ -41,6 +41,7 @@ export class Core {
     this.thunder = new Thunder(this.damage)
     this.wood = new Wood(this.damage)
 
+    applyTianGongDamageBoosts(this)
     getCards(this).forEach((card) => {
       this.cardsMap.set(card.id, card)
       if (isActiveCard(card)) this.actions.push(card)
@@ -60,6 +61,7 @@ export class Core {
     this.ice.reset()
     this.thunder.reset()
     this.wood.reset()
+    applyTianGongDamageBoosts(this)
     this.cardsMap.forEach((card) => card.reset())
   }
 

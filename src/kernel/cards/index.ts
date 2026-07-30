@@ -48,6 +48,38 @@ import { ShenMuTouLingYun } from './wood/ly/ShenMuTouLingYun'
 
 export type CardConstructor = new (core: Core, level: number) => Card
 
+export const TIAN_GONG_DAMAGE_BOOST_PER_LEVEL = 0.002
+export const TIAN_GONG_CARD_IDS = {
+  fire: [
+    CARD_IDS.lieYanFenShen,
+    CARD_IDS.lieHuoLiaoYuan,
+    CARD_IDS.tianHuoYunXing,
+    CARD_IDS.chiYanTianHuan,
+    CARD_IDS.shenHuoBengFa,
+  ],
+  ice: [
+    CARD_IDS.shuangHanPoLie,
+    CARD_IDS.hanChaoBingYong,
+    CARD_IDS.linShuangHanYong,
+    CARD_IDS.hanJingCi,
+    CARD_IDS.shuangCiHanYu,
+  ],
+  thunder: [
+    CARD_IDS.tianLeiHuYou,
+    CARD_IDS.jingLeiJi,
+    CARD_IDS.wuLeiZhu,
+    CARD_IDS.jiuXiaoLeiDong,
+    CARD_IDS.leiTingZhenJi,
+  ],
+  wood: [
+    CARD_IDS.fuMuZhangFeng,
+    CARD_IDS.lieDiBeng,
+    CARD_IDS.muYinQingLing,
+    CARD_IDS.cangLinFuSheng,
+    CARD_IDS.shenMuTou_ly,
+  ],
+} as const
+
 export const cards: Partial<Record<CardId, CardConstructor>> = {
   [CARD_IDS.zhuoZhuoTianYan]: ZhuoZhuoTianYan,
   [CARD_IDS.xingHongJuYi]: XingHongJuYi,
@@ -108,4 +140,30 @@ export function getCards(core: Core) {
   })
 
   return instances
+}
+
+export function applyTianGongDamageBoosts(core: Core) {
+  const entries = Object.entries(TIAN_GONG_CARD_IDS) as [
+    keyof typeof TIAN_GONG_CARD_IDS,
+    readonly CardId[],
+  ][]
+
+  entries.forEach(([type, ids]) => {
+    core[type].addBoost(getTianGongDamageBoost(core, ids))
+  })
+}
+
+export function getTianGongDamageBoost(
+  core: Core,
+  ids: readonly CardId[],
+) {
+  const levels = new Map(
+    core.coreOptions.cards.map((card) => [card.id, card.level]),
+  )
+  const totalLevel = ids.reduce(
+    (total, id) => total + (levels.get(id) ?? 0),
+    0,
+  )
+
+  return totalLevel * TIAN_GONG_DAMAGE_BOOST_PER_LEVEL
 }

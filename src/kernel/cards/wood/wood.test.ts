@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Core, type CardOptions } from '../../core/Core'
+import {
+  getTianGongDamageBoost,
+  TIAN_GONG_CARD_IDS,
+} from '..'
 import type { CardId } from '../Card'
 import { CARD_IDS } from '../cardIds'
 import { QingWuFuSheng } from './QingWuFuSheng'
@@ -28,7 +32,15 @@ function card<T>(core: Core, id: CardId) {
 }
 
 function damage(core: Core, key: string) {
-  return core.damage.output().damageMap[key] ?? 0
+  const value = core.damage.output().damageMap[key] ?? 0
+  if (key === '本体伤害扣减') return value
+
+  return Number(
+    (
+      value /
+      (1 + getTianGongDamageBoost(core, TIAN_GONG_CARD_IDS.wood))
+    ).toFixed(9),
+  )
 }
 
 function count(core: Core, key: string) {
@@ -495,7 +507,7 @@ describe('苍木灵韵', () => {
     expect(damage(core, '苍木激化 · 绽放')).toBe(
       72108 * 1.4 * 3,
     )
-    expect(damage(core, '腐木瘴风')).toBe(
+    expect(damage(core, '腐木瘴风')).toBeCloseTo(
       25042 * 1.75 * 1.4 * 3,
     )
   })

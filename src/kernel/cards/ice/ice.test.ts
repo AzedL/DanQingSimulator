@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Core, type CardOptions } from '../../core/Core'
+import {
+  getTianGongDamageBoost,
+  TIAN_GONG_CARD_IDS,
+} from '..'
 import type { CardId } from '../Card'
 import { CARD_IDS } from '../cardIds'
 import { ShangGuanCe } from './dq/ShangGuanCe'
@@ -30,7 +34,15 @@ function card<T>(core: Core, id: CardId) {
 }
 
 function damage(core: Core, key: string) {
-  return core.damage.output().damageMap[key] ?? 0
+  const value = core.damage.output().damageMap[key] ?? 0
+  if (key === '本体伤害扣减') return value
+
+  return Number(
+    (
+      value /
+      (1 + getTianGongDamageBoost(core, TIAN_GONG_CARD_IDS.ice))
+    ).toFixed(9),
+  )
 }
 
 function count(core: Core, key: string) {
