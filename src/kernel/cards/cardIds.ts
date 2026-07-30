@@ -25,7 +25,7 @@ export const CARD_IDS = {
   yinLeiFan: 'dq-yinleifan',
   leiPoJing: 'dq-leipojing',
   lianLeiBi: 'dq-lianleibi',
-  ziLeiHu: 'dq-zileihu',
+  ziXiaoHu: 'dq-zixiaohu',
   ziDianChiWen: 'dq-zidianchiwen',
   leiTingZhenJi: 'ly-leitingzhenji',
   jingLeiJi: 'ly-jingleiji',

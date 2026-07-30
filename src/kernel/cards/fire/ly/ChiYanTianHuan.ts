@@ -19,7 +19,7 @@ export class ChiYanTianHuan extends Card {
   }
 
   protected init() {
-    this._damage = 3038 * MULTIPLIER[this.level]
+    this._damage = 3080 * MULTIPLIER[this.level]
   }
 
   get activationInterval() {

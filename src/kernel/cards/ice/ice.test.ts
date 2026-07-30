@@ -171,7 +171,7 @@ describe('玄冰丹青', () => {
     expect(count(core, '碎裂')).toBe(1)
   })
 
-  it('齐昊在2秒内结算20次玄冰风暴伤害', () => {
+  it('齐昊分四次结算20次玄冰风暴伤害', () => {
     const core = createCore([{ id: CARD_IDS.qiHao, level: 0 }], 3)
 
     core.exec()
@@ -180,7 +180,7 @@ describe('玄冰丹青', () => {
     expect(count(core, '玄冰风暴')).toBe(20)
   })
 
-  it('玄冰风暴随两次伤害分别累加一半玄冰值', () => {
+  it('玄冰风暴随四次伤害分别累加四分之一玄冰值', () => {
     const first = createCore(
       [
         { id: CARD_IDS.qiHao, level: 0 },
@@ -195,6 +195,10 @@ describe('玄冰丹青', () => {
       ],
       3,
     )
+    const onStorm = vi.spyOn(
+      card<ShangGuanCe>(complete, CARD_IDS.shangGuanCe),
+      'onStorm',
+    )
 
     first.exec()
     complete.exec()
@@ -205,6 +209,12 @@ describe('玄冰丹青', () => {
     expect(
       card<ShangGuanCe>(complete, CARD_IDS.shangGuanCe).iceValue,
     ).toBe(1400)
+    expect(onStorm.mock.calls).toEqual([
+      [0.25],
+      [0.25],
+      [0.25],
+      [0.25],
+    ])
   })
 
   it('每枚冰箭使齐昊冷却缩短2秒', () => {

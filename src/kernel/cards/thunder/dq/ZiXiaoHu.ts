@@ -7,12 +7,12 @@ import type { LeiTingZhenJi } from '../ly/LeiTingZhenJi'
 
 const CHAIN_VALUE = [392, 420, 448, 476, 504, 532, 560]
 
-export class ZiLeiHu extends Card {
+export class ZiXiaoHu extends Card {
   declare private _chainValue: number
   declare private _thunderValue: number
 
   constructor(core: Core, level: number) {
-    super(core, 'passive', CARD_IDS.ziLeiHu, '紫雷葫', level)
+    super(core, 'passive', CARD_IDS.ziXiaoHu, '紫霄葫', level)
   }
 
   protected init() {

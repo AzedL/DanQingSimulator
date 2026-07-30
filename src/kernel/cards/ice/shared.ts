@@ -1,6 +1,6 @@
 import { DEFAULT_DAMAGE_MULTIPLIER } from '../../core/Damage'
 import type { Core } from '../../core/Core'
-import { enqueueRepeated, getCard } from '../shared'
+import { getCard } from '../shared'
 import type { QiHao } from './dq/QiHao'
 import type { ShangGuanCe } from './dq/ShangGuanCe'
 import type { WenMin } from './dq/WenMin'
@@ -50,12 +50,14 @@ export function summonFrostElement(
     zuoGui?.arrowStormDamageMultiplier ?? DEFAULT_DAMAGE_MULTIPLIER
   const damage = stormDamage * multiplier
 
-  enqueueRepeated(core, 2, 1, () => {
-    core.ice.add(damage / 2, 10, stormKey)
-    zuoGui?.onHit(10)
-    getCard<ShangGuanCe>(
-      core,
-      CARD_IDS.shangGuanCe,
-    )?.onStorm(0.5)
-  })
+  for (let index = 0; index < 4; index++) {
+    core.queue.enqueue(() => {
+      core.ice.add(damage / 4, 5, stormKey)
+      zuoGui?.onHit(5)
+      getCard<ShangGuanCe>(
+        core,
+        CARD_IDS.shangGuanCe,
+      )?.onStorm(0.25)
+    }, 1 + index * 0.5)
+  }
 }

@@ -28,7 +28,7 @@ import { LeiPoJing } from './thunder/dq/LeiPoJing'
 import { LianLeiBi } from './thunder/dq/LianLeiBi'
 import { YinLeiFan } from './thunder/dq/YinLeiFan'
 import { ZiDianChiWen } from './thunder/dq/ZiDianChiWen'
-import { ZiLeiHu } from './thunder/dq/ZiLeiHu'
+import { ZiXiaoHu } from './thunder/dq/ZiXiaoHu'
 import { JingLeiJi } from './thunder/ly/JingLeiJi'
 import { JiuXiaoLeiDong } from './thunder/ly/JiuXiaoLeiDong'
 import { LeiTingZhenJi } from './thunder/ly/LeiTingZhenJi'
@@ -109,7 +109,7 @@ export const cards: Partial<Record<CardId, CardConstructor>> = {
   [CARD_IDS.wuLeiZhu]: WuLeiZhu,
   [CARD_IDS.leiPoJing]: LeiPoJing,
   [CARD_IDS.lianLeiBi]: LianLeiBi,
-  [CARD_IDS.ziLeiHu]: ZiLeiHu,
+  [CARD_IDS.ziXiaoHu]: ZiXiaoHu,
   [CARD_IDS.leiTingZhenJi]: LeiTingZhenJi,
   [CARD_IDS.jingLeiJi]: JingLeiJi,
   [CARD_IDS.tianLeiHuYou]: TianLeiHuYou,

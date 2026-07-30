@@ -209,7 +209,7 @@ describe('天火灵韵', () => {
     ring.onActivation()
     core.exec()
 
-    expect(damage(core, '赤焰天环')).toBe(3038 * 1.75 * 10)
+    expect(damage(core, '赤焰天环')).toBe(3080 * 1.75 * 10)
     expect(count(core, '赤焰天环')).toBe(10)
     expect(damage(core, '引燃')).toBeCloseTo(3696 * 4)
     expect(count(core, '引燃')).toBeCloseTo(4)

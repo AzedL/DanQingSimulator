@@ -353,7 +353,7 @@ describe('苍木灵韵', () => {
 
     for (let index = 0; index < 12; index++) triggerPulse(core)
 
-    expect(damage(core, '神木骰')).toBe(111451 * 2)
+    expect(damage(core, '神木骰')).toBe(114514 * 2)
     expect(count(core, '神木骰')).toBe(2)
   })
 

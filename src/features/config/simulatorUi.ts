@@ -42,7 +42,7 @@ export const danQingList: CardSelectOption[] = [
   { value: CARD_IDS.linFeng, label: '林峰', group: '苍木', cost: 4 },
   { value: CARD_IDS.liuHeJing, label: '六合镜', group: '苍木', cost: 5 },
   { value: CARD_IDS.yinLeiFan, label: '引雷幡', group: '神雷', cost: 1 },
-  { value: CARD_IDS.ziLeiHu, label: '紫雷葫', group: '神雷', cost: 2 },
+  { value: CARD_IDS.ziXiaoHu, label: '紫霄葫', group: '神雷', cost: 2 },
   { value: CARD_IDS.leiPoJing, label: '雷魄晶', group: '神雷', cost: 3 },
   { value: CARD_IDS.lianLeiBi, label: '连雷璧', group: '神雷', cost: 4 },
   { value: CARD_IDS.ziDianChiWen, label: '紫电螭吻', group: '神雷', cost: 5 },

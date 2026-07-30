@@ -2,7 +2,7 @@ import type { Core } from '../../../core/Core'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
 import { getCard } from '../../shared'
-import type { ZiLeiHu } from '../dq/ZiLeiHu'
+import type { ZiXiaoHu } from '../dq/ZiXiaoHu'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -27,9 +27,9 @@ export class JiuXiaoLeiDong extends Card {
         '九霄雷动',
       )
       if (this.level >= 3) {
-        getCard<ZiLeiHu>(
+        getCard<ZiXiaoHu>(
           this.core,
-          CARD_IDS.ziLeiHu,
+          CARD_IDS.ziXiaoHu,
         )?.addThunderValue(100)
       }
     }, 2)

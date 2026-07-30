@@ -30,7 +30,7 @@ describe('CARD_IDS', () => {
       'dq-yinleifan',
       'dq-leipojing',
       'dq-lianleibi',
-      'dq-zileihu',
+      'dq-zixiaohu',
       'dq-zidianchiwen',
       'ly-leitingzhenji',
       'ly-jingleiji',

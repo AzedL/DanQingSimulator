@@ -5,7 +5,7 @@ import type { LeiPoJing } from './dq/LeiPoJing'
 import type { LianLeiBi } from './dq/LianLeiBi'
 import type { YinLeiFan } from './dq/YinLeiFan'
 import type { ZiDianChiWen } from './dq/ZiDianChiWen'
-import type { ZiLeiHu } from './dq/ZiLeiHu'
+import type { ZiXiaoHu } from './dq/ZiXiaoHu'
 import type { JingLeiJi } from './ly/JingLeiJi'
 import type { TianLeiHuYou } from './ly/TianLeiHuYou'
 
@@ -53,7 +53,7 @@ function settleChainLightningGroup(
   const damage = chainDamage(core) * chainMultiplier(core) * efficiency
 
   core.thunder.add(damage * count, count, key)
-  getCard<ZiLeiHu>(core, CARD_IDS.ziLeiHu)?.onChain(count)
+  getCard<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu)?.onChain(count)
   getCard<JingLeiJi>(core, CARD_IDS.jingLeiJi)?.onChain(count)
   if (allowOverload) {
     getCard<LeiPoJing>(core, CARD_IDS.leiPoJing)?.onChain(count)
@@ -80,7 +80,7 @@ function settleCopiedChainLightning(
   const damage = chainDamage(core) * chainMultiplier(core) * efficiency
 
   core.thunder.add(damage * count, count, key)
-  getCard<ZiLeiHu>(core, CARD_IDS.ziLeiHu)?.onChain(count)
+  getCard<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu)?.onChain(count)
   getCard<JingLeiJi>(core, CARD_IDS.jingLeiJi)?.onChain(count)
   if (allowOverload) {
     getCard<LeiPoJing>(core, CARD_IDS.leiPoJing)?.onChain(count)

@@ -72,7 +72,7 @@ export class ShenMuTouLingYun extends Card {
     }
 
     if (state.triggerDice && this.level >= 5) {
-      this.core.wood.add(111451, 1, '神木骰')
+      this.core.wood.add(114514, 1, '神木骰')
     }
   }
 

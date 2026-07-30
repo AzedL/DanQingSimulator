@@ -8,7 +8,7 @@ import type { CardId } from '../Card'
 import { CARD_IDS } from '../cardIds'
 import { LeiPoJing } from './dq/LeiPoJing'
 import { ZiDianChiWen } from './dq/ZiDianChiWen'
-import { ZiLeiHu } from './dq/ZiLeiHu'
+import { ZiXiaoHu } from './dq/ZiXiaoHu'
 import { JingLeiJi } from './ly/JingLeiJi'
 import { JiuXiaoLeiDong } from './ly/JiuXiaoLeiDong'
 import { LeiTingZhenJi } from './ly/LeiTingZhenJi'
@@ -289,9 +289,9 @@ describe('神雷丹青', () => {
     expect(count(core, '静电过载')).toBe(4 * 6)
   })
 
-  it('紫雷葫累计神雷值、保留余数并可连续激化', () => {
-    const core = createCore([{ id: CARD_IDS.ziLeiHu, level: 0 }], 0)
-    const gourd = card<ZiLeiHu>(core, CARD_IDS.ziLeiHu)
+  it('紫霄葫累计神雷值、保留余数并可连续激化', () => {
+    const core = createCore([{ id: CARD_IDS.ziXiaoHu, level: 0 }], 0)
+    const gourd = card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu)
 
     gourd.onChain(52)
 
@@ -303,14 +303,14 @@ describe('神雷丹青', () => {
   it('神雷激化触发雷霆震击和九霄雷动', () => {
     const core = createCore(
       [
-        { id: CARD_IDS.ziLeiHu, level: 0 },
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
         { id: CARD_IDS.leiTingZhenJi, level: 1 },
         { id: CARD_IDS.jiuXiaoLeiDong, level: 1 },
       ],
       2,
     )
 
-    card<ZiLeiHu>(core, CARD_IDS.ziLeiHu).addThunderValue(10000)
+    card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).addThunderValue(10000)
     core.exec()
 
     expect(damage(core, '神雷激化')).toBe(93805)
@@ -355,7 +355,7 @@ describe('神雷灵韵', () => {
   it('五级雷霆震击结束后爆炸并累积500神雷值', () => {
     const core = createCore(
       [
-        { id: CARD_IDS.ziLeiHu, level: 0 },
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
         { id: CARD_IDS.leiTingZhenJi, level: 5 },
       ],
       30,
@@ -368,7 +368,7 @@ describe('神雷灵韵', () => {
     core.exec()
 
     expect(damage(core, '雷霆震击-爆炸')).toBe(142055)
-    expect(card<ZiLeiHu>(core, CARD_IDS.ziLeiHu).thunderValue).toBe(500)
+    expect(card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).thunderValue).toBe(500)
   })
 
   it('惊雷戟由每次连锁闪电触发', () => {
@@ -541,7 +541,7 @@ describe('神雷灵韵', () => {
   it('五级九霄雷动结算4道雷电并累积100神雷值', () => {
     const core = createCore(
       [
-        { id: CARD_IDS.ziLeiHu, level: 0 },
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
         { id: CARD_IDS.jiuXiaoLeiDong, level: 5 },
       ],
       2,
@@ -555,7 +555,7 @@ describe('神雷灵韵', () => {
 
     expect(damage(core, '九霄雷动')).toBe(27506 * 2.5 * 4)
     expect(count(core, '九霄雷动')).toBe(4)
-    expect(card<ZiLeiHu>(core, CARD_IDS.ziLeiHu).thunderValue).toBe(100)
+    expect(card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).thunderValue).toBe(100)
   })
 
   it('全部神雷卡片可以重置', () => {
@@ -567,7 +567,7 @@ describe('神雷灵韵', () => {
         { id: CARD_IDS.wuLeiZhu, level: 1 },
         { id: CARD_IDS.leiPoJing, level: 0 },
         { id: CARD_IDS.lianLeiBi, level: 0 },
-        { id: CARD_IDS.ziLeiHu, level: 0 },
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
         { id: CARD_IDS.leiTingZhenJi, level: 1 },
         { id: CARD_IDS.jingLeiJi, level: 1 },
         { id: CARD_IDS.tianLeiHuYou, level: 1 },
