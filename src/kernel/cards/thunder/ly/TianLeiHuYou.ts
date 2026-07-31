@@ -24,7 +24,7 @@ export class TianLeiHuYou extends Card {
     return this._active ? 1 + this._chainBoost : 1
   }
 
-  onSkillDamageSettled() {
+  onSkillDamage() {
     this._active = true
 
     if (this.level >= 3) {

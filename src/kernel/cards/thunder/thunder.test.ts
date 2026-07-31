@@ -148,6 +148,20 @@ describe('神雷技能', () => {
       8970 * 1.08 * 5,
     )
   })
+
+  it('雷佑灵光直伤享受五级天雷护佑的70%增伤', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.leiYouLingGuang, level: 0 },
+        { id: CARD_IDS.tianLeiHuYou, level: 5 },
+      ],
+      2,
+    )
+
+    core.exec()
+
+    expect(damage(core, '雷佑灵光')).toBeCloseTo(187960 * 1.7)
+  })
 })
 
 describe('神雷丹青', () => {
@@ -428,7 +442,7 @@ describe('神雷灵韵', () => {
     card<TianLeiHuYou>(
       core,
       CARD_IDS.tianLeiHuYou,
-    ).onSkillDamageSettled()
+    ).onSkillDamage()
     triggerChainLightning(core, { useFury: false })
 
     expect(damage(core, '连锁闪电')).toBeCloseTo(9660 * 1.42 * 1.08)
@@ -441,7 +455,7 @@ describe('神雷灵韵', () => {
     )
     const blessing = card<TianLeiHuYou>(core, CARD_IDS.tianLeiHuYou)
 
-    blessing.onSkillDamageSettled()
+    blessing.onSkillDamage()
     core.fire.add(100, 1, '测试-持续中')
     core.exec()
     core.wood.add(100, 1, '测试-结束后')
@@ -461,7 +475,7 @@ describe('神雷灵韵', () => {
     card<TianLeiHuYou>(
       core,
       CARD_IDS.tianLeiHuYou,
-    ).onSkillDamageSettled()
+    ).onSkillDamage()
     core.exec()
 
     expect(damage(core, '本体伤害增幅')).toBe(1000 * 0.05 * 10)

@@ -30,12 +30,6 @@ export class LeiYouLingGuang extends Card {
     const insightMultiplier = this.core.damage.consumeInsightMultiplier()
 
     this.core.queue.enqueue(() => {
-      this.core.thunder.add(
-        DAMAGE * insightMultiplier,
-        1,
-        '雷佑灵光',
-      )
-
       for (let index = 1; index <= 5; index++) {
         this.core.queue.enqueue(() => {
           triggerChainLightning(this.core, {
@@ -48,7 +42,13 @@ export class LeiYouLingGuang extends Card {
       getCard<TianLeiHuYou>(
         this.core,
         CARD_IDS.tianLeiHuYou,
-      )?.onSkillDamageSettled()
+      )?.onSkillDamage()
+
+      this.core.thunder.add(
+        DAMAGE * insightMultiplier,
+        1,
+        '雷佑灵光',
+      )
     }, 1)
   }
 
