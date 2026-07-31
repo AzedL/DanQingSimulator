@@ -30,8 +30,8 @@ export class LiuWeiMoHu extends Card {
     this._locked = true
     this.core.queue.enqueue(() => {
       const layers = ant.burnLayers
-      this.core.fire.add(this._damage * layers, 1, '爆燃')
-      ant.resetBurn()
+      this.core.fire.add(this._damage * (layers - 1), 1, '爆燃')
+      ant.retainOneBurnLayer()
       this._locked = false
       getCard<MengHu>(this.core, CARD_IDS.mengHu)?.onExplosion()
       getCard<LieYanFenShen>(

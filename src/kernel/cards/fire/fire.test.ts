@@ -120,21 +120,22 @@ describe('天火丹青', () => {
     expect(card<XingHongJuYi>(core, CARD_IDS.xingHongJuYi).burnLayers).toBe(2)
   })
 
-  it('六尾魔狐按爆燃执行时的燃烧层数结算并重置为1层', () => {
+  it('六尾魔狐引爆当前层数减一并保留燃烧结算冷却', () => {
     const core = createCore(
       [
         { id: CARD_IDS.xingHongJuYi, level: 0 },
         { id: CARD_IDS.liuWeiMoHu, level: 0 },
       ],
-      2,
+      4,
     )
     const ant = card<XingHongJuYi>(core, CARD_IDS.xingHongJuYi)
 
     ant.addBurn(6)
     core.exec()
 
-    expect(damage(core, '爆燃')).toBe(8055 * 7)
+    expect(damage(core, '爆燃')).toBe(8055 * 6)
     expect(count(core, '爆燃')).toBe(1)
+    expect(damage(core, '燃烧')).toBe(2209)
     expect(ant.burnLayers).toBe(1)
   })
 

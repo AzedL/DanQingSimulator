@@ -60,7 +60,7 @@ export class XingHongJuYi extends Card {
     )?.onBurnChanged()
   }
 
-  resetBurn() {
+  retainOneBurnLayer() {
     this._burnLayers = 1
   }
 
