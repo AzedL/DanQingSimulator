@@ -2,7 +2,6 @@ import type { Core } from '../../../core/Core'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
 import {
-  enqueueRepeated,
   forEachIndependentCount,
   getCard,
 } from '../../shared'
@@ -24,27 +23,29 @@ export class MuYinQingLing extends Card {
 
   summon(count: number) {
     forEachIndependentCount(count, (weight) => {
-      enqueueRepeated(this.core, 14, 2, () => {
-        this.core.wood.add(
-          this._damage * weight,
-          weight,
-          '木引青灵',
-        )
-        if (this.level >= 3) {
-          getCard<QingWuFuSheng>(
+      for (let index = 0; index < 14; index++) {
+        this.core.queue.enqueue(() => {
+          this.core.wood.add(
+            this._damage * weight,
+            weight,
+            '木引青灵',
+          )
+          if (this.level >= 3) {
+            getCard<QingWuFuSheng>(
+              this.core,
+              CARD_IDS.qingWuFuSheng,
+            )?.reduceCooldown(1)
+          }
+          getCard<LieDiBeng>(
             this.core,
-            CARD_IDS.qingWuFuSheng,
-          )?.reduceCooldown(1)
-        }
-        getCard<LieDiBeng>(
-          this.core,
-          CARD_IDS.lieDiBeng,
-        )?.onSummonAttack()
-      })
+            CARD_IDS.lieDiBeng,
+          )?.onSummonAttack()
+        }, 1 + index * 2)
+      }
     })
   }
 
-  onSkillDamageSettled() {
+  onSkillCastCompleted() {
     if (this.level >= 5) this.summon(2)
   }
 

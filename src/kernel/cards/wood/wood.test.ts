@@ -412,18 +412,28 @@ describe('苍木灵韵', () => {
     ).toBe(80 * 11)
   })
 
-  it('木引青灵召唤2秒后开始攻击并在30秒内攻击14次', () => {
+  it('木引青灵召唤1秒后开始攻击并每2秒攻击一次', () => {
+    const first = createCore(
+      [{ id: CARD_IDS.muYinQingLing, level: 1 }],
+      1,
+    )
     const core = createCore(
       [{ id: CARD_IDS.muYinQingLing, level: 1 }],
-      28,
+      27,
     )
 
+    card<MuYinQingLing>(
+      first,
+      CARD_IDS.muYinQingLing,
+    ).summon(1)
     card<MuYinQingLing>(
       core,
       CARD_IDS.muYinQingLing,
     ).summon(1)
+    first.exec()
     core.exec()
 
+    expect(count(first, '木引青灵')).toBe(1)
     expect(damage(core, '木引青灵')).toBe(5992 * 14)
     expect(count(core, '木引青灵')).toBe(14)
   })
@@ -512,8 +522,17 @@ describe('苍木灵韵', () => {
     )
   })
 
-  it('五级腐木瘴风和木引青灵在青芜浮生伤害结算时触发', () => {
-    const before = createCore(
+  it('青芜浮生读条完成后召唤木引青灵并在2秒后结算伤害', () => {
+    const summoned = createCore(
+      [
+        { id: CARD_IDS.qingWuFuSheng, level: 0 },
+        { id: CARD_IDS.qingLiangZhu, level: 0 },
+        { id: CARD_IDS.fuMuZhangFeng, level: 5 },
+        { id: CARD_IDS.muYinQingLing, level: 5 },
+      ],
+      3,
+    )
+    const attacked = createCore(
       [
         { id: CARD_IDS.qingWuFuSheng, level: 0 },
         { id: CARD_IDS.qingLiangZhu, level: 0 },
@@ -522,7 +541,7 @@ describe('苍木灵韵', () => {
       ],
       4,
     )
-    const after = createCore(
+    const settled = createCore(
       [
         { id: CARD_IDS.qingWuFuSheng, level: 0 },
         { id: CARD_IDS.qingLiangZhu, level: 0 },
@@ -531,31 +550,35 @@ describe('苍木灵韵', () => {
       ],
       5,
     )
-    const beforeValue = vi.spyOn(
-      card<QingLiangZhu>(before, CARD_IDS.qingLiangZhu),
+    const summonedValue = vi.spyOn(
+      card<QingLiangZhu>(summoned, CARD_IDS.qingLiangZhu),
       'addWoodValue',
     )
-    const beforeSummon = vi.spyOn(
-      card<MuYinQingLing>(before, CARD_IDS.muYinQingLing),
+    const summonedCall = vi.spyOn(
+      card<MuYinQingLing>(summoned, CARD_IDS.muYinQingLing),
       'summon',
     )
-    const afterValue = vi.spyOn(
-      card<QingLiangZhu>(after, CARD_IDS.qingLiangZhu),
+    const attackedValue = vi.spyOn(
+      card<QingLiangZhu>(attacked, CARD_IDS.qingLiangZhu),
       'addWoodValue',
     )
-    const afterSummon = vi.spyOn(
-      card<MuYinQingLing>(after, CARD_IDS.muYinQingLing),
-      'summon',
+    const settledValue = vi.spyOn(
+      card<QingLiangZhu>(settled, CARD_IDS.qingLiangZhu),
+      'addWoodValue',
     )
 
-    before.exec()
-    after.exec()
+    summoned.exec()
+    attacked.exec()
+    settled.exec()
 
-    expect(beforeValue).not.toHaveBeenCalled()
-    expect(beforeSummon).not.toHaveBeenCalled()
-    expect(afterValue).toHaveBeenCalledWith(10000)
-    expect(afterSummon).toHaveBeenCalledWith(1)
-    expect(afterSummon).toHaveBeenCalledWith(2)
+    expect(summonedCall).toHaveBeenCalledWith(2)
+    expect(summonedValue).not.toHaveBeenCalled()
+    expect(count(summoned, '木引青灵')).toBe(0)
+    expect(count(attacked, '木引青灵')).toBe(2)
+    expect(attackedValue).not.toHaveBeenCalled()
+    expect(damage(attacked, '青芜浮生')).toBe(0)
+    expect(settledValue).toHaveBeenCalledWith(10000)
+    expect(damage(settled, '青芜浮生')).toBe(279564)
   })
 
   it('三级裂地崩附加30次回响伤害', () => {

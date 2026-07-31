@@ -37,6 +37,13 @@ export class QingWuFuSheng extends Card {
       this.core.damage.consumeInsightMultiplier()
 
     this.core.queue.enqueue(() => {
+      getCard<MuYinQingLing>(
+        this.core,
+        CARD_IDS.muYinQingLing,
+      )?.onSkillCastCompleted()
+    }, CAST_DURATION)
+
+    this.core.queue.enqueue(() => {
       this.core.wood.add(
         DAMAGE * insightMultiplier,
         1,
@@ -52,11 +59,6 @@ export class QingWuFuSheng extends Card {
         this.core,
         CARD_IDS.fuMuZhangFeng,
       )?.onSkillDamageSettled()
-      getCard<MuYinQingLing>(
-        this.core,
-        CARD_IDS.muYinQingLing,
-      )?.onSkillDamageSettled()
-
       const attackCount = collapse ? 5 : 6
       for (let index = 1; index <= attackCount; index++) {
         this.core.queue.enqueue(() => {
