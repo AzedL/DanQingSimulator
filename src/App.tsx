@@ -23,6 +23,8 @@ function App() {
   const simulation = useSimulation()
   const [autoMockWhitelistEnabled, setAutoMockWhitelistEnabled] =
     useState(false)
+  const [autoMockSettingsOpen, setAutoMockSettingsOpen] =
+    useState(false)
   const [autoMockWhitelistCardIds, setAutoMockWhitelistCardIds] =
     useState<CardId[]>([])
   const groupAutoMockCardIds = lingYunList
@@ -150,6 +152,7 @@ function App() {
           setAvailableTianGongValue={
             simulation.simulationConfig.setAvailableTianGongValue
           }
+          onOpenAutoMockSettings={() => setAutoMockSettingsOpen(true)}
           isExecuting={simulation.simulationConfig.isAutoMock ? autoMock.isAutoMockRunning : false}
           onExecute={handleExecute}
         />
@@ -187,6 +190,8 @@ function App() {
       </footer>
 
       <AutoMockSettingsDialog
+        open={autoMockSettingsOpen}
+        setOpen={setAutoMockSettingsOpen}
         whitelistEnabled={autoMockWhitelistEnabled}
         setWhitelistEnabled={setAutoMockWhitelistEnabled}
         whitelistCardIds={autoMockWhitelistCardIds}

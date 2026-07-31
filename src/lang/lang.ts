@@ -7,6 +7,12 @@ const lang = {
   skillGroup: '灵韵技能',
   duration: '模拟时间',
   autoMockGroup: '模拟范围',
+  autoMockWhitelist: '自动模拟白名单',
+  autoMockWhitelistSettings: '白名单设置',
+  enableAutoMockWhitelist: '启用自动模拟白名单',
+  autoMockMaxCombinations: '自动模拟最大组合数',
+  autoMockWhitelistWarning:
+    '启用白名单将勾选天工纳入自动模拟范围。组合数和模拟时长将迅速上升，酌情使用！',
   availableTianGongValue: '可用天工机巧值',
   availableTianGongValueTip: '基于已选丹青和天工，在模拟范围内按照可用天工机巧值追加模拟',
   useRandom: '模拟随机',

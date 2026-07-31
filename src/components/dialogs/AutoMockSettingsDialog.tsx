@@ -1,4 +1,9 @@
-import { useEffect, useId, useState } from 'react'
+import {
+  useEffect,
+  useId,
+  type Dispatch,
+  type SetStateAction,
+} from 'react'
 import CheckboxField from '@/components/form/CheckboxField'
 import {
   cardGroups,
@@ -9,9 +14,12 @@ import {
   getAutoMockMaxCombinations,
 } from '@/features/autoMock/autoMockSettings'
 import type { CardId } from '@/kernel'
+import lang from '@/lang/lang'
 import { cn } from '@/lib/utils'
 
 interface Props {
+  open: boolean
+  setOpen: Dispatch<SetStateAction<boolean>>
   whitelistEnabled: boolean
   setWhitelistEnabled: (value: boolean) => void
   whitelistCardIds: CardId[]
@@ -23,12 +31,13 @@ const recommendedIds = new Set(
 )
 
 export default function AutoMockSettingsDialog({
+  open,
+  setOpen,
   whitelistEnabled,
   setWhitelistEnabled,
   whitelistCardIds,
   setWhitelistCardIds,
 }: Props) {
-  const [open, setOpen] = useState(false)
   const maxCombinationsInputId = useId()
 
   useEffect(() => {
@@ -44,7 +53,7 @@ export default function AutoMockSettingsDialog({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [setOpen])
 
   if (!open) return null
 
@@ -76,16 +85,16 @@ export default function AutoMockSettingsDialog({
             id="auto-mock-settings-title"
             className="text-lg font-bold text-slate-800"
           >
-            自动模拟白名单
+            {lang.autoMockWhitelist}
           </h2>
         </header>
 
         <div className="grid gap-5 p-6">
-          <div className="grid items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 md:grid-cols-2">
+          <div className="grid items-center gap-x-4 gap-y-2 rounded-lg border border-slate-200 bg-white p-4 md:grid-cols-2">
             <CheckboxField
               value={whitelistEnabled}
               onChange={setWhitelistEnabled}
-              label="启用自动模拟白名单"
+              label={lang.enableAutoMockWhitelist}
             />
 
             <div className="flex items-center gap-3">
@@ -93,7 +102,7 @@ export default function AutoMockSettingsDialog({
                 htmlFor={maxCombinationsInputId}
                 className="shrink-0 text-sm font-medium text-slate-700"
               >
-                自动模拟最大组合数
+                {lang.autoMockMaxCombinations}
               </label>
               <input
                 id={maxCombinationsInputId}
@@ -118,6 +127,9 @@ export default function AutoMockSettingsDialog({
                 }}
               />
             </div>
+            <p className="text-sm font-medium text-red-600 md:col-span-2">
+              {lang.autoMockWhitelistWarning}
+            </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
