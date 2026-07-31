@@ -32,7 +32,7 @@ interface Props {
 
 export default function SimulationControlPanel(props: Props) {
   return (
-    <div className="flex h-[400px] w-full min-w-72 flex-col gap-2.5 rounded-xl border border-pink-100 bg-linear-to-br from-pink-50 to-rose-50 p-6 text-pink-800 shadow-lg">
+    <div className="flex h-[400px] w-full min-w-72 flex-col gap-5 rounded-xl border border-pink-100 bg-linear-to-br from-pink-50 to-rose-50 p-6 text-pink-800 shadow-lg">
       <h2 className="mb-1 text-xl font-bold text-pink-950">{lang.mockConfig}</h2>
       <div className="flex items-center gap-3">
         <span className="shrink-0 text-sm font-medium">
@@ -49,7 +49,7 @@ export default function SimulationControlPanel(props: Props) {
       </div>
       <TabsField value={props.currentTab} onChange={props.setCurrentTab} list={props.tabValues} />
       {!props.isAutoMock && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-5">
           <CardGroupField
             label={lang.skillGroup}
             value={props.skillGroup}
@@ -64,7 +64,7 @@ export default function SimulationControlPanel(props: Props) {
         </div>
       )}
       {props.isAutoMock && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-5">
           <CardGroupField
             label={lang.autoMockGroup}
             value={props.autoMockGroup}
