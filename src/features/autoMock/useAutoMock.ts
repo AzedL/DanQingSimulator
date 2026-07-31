@@ -11,7 +11,12 @@ import {
   AUTO_MOCK_TOP_RESULT_COUNT,
 } from '@/features/config/simulatorDefaults'
 import { getAutoMockMaxCombinations } from './autoMockSettings'
-import type { AutoMockItem } from './autoMock'
+import {
+  mergeAutoMockResults,
+  type AutoMockItem,
+  type AutoMockResult,
+} from './autoMock'
+import { getAutoMockWorkerCount } from './autoMockWorkerPool'
 import type {
   AutoMockWorkerError,
   AutoMockWorkerSuccess,
@@ -39,6 +44,7 @@ export function useAutoMock(
   coreOptions: CoreOptions,
   targetCardIds: CardId[],
   additionalValue: string,
+  whitelistEnabled: boolean,
 ) {
   const [autoMockLengthOverflow, setAutoMockLengthOverflow] =
     useState(false)
@@ -49,10 +55,8 @@ export function useAutoMock(
     setAutoMockDanQingCombination,
   ] = useState('')
   const [isAutoMockRunning, setIsAutoMockRunning] = useState(false)
-  const workerRef = useRef<Worker | null>(null)
+  const workersRef = useRef<Worker[]>([])
   const requestIdRef = useRef(0)
-  const onDoneRef = useRef<(() => void) | undefined>(undefined)
-  const pendingDanQingCombinationRef = useRef('')
 
   const autoMockResult = useMemo<AutoMockViewItem[]>(
     () =>
@@ -81,69 +85,119 @@ export function useAutoMock(
   )
 
   useEffect(() => {
-    const worker = new Worker(
-      new URL('./autoMock.worker.ts', import.meta.url),
-      { type: 'module' },
-    )
-    workerRef.current = worker
-
-    worker.onmessage = (
-      event: MessageEvent<
-        AutoMockWorkerSuccess | AutoMockWorkerError
-      >,
-    ) => {
-      const message = event.data
-      if (message.requestId !== requestIdRef.current) return
-
-      setIsAutoMockRunning(false)
-      if (message.type === 'error') {
-        console.error(message.message)
-        onDoneRef.current = undefined
-        return
-      }
-
-      setAutoMockLengthOverflow(message.overflow)
-      setItems(message.items)
-      setAutoMockCurrent(0)
-      setAutoMockDanQingCombination(
-        pendingDanQingCombinationRef.current,
-      )
-      onDoneRef.current?.()
-      onDoneRef.current = undefined
-    }
-
     return () => {
-      worker.terminate()
-      workerRef.current = null
+      workersRef.current.forEach((worker) => worker.terminate())
+      workersRef.current = []
     }
   }, [])
 
   function execAutoMock(onDone?: () => void) {
-    const worker = workerRef.current
-    if (!worker) return
-
     const requestId = requestIdRef.current + 1
     requestIdRef.current = requestId
-    onDoneRef.current = onDone
-    pendingDanQingCombinationRef.current = coreOptions.cards
+    workersRef.current.forEach((worker) => worker.terminate())
+    workersRef.current = []
+
+    const pendingDanQingCombination = coreOptions.cards
       .filter((card) => danQingNames.has(card.id))
       .map(
         (card) =>
           `${danQingNames.get(card.id)}${card.level}级`,
       )
       .join(' + ')
-    setIsAutoMockRunning(true)
-    worker.postMessage({
-      requestId,
-      coreOptions,
-      targetCardIds,
-      resultCardIds: [...skillList, ...lingYunList].map(
-        (card) => card.value,
-      ),
-      additionalValue: toInt(additionalValue),
-      maxCombinations: getAutoMockMaxCombinations(),
-      topCount: AUTO_MOCK_TOP_RESULT_COUNT,
-    })
+    const isMobile = window.matchMedia(
+      '(pointer: coarse)',
+    ).matches
+    const workerCount = getAutoMockWorkerCount(
+      whitelistEnabled,
+      isMobile,
+      navigator.hardwareConcurrency,
+    )
+    const maxCombinations = getAutoMockMaxCombinations()
+    const topCount = AUTO_MOCK_TOP_RESULT_COUNT
+    const results: AutoMockResult[] = []
+    let settled = false
+
+    const terminateWorkers = () => {
+      workersRef.current.forEach((worker) => worker.terminate())
+      workersRef.current = []
+    }
+
+    const fail = (message: string) => {
+      if (settled || requestId !== requestIdRef.current) return
+      settled = true
+      terminateWorkers()
+      setIsAutoMockRunning(false)
+      console.error(message)
+    }
+
+    const handleMessage = (
+      event: MessageEvent<
+        AutoMockWorkerSuccess | AutoMockWorkerError
+      >,
+    ) => {
+      const message = event.data
+      if (
+        settled ||
+        message.requestId !== requestIdRef.current ||
+        message.requestId !== requestId
+      ) {
+        return
+      }
+      if (message.type === 'error') {
+        fail(message.message)
+        return
+      }
+
+      results.push(message)
+      if (results.length !== workerCount) return
+
+      settled = true
+      const result = mergeAutoMockResults(results, topCount)
+      terminateWorkers()
+      setIsAutoMockRunning(false)
+      setAutoMockLengthOverflow(result.overflow)
+      setItems(result.items)
+      setAutoMockCurrent(0)
+      setAutoMockDanQingCombination(pendingDanQingCombination)
+      onDone?.()
+    }
+
+    try {
+      const workers: Worker[] = []
+      workersRef.current = workers
+      for (
+        let workerIndex = 0;
+        workerIndex < workerCount;
+        workerIndex += 1
+      ) {
+        const worker = new Worker(
+          new URL('./autoMock.worker.ts', import.meta.url),
+          { type: 'module' },
+        )
+        worker.onmessage = handleMessage
+        worker.onerror = (event) => fail(event.message)
+        workers.push(worker)
+      }
+      setIsAutoMockRunning(true)
+
+      workers.forEach((worker, workerIndex) => {
+        worker.postMessage({
+          requestId,
+          coreOptions,
+          targetCardIds,
+          resultCardIds: [...skillList, ...lingYunList].map(
+            (card) => card.value,
+          ),
+          additionalValue: toInt(additionalValue),
+          maxCombinations,
+          topCount,
+          workerIndex,
+          workerCount,
+        })
+      })
+    } catch (error) {
+      fail(error instanceof Error ? error.message : String(error))
+    }
   }
 
   return {

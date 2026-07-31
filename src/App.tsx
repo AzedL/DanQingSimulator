@@ -42,6 +42,7 @@ function App() {
     simulation.coreOptions,
     autoMockCardIds,
     simulation.simulationConfig.availableTianGongValue,
+    autoMockWhitelistEnabled,
   )
 
   const [currentTabResult, setCurrentTabResult] = useState(APP_VIEW_DEFAULTS.currentTabResult)
