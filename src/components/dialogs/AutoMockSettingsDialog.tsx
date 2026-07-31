@@ -4,6 +4,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
+import Button from '@/components/form/Button'
 import CheckboxField from '@/components/form/CheckboxField'
 import {
   cardGroups,
@@ -80,13 +81,33 @@ export default function AutoMockSettingsDialog({
         className="max-h-[calc(100vh-2rem)] w-full max-w-4xl overflow-y-auto rounded-xl border border-slate-200 bg-[#f8faf9] shadow-[0_18px_60px_rgb(15_23_42/18%)]"
         role="dialog"
       >
-        <header className="flex justify-start border-b border-slate-200 px-6 py-4">
+        <header className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <h2
             id="auto-mock-settings-title"
             className="text-lg font-bold text-slate-800"
           >
             {lang.autoMockWhitelist}
           </h2>
+          <Button
+            aria-label={lang.close}
+            variant="danger"
+            className="size-9 px-0"
+            onClick={() => setOpen(false)}
+          >
+            <svg
+              aria-hidden="true"
+              className="size-4"
+              fill="none"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="m4 4 8 8m0-8-8 8"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.7"
+              />
+            </svg>
+          </Button>
         </header>
 
         <div className="grid gap-5 p-6">

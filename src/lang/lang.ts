@@ -20,6 +20,7 @@ const lang = {
 
   exec: '模拟',
   executing: '模拟中...',
+  close: '关闭',
 
   mergeSameNameDamage: '合并同名伤害',
   damageName: '伤害名称',
