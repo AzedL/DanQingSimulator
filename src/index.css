@@ -135,17 +135,21 @@ textarea {
     background: #fff1ed;
   }
 
-  .app-select,
-  .app-select::picker(select) {
-    appearance: base-select;
-  }
-
   .app-select {
+    -webkit-appearance: none;
+    appearance: none;
     max-width: 100%;
     align-items: center;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .app-select,
+    .app-select::picker(select) {
+      appearance: base-select;
+    }
   }
 
   .app-select::picker-icon,
