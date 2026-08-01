@@ -139,7 +139,7 @@ describe('天火丹青', () => {
     expect(ant.burnLayers).toBe(1)
   })
 
-  it('猛虎保留溢出的天火值并允许天火激化重叠触发', () => {
+  it('猛虎保留溢出天火值并以新天火激化覆盖旧激化', () => {
     const core = createCore([{ id: CARD_IDS.mengHu, level: 0 }], 10)
     const tiger = card<MengHu>(core, CARD_IDS.mengHu)
 
@@ -147,8 +147,8 @@ describe('天火丹青', () => {
     core.exec()
 
     expect(tiger.fireValue).toBe(5000)
-    expect(damage(core, '天火激化')).toBe(39181 * 10)
-    expect(count(core, '天火激化')).toBe(10)
+    expect(damage(core, '天火激化')).toBe(39181 * 5)
+    expect(count(core, '天火激化')).toBe(5)
   })
 
   it('猛虎分别接收燃烧和爆燃提供的天火值', () => {
@@ -207,7 +207,9 @@ describe('天火灵韵', () => {
     )
     const ring = card<ChiYanTianHuan>(core, CARD_IDS.chiYanTianHuan)
 
-    ring.onActivation()
+    for (let index = 0; index < 5; index++) {
+      ring.onActivationDamage()
+    }
     core.exec()
 
     expect(damage(core, '赤焰天环')).toBe(3080 * 1.75 * 10)
@@ -344,6 +346,62 @@ describe('天火灵韵', () => {
     expect(count(core, '赤焰天环')).toBe(16)
   })
 
+  it('天火激化仅剩最后一跳时被覆盖会与赤焰天环立即结算', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.mengHu, level: 0 },
+        { id: CARD_IDS.chiYanTianHuan, level: 1 },
+      ],
+      8,
+    )
+    const tiger = card<MengHu>(core, CARD_IDS.mengHu)
+
+    tiger.addFireValue(10000)
+    core.exec()
+    expect(count(core, '天火激化')).toBe(4)
+    expect(count(core, '赤焰天环')).toBe(4)
+
+    tiger.addFireValue(10000)
+
+    expect(count(core, '天火激化')).toBe(5)
+    expect(count(core, '赤焰天环')).toBe(5)
+  })
+
+  it('天火激化剩余两跳时被覆盖不会立即结算', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.mengHu, level: 0 },
+        { id: CARD_IDS.chiYanTianHuan, level: 1 },
+      ],
+      6,
+    )
+    const tiger = card<MengHu>(core, CARD_IDS.mengHu)
+
+    tiger.addFireValue(10000)
+    core.exec()
+    tiger.addFireValue(10000)
+
+    expect(count(core, '天火激化')).toBe(3)
+    expect(count(core, '赤焰天环')).toBe(3)
+  })
+
+  it('天火激化覆盖后重新等待完整间隔并废弃旧任务', () => {
+    const core = createCore(
+      [{ id: CARD_IDS.mengHu, level: 0 }],
+      7,
+    )
+    const tiger = card<MengHu>(core, CARD_IDS.mengHu)
+
+    tiger.addFireValue(10000)
+    core.exec()
+    expect(count(core, '天火激化')).toBe(3)
+
+    tiger.addFireValue(10000)
+    core.exec()
+
+    expect(count(core, '天火激化')).toBe(6)
+  })
+
   it('天火陨星3立即结算本体并生成5次固定伤害', () => {
     const core = createCore([{ id: CARD_IDS.tianHuoYunXing, level: 3 }], 11)
 
@@ -441,7 +499,9 @@ describe('天火灵韵', () => {
     burning.onSkillDamage()
     card<ShenHuoBengFa>(core, CARD_IDS.shenHuoBengFa).onActivation()
     meteor.onActivation()
-    ring.onActivation()
+    for (let index = 0; index < 5; index++) {
+      ring.onActivationDamage()
+    }
     core.exec()
 
     expect(count(core, '神火迸发')).toBe(1)

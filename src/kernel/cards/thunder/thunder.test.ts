@@ -385,6 +385,65 @@ describe('神雷灵韵', () => {
     expect(card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).thunderValue).toBe(500)
   })
 
+  it('五级雷霆震击被神雷激化覆盖时立即爆炸', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
+        { id: CARD_IDS.leiTingZhenJi, level: 5 },
+      ],
+      10,
+    )
+    const gourd = card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu)
+
+    gourd.addThunderValue(10000)
+    core.exec()
+    gourd.addThunderValue(10000)
+
+    expect(damage(core, '雷霆震击-爆炸')).toBe(142055)
+    expect(gourd.thunderValue).toBe(500)
+  })
+
+  it('雷霆震击覆盖后重新等待1秒并废弃旧任务', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
+        { id: CARD_IDS.leiTingZhenJi, level: 1 },
+      ],
+      10,
+    )
+    const gourd = card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu)
+
+    gourd.addThunderValue(10000)
+    core.exec()
+    expect(count(core, '雷霆震击')).toBe(10)
+
+    gourd.addThunderValue(10000)
+    core.exec()
+
+    expect(count(core, '雷霆震击')).toBe(20)
+  })
+
+  it('神雷激化覆盖不取消已经进入队列的九霄雷动', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
+        { id: CARD_IDS.leiTingZhenJi, level: 1 },
+        { id: CARD_IDS.jiuXiaoLeiDong, level: 1 },
+      ],
+      1,
+    )
+    const gourd = card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu)
+
+    gourd.addThunderValue(10000)
+    core.exec()
+    gourd.addThunderValue(10000)
+    core.exec()
+    core.exec()
+
+    expect(damage(core, '九霄雷动')).toBe(27506 * 2 * 2)
+    expect(count(core, '九霄雷动')).toBe(4)
+  })
+
   it('惊雷戟由每次连锁闪电触发', () => {
     const core = createCore(
       [{ id: CARD_IDS.jingLeiJi, level: 2 }],

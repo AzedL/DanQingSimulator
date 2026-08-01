@@ -7,7 +7,7 @@ import {
   MENG_HU_ACTIVATION_INTERVAL,
 } from '../dq/MengHu'
 import type { XingHongJuYi } from '../dq/XingHongJuYi'
-import { enqueueRepeated, getCard } from '../../shared'
+import { getCard } from '../../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -30,23 +30,20 @@ export class ChiYanTianHuan extends Card {
     return this.level >= 5 ? 12 : MENG_HU_ACTIVATION_DURATION
   }
 
-  onActivation() {
-    const times = this.activationDuration / this.activationInterval
+  onActivationDamage() {
     const triggerCount = this.level >= 3 ? 2 : 1
 
-    enqueueRepeated(this.core, times, this.activationInterval, () => {
-      for (let index = 0; index < triggerCount; index++) {
-        this.core.fire.add(this._damage, 1, '赤焰天环')
-        const count = handleProbability(
-          0.2,
-          this.core.coreOptions.useRandom,
-        )
-        getCard<XingHongJuYi>(
-          this.core,
-          CARD_IDS.xingHongJuYi,
-        )?.addBurn(count)
-      }
-    })
+    for (let index = 0; index < triggerCount; index++) {
+      this.core.fire.add(this._damage, 1, '赤焰天环')
+      const count = handleProbability(
+        0.2,
+        this.core.coreOptions.useRandom,
+      )
+      getCard<XingHongJuYi>(
+        this.core,
+        CARD_IDS.xingHongJuYi,
+      )?.addBurn(count)
+    }
   }
 
   reset() {}
