@@ -351,7 +351,7 @@ describe('玄冰灵韵', () => {
     card<ShangGuanCe>(core, CARD_IDS.shangGuanCe).addIceValue(10000)
     core.exec()
 
-    expect(damage(core, '玄冰激化')).toBeCloseTo((43534 + 85327) * 1.3)
+    expect(damage(core, '玄冰激化')).toBeCloseTo((43534 + 85327) * 1.5)
     expect(damage(core, '凛霜寒涌')).toBe(75540 * 1.75)
   })
 

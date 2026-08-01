@@ -39,7 +39,11 @@ export class LieDiBeng extends Card {
   }
 
   private settleEcho() {
-    this.core.wood.add(2887, 1, '裂地崩 · 回响')
+    this.core.wood.add(
+      2887 * 2 * MULTIPLIER[this.level],
+      1,
+      '裂地崩 · 回响',
+    )
   }
 
   reset() {

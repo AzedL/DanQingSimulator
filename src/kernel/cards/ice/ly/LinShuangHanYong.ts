@@ -22,7 +22,7 @@ export class LinShuangHanYong extends Card {
 
   get activationDamageMultiplier() {
     return this.level >= 3
-      ? 1.3
+      ? 1.5
       : SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER
   }
 
