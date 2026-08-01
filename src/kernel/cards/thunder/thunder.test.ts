@@ -197,7 +197,7 @@ describe('神雷丹青', () => {
     expect(count(core, '静电过载')).toBe(4)
   })
 
-  it('多次连锁闪电分别建立静电过载伤害序列', () => {
+  it('多次连锁闪电叠加静电过载并合并结算', () => {
     const core = createCore([{ id: CARD_IDS.leiPoJing, level: 0 }], 2)
     const overload = card<LeiPoJing>(core, CARD_IDS.leiPoJing)
     const add = vi.spyOn(core.thunder, 'add')
@@ -205,8 +205,8 @@ describe('神雷丹青', () => {
     overload.onChain(3)
     core.exec()
 
-    expect(add).toHaveBeenCalledTimes(3)
-    expect(add).toHaveBeenNthCalledWith(1, 16100 / 4, 1, '静电过载')
+    expect(add).toHaveBeenCalledOnce()
+    expect(add).toHaveBeenCalledWith(16100 / 4 * 3, 1, '静电过载')
   })
 
   it('连雷璧只增幅连锁闪电', () => {
@@ -287,7 +287,7 @@ describe('神雷丹青', () => {
     expect(ziDian.consumeFury()).toBe(true)
   })
 
-  it('狂雷的每次连锁闪电独立触发静电过载', () => {
+  it('狂雷的每次连锁闪电叠加静电过载并合并结算', () => {
     const core = createCore(
       [
         { id: CARD_IDS.leiPoJing, level: 0 },
@@ -300,7 +300,7 @@ describe('神雷丹青', () => {
     core.exec()
 
     expect(damage(core, '静电过载')).toBe(16100 * 6)
-    expect(count(core, '静电过载')).toBe(4 * 6)
+    expect(count(core, '静电过载')).toBe(4)
   })
 
   it('紫霄葫累计神雷值、保留余数并可连续激化', () => {
@@ -397,7 +397,7 @@ describe('神雷灵韵', () => {
     expect(count(core, '惊雷戟')).toBe(2)
   })
 
-  it('三级惊雷戟的每层效果独立结算16次固定伤害', () => {
+  it('三级惊雷戟的多层效果合并结算16次固定伤害', () => {
     const core = createCore(
       [{ id: CARD_IDS.jingLeiJi, level: 3 }],
       8,
@@ -409,10 +409,10 @@ describe('神雷灵韵', () => {
     core.exec()
 
     expect(damage(core, '惊雷戟3')).toBe(95 * 16 * 3)
-    expect(count(core, '惊雷戟3')).toBe(16 * 3)
+    expect(count(core, '惊雷戟3')).toBe(16)
     expect(
       add.mock.calls.filter((call) => call[2] === '惊雷戟3'),
-    ).toHaveLength(16 * 3)
+    ).toHaveLength(16)
   })
 
   it('五级惊雷戟每次触发结算3次并建立3层持续伤害', () => {

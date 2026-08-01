@@ -142,7 +142,7 @@ describe('苍木丹青', () => {
     expect(count(core, '脉冲-神木骰')).toBe(3)
   })
 
-  it('每次脉冲分别建立5次震荡伤害', () => {
+  it('每次脉冲叠加震荡并沿用已有节奏合并结算', () => {
     const core = createCore(
       [{ id: CARD_IDS.shenMuTou_dq, level: 0 }],
       17,
@@ -151,7 +151,7 @@ describe('苍木丹青', () => {
     core.exec()
 
     expect(damage(core, '震荡')).toBe(12005 * 3)
-    expect(count(core, '震荡')).toBe(5 * 3)
+    expect(count(core, '震荡')).toBe(8)
   })
 
   it('脉冲-神木骰使用折扇等级伤害', () => {
@@ -228,7 +228,7 @@ describe('苍木丹青', () => {
     ).toBe(280 * 3)
   })
 
-  it('清凉珠保留溢出的苍木值并允许苍木激化重叠触发', () => {
+  it('清凉珠保留溢出苍木值并合并结算重叠的苍木激化', () => {
     const core = createCore([{ id: CARD_IDS.qingLiangZhu, level: 0 }], 9)
     const pearl = card<QingLiangZhu>(core, CARD_IDS.qingLiangZhu)
 
@@ -237,9 +237,9 @@ describe('苍木丹青', () => {
 
     expect(pearl.woodValue).toBe(5000)
     expect(damage(core, '苍木激化')).toBe(24916 * 9 * 2)
-    expect(count(core, '苍木激化')).toBe(9 * 2)
+    expect(count(core, '苍木激化')).toBe(9)
     expect(damage(core, '苍木激化 · 绽放')).toBe(72108 * 3 * 2)
-    expect(count(core, '苍木激化 · 绽放')).toBe(3 * 2)
+    expect(count(core, '苍木激化 · 绽放')).toBe(3)
   })
 })
 

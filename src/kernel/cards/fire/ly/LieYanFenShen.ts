@@ -1,14 +1,15 @@
 import type { Core } from '../../../core/Core'
 import { CooldownTime } from '../../../utils/CooldownTime'
+import { StackedEffect } from '../../../utils/StackedEffect'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
-import { enqueueRepeated } from '../../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
 export class LieYanFenShen extends Card {
   declare private _damage: number
   declare private _cooldown: CooldownTime
+  declare private _effect: StackedEffect
 
   constructor(core: Core, level: number) {
     super(core, 'active', CARD_IDS.lieYanFenShen, '烈焰焚身', level)
@@ -17,6 +18,17 @@ export class LieYanFenShen extends Card {
   protected init() {
     this._damage = 1082 * MULTIPLIER[this.level]
     this._cooldown = new CooldownTime(15)
+    this._effect = new StackedEffect(this.core.queue, {
+      interval: 1,
+      duration: 12,
+      onTick: (layers) => {
+        this.core.fire.add(
+          this._damage * layers,
+          1,
+          '烈焰焚身',
+        )
+      },
+    })
   }
 
   tick() {
@@ -25,11 +37,7 @@ export class LieYanFenShen extends Card {
   }
 
   addLayers(layers: number) {
-    for (let layer = 0; layer < layers; layer++) {
-      enqueueRepeated(this.core, 12, 1, () => {
-        this.core.fire.add(this._damage, 1, '烈焰焚身')
-      })
-    }
+    this._effect.add(layers)
   }
 
   onExplosion() {
@@ -42,5 +50,6 @@ export class LieYanFenShen extends Card {
 
   reset() {
     this._cooldown.reset()
+    this._effect.reset()
   }
 }

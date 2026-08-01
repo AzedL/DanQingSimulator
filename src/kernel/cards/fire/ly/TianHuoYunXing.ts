@@ -1,15 +1,17 @@
 import type { Core } from '../../../core/Core'
 import { CooldownTime } from '../../../utils/CooldownTime'
+import { StackedEffect } from '../../../utils/StackedEffect'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
 import type { MengHu } from '../dq/MengHu'
-import { enqueueRepeated, getCard } from '../../shared'
+import { getCard } from '../../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
 export class TianHuoYunXing extends Card {
   declare private _damage: number
   declare private _cooldown: CooldownTime
+  declare private _effect: StackedEffect
 
   constructor(core: Core, level: number) {
     super(core, 'active', CARD_IDS.tianHuoYunXing, '天火陨星', level)
@@ -18,6 +20,18 @@ export class TianHuoYunXing extends Card {
   protected init() {
     this._damage = 26594 * MULTIPLIER[this.level]
     this._cooldown = new CooldownTime(20, true)
+    this._effect = new StackedEffect(this.core.queue, {
+      interval: 2,
+      duration: 10,
+      maxLayers: 2,
+      onTick: (layers) => {
+        this.core.fire.add(5342 * layers, 1, '天火陨星3')
+        getCard<MengHu>(
+          this.core,
+          CARD_IDS.mengHu,
+        )?.addFireValue(200 * layers)
+      },
+    })
   }
 
   tick() {
@@ -35,13 +49,11 @@ export class TianHuoYunXing extends Card {
 
     if (this.level < 3) return
 
-    enqueueRepeated(this.core, 5, 2, () => {
-      this.core.fire.add(5342, 1, '天火陨星3')
-      getCard<MengHu>(this.core, CARD_IDS.mengHu)?.addFireValue(200)
-    })
+    this._effect.add()
   }
 
   reset() {
     this._cooldown.reset()
+    this._effect.reset()
   }
 }

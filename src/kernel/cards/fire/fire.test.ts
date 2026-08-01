@@ -274,16 +274,16 @@ describe('天火灵韵', () => {
     expect(core.damage.boost).toBe(0)
   })
 
-  it('烈焰焚身首次在第16秒获得并立即消费3层焚尽', () => {
+  it('烈焰焚身首次在第16秒获得并将3层合并结算', () => {
     const core = createCore([{ id: CARD_IDS.lieYanFenShen, level: 1 }], 17)
 
     core.exec()
 
     expect(damage(core, '烈焰焚身')).toBe(1082 * 3)
-    expect(count(core, '烈焰焚身')).toBe(3)
+    expect(count(core, '烈焰焚身')).toBe(1)
   })
 
-  it('烈焰焚身3在爆燃时添加2个独立伤害层', () => {
+  it('烈焰焚身3在爆燃时添加2层并合并结算', () => {
     const core = createCore(
       [
         { id: CARD_IDS.xingHongJuYi, level: 0 },
@@ -297,10 +297,10 @@ describe('天火灵韵', () => {
     core.exec()
 
     expect(damage(core, '烈焰焚身')).toBe(1082 * 1.75 * 2)
-    expect(count(core, '烈焰焚身')).toBe(2)
+    expect(count(core, '烈焰焚身')).toBe(1)
   })
 
-  it('烈焰焚身5由灼灼天炎的6次伤害添加12个独立伤害层', () => {
+  it('烈焰焚身5由灼灼天炎的6次伤害添加12层并合并结算', () => {
     const core = createCore([{ id: CARD_IDS.lieYanFenShen, level: 5 }], 12)
     const burning = card<LieYanFenShen>(core, CARD_IDS.lieYanFenShen)
 
@@ -308,7 +308,7 @@ describe('天火灵韵', () => {
     core.exec()
 
     expect(damage(core, '烈焰焚身')).toBeCloseTo(1082 * 2.5 * 12 * 12)
-    expect(count(core, '烈焰焚身')).toBe(12 * 12)
+    expect(count(core, '烈焰焚身')).toBe(12)
   })
 
   it('神火迸发5立即结算并在2秒后再次结算且提高天火激化伤害', () => {
@@ -355,7 +355,7 @@ describe('天火灵韵', () => {
     expect(count(core, '天火陨星3')).toBe(5)
   })
 
-  it('天火陨星5在天火激化时与正常效果形成两个独立触发', () => {
+  it('天火陨星5在天火激化时与正常效果形成两层并合并结算', () => {
     const core = createCore(
       [
         { id: CARD_IDS.mengHu, level: 0 },
@@ -370,7 +370,27 @@ describe('天火灵韵', () => {
     expect(damage(core, '天火陨星')).toBe(26594 * 2.5 * 2)
     expect(count(core, '天火陨星')).toBe(2)
     expect(damage(core, '天火陨星3')).toBe(5342 * 10)
-    expect(count(core, '天火陨星3')).toBe(10)
+    expect(count(core, '天火陨星3')).toBe(5)
+  })
+
+  it('天火陨星3最多按2层结算', () => {
+    const core = createCore(
+      [{ id: CARD_IDS.tianHuoYunXing, level: 5 }],
+      11,
+    )
+    const meteor = card<TianHuoYunXing>(
+      core,
+      CARD_IDS.tianHuoYunXing,
+    )
+
+    meteor.onActivation()
+    meteor.onActivation()
+    meteor.onActivation()
+    core.exec()
+
+    expect(damage(core, '天火陨星')).toBe(26594 * 2.5 * 4)
+    expect(damage(core, '天火陨星3')).toBe(5342 * 2 * 5)
+    expect(count(core, '天火陨星3')).toBe(5)
   })
 
   it('重置后清空卡片状态并恢复首次触发行为', () => {
