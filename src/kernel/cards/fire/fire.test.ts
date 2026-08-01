@@ -120,10 +120,11 @@ describe('天火丹青', () => {
     expect(card<XingHongJuYi>(core, CARD_IDS.xingHongJuYi).burnLayers).toBe(2)
   })
 
-  it('六尾魔狐引爆当前层数减一并保留燃烧结算冷却', () => {
+  it('六尾魔狐引爆后保留燃烧结算冷却并触发二尾妖狐', () => {
     const core = createCore(
       [
         { id: CARD_IDS.xingHongJuYi, level: 0 },
+        { id: CARD_IDS.erWeiYaoHu, level: 0 },
         { id: CARD_IDS.liuWeiMoHu, level: 0 },
       ],
       4,
@@ -136,6 +137,8 @@ describe('天火丹青', () => {
     expect(damage(core, '爆燃')).toBe(8055 * 6)
     expect(count(core, '爆燃')).toBe(1)
     expect(damage(core, '燃烧')).toBe(2209)
+    expect(damage(core, '引燃')).toBe(3696 * 8)
+    expect(count(core, '引燃')).toBe(8)
     expect(ant.burnLayers).toBe(1)
   })
 

@@ -62,6 +62,10 @@ export class XingHongJuYi extends Card {
 
   retainOneBurnLayer() {
     this._burnLayers = 1
+    getCard<ErWeiYaoHu>(
+      this.core,
+      CARD_IDS.erWeiYaoHu,
+    )?.onBurnAttempt(1)
   }
 
   private settleBurn() {
