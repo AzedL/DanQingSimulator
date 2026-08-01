@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import BasicConfigPanel from '@/components/panels/BasicConfigPanel'
 import CardLoadoutPanel from '@/components/panels/CardLoadoutPanel'
 import ResultPanel from '@/components/panels/ResultPanel'
 import SimulationControlPanel from '@/components/panels/SimulationControlPanel'
 import AutoMockSettingsDialog from '@/components/dialogs/AutoMockSettingsDialog'
+import ChangelogDialog from '@/components/dialogs/ChangelogDialog'
 import {
   danQingLevelValues,
   danQingList,
@@ -18,26 +19,36 @@ import { mergeAutoMockCardIds } from '@/features/autoMock/autoMockSettings'
 import { APP_VIEW_DEFAULTS } from '@/features/config/simulatorDefaults'
 import { useSimulation } from '@/features/simulator/useSimulation'
 import type { CardId } from '@/kernel'
+import { updatedAt } from '@/lang/changelog'
+
+const CHANGELOG_STORAGE_KEY = 'danqing-simulator:changelog-updated-at'
+
+function shouldShowChangelog() {
+  try {
+    return localStorage.getItem(CHANGELOG_STORAGE_KEY) !== updatedAt
+  } catch {
+    return true
+  }
+}
 
 function App() {
   const simulation = useSimulation()
-  const [autoMockWhitelistEnabled, setAutoMockWhitelistEnabled] =
-    useState(false)
-  const [autoMockSettingsOpen, setAutoMockSettingsOpen] =
-    useState(false)
-  const [autoMockWhitelistCardIds, setAutoMockWhitelistCardIds] =
-    useState<CardId[]>([])
+  const [autoMockWhitelistEnabled, setAutoMockWhitelistEnabled] = useState(false)
+  const [autoMockSettingsOpen, setAutoMockSettingsOpen] = useState(false)
+  const [autoMockWhitelistCardIds, setAutoMockWhitelistCardIds] = useState<CardId[]>([])
+  const [changelogOpen, setChangelogOpen] = useState(shouldShowChangelog)
+
+  useEffect(() => {
+    if (!changelogOpen) return
+
+    try {
+      localStorage.setItem(CHANGELOG_STORAGE_KEY, updatedAt)
+    } catch {}
+  }, [changelogOpen])
   const groupAutoMockCardIds = lingYunList
-    .filter(
-      (card) =>
-        card.group === simulation.simulationConfig.autoMockGroup,
-    )
+    .filter((card) => card.group === simulation.simulationConfig.autoMockGroup)
     .map((card) => card.value)
-  const autoMockCardIds = mergeAutoMockCardIds(
-    groupAutoMockCardIds,
-    autoMockWhitelistEnabled,
-    autoMockWhitelistCardIds,
-  )
+  const autoMockCardIds = mergeAutoMockCardIds(groupAutoMockCardIds, autoMockWhitelistEnabled, autoMockWhitelistCardIds)
   const autoMock = useAutoMock(
     simulation.coreOptions,
     autoMockCardIds,
@@ -47,9 +58,7 @@ function App() {
 
   const [currentTabResult, setCurrentTabResult] = useState(APP_VIEW_DEFAULTS.currentTabResult)
   const danQingCost = simulation.cardsConfig.danQingCards.reduce(
-    (total, card) =>
-      total +
-      (danQingList.find((option) => option.value === card.id)?.cost ?? 0),
+    (total, card) => total + (danQingList.find((option) => option.value === card.id)?.cost ?? 0),
     0,
   )
   const lingYunCount = simulation.cardsConfig.lingYunCards.reduce(
@@ -58,15 +67,11 @@ function App() {
   )
   const danQingQuickGroups = cardGroups.map((label) => ({
     label,
-    ids: danQingList
-      .filter((option) => option.group === label)
-      .map((option) => option.value),
+    ids: danQingList.filter((option) => option.group === label).map((option) => option.value),
   }))
   const lingYunQuickGroups = cardGroups.map((label) => ({
     label,
-    ids: lingYunList
-      .filter((option) => option.group === label)
-      .map((option) => option.value),
+    ids: lingYunList.filter((option) => option.group === label).map((option) => option.value),
   }))
 
   function handleExecute() {
@@ -96,17 +101,13 @@ function App() {
           quickGroups={danQingQuickGroups}
           maxQuickLevel={6}
           levelValues={danQingLevelValues}
-          getCardList={(id) =>
-            simulation.cardsConfig.getDanQingList(id, danQingList)
-          }
+          getCardList={(id) => simulation.cardsConfig.getDanQingList(id, danQingList)}
           handleAdd={simulation.cardsConfig.addDanQing}
           handleDelete={simulation.cardsConfig.deleteDanQing}
           handleCardChange={simulation.cardsConfig.changeDanQing}
           handleLevelChange={simulation.cardsConfig.changeDanQingLevel}
           handleGroupSelect={simulation.cardsConfig.selectDanQingGroup}
-          handleAllLevelChange={
-            simulation.cardsConfig.changeAllDanQingLevels
-          }
+          handleAllLevelChange={simulation.cardsConfig.changeAllDanQingLevels}
         />
 
         <CardLoadoutPanel
@@ -118,17 +119,13 @@ function App() {
           quickGroups={lingYunQuickGroups}
           maxQuickLevel={5}
           levelValues={lingYunLevelValues}
-          getCardList={(id) =>
-            simulation.cardsConfig.getLingYunList(id, lingYunList)
-          }
+          getCardList={(id) => simulation.cardsConfig.getLingYunList(id, lingYunList)}
           handleAdd={simulation.cardsConfig.addLingYun}
           handleDelete={simulation.cardsConfig.deleteLingYun}
           handleCardChange={simulation.cardsConfig.changeLingYun}
           handleLevelChange={simulation.cardsConfig.changeLingYunLevel}
           handleGroupSelect={simulation.cardsConfig.selectLingYunGroup}
-          handleAllLevelChange={
-            simulation.cardsConfig.changeAllLingYunLevels
-          }
+          handleAllLevelChange={simulation.cardsConfig.changeAllLingYunLevels}
         />
       </div>
 
@@ -147,12 +144,8 @@ function App() {
           autoMockGroup={simulation.simulationConfig.autoMockGroup}
           setAutoMockGroup={simulation.simulationConfig.setAutoMockGroup}
           selectedTianGongValue={lingYunCount}
-          availableTianGongValue={
-            simulation.simulationConfig.availableTianGongValue
-          }
-          setAvailableTianGongValue={
-            simulation.simulationConfig.setAvailableTianGongValue
-          }
+          availableTianGongValue={simulation.simulationConfig.availableTianGongValue}
+          setAvailableTianGongValue={simulation.simulationConfig.setAvailableTianGongValue}
           onOpenAutoMockSettings={() => setAutoMockSettingsOpen(true)}
           isExecuting={simulation.simulationConfig.isAutoMock ? autoMock.isAutoMockRunning : false}
           onExecute={handleExecute}
@@ -170,9 +163,7 @@ function App() {
         autoMockCurrent={autoMock.autoMockCurrent}
         setAutoMockCurrent={autoMock.setAutoMockCurrent}
         autoMockResult={autoMock.autoMockResult}
-        autoMockDanQingCombination={
-          autoMock.autoMockDanQingCombination
-        }
+        autoMockDanQingCombination={autoMock.autoMockDanQingCombination}
         onAutoMockResultDoubleClick={(cards, skillGroup) => {
           simulation.applyAutoMockResult(cards, skillGroup)
           setCurrentTabResult('mock')
@@ -198,6 +189,8 @@ function App() {
         whitelistCardIds={autoMockWhitelistCardIds}
         setWhitelistCardIds={setAutoMockWhitelistCardIds}
       />
+
+      <ChangelogDialog open={changelogOpen} onClose={() => setChangelogOpen(false)} />
     </div>
   )
 }

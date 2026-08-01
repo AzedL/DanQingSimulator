@@ -78,10 +78,10 @@ export default function AutoMockSettingsDialog({
       <section
         aria-labelledby="auto-mock-settings-title"
         aria-modal="true"
-        className="max-h-[calc(100vh-2rem)] w-full max-w-4xl overflow-y-auto rounded-xl border border-slate-200 bg-[#f8faf9] shadow-[0_18px_60px_rgb(15_23_42/18%)]"
+        className="flex max-h-[calc(100vh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-[#f8faf9] shadow-[0_18px_60px_rgb(15_23_42/18%)]"
         role="dialog"
       >
-        <header className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+        <header className="flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-4">
           <h2
             id="auto-mock-settings-title"
             className="text-lg font-bold text-slate-800"
@@ -110,7 +110,7 @@ export default function AutoMockSettingsDialog({
           </Button>
         </header>
 
-        <div className="grid gap-5 p-6">
+        <div className="grid min-h-0 gap-5 overflow-y-auto p-6">
           <div className="grid items-center gap-x-4 gap-y-2 rounded-lg border border-slate-200 bg-white p-4 md:grid-cols-2">
             <CheckboxField
               value={whitelistEnabled}
