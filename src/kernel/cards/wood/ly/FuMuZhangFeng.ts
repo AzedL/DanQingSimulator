@@ -26,9 +26,9 @@ export class FuMuZhangFeng extends Card {
     return this._activationDamageMultiplier
   }
 
-  onBloom(layers = 1) {
+  onBloom() {
     this.core.wood.add(
-      this._damage * this._activationDamageMultiplier * layers,
+      this._damage * this._activationDamageMultiplier,
       1,
       '腐木瘴风',
     )

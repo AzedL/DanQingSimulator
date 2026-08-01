@@ -498,6 +498,26 @@ describe('苍木灵韵', () => {
     expect(count(core, '腐木瘴风')).toBe(3)
   })
 
+  it('多层苍木激化合并绽放时只触发1次腐木瘴风', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.qingLiangZhu, level: 0 },
+        { id: CARD_IDS.fuMuZhangFeng, level: 1 },
+      ],
+      9,
+    )
+
+    card<QingLiangZhu>(
+      core,
+      CARD_IDS.qingLiangZhu,
+    ).addWoodValue(25000)
+    core.exec()
+
+    expect(damage(core, '苍木激化 · 绽放')).toBe(72108 * 3 * 2)
+    expect(damage(core, '腐木瘴风')).toBe(25042 * 3)
+    expect(count(core, '腐木瘴风')).toBe(3)
+  })
+
   it('三级腐木瘴风增幅自身、苍木激化和绽放伤害', () => {
     const core = createCore(
       [

@@ -50,7 +50,7 @@ export class QingLiangZhu extends Card {
           1,
           '苍木激化 · 绽放',
         )
-        plague?.onBloom(layers)
+        plague?.onBloom()
       },
     })
   }
