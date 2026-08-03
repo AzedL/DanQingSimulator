@@ -1,6 +1,13 @@
-export const updatedAt = '2026-08-01 18:00'
+export const updatedAt = '2026-08-03'
 
 export const changelog = [
+  {
+    date: '2026-08-03',
+    changes: [
+      '本次更新修正一处游戏内描述与实测不符的问题，建议先观望等待游戏官方更新。',
+      '修正：纸人风暴实际伤害为游戏内描述两倍的问题。木系伤害提高。',
+    ],
+  },
   {
     date: '2026-08-01 18:00',
     changes: [

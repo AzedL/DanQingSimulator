@@ -19,7 +19,7 @@ export class CangLinFuSheng extends Card {
 
   protected init() {
     this._attackDamage = 10022 * MULTIPLIER[this.level]
-    this._stormDamage = 4513 * MULTIPLIER[this.level]
+    this._stormDamage = 4513 * 2 * MULTIPLIER[this.level]
     this._cooldown = new CooldownTime(20, true)
   }
 

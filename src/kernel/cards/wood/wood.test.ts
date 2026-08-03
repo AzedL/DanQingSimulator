@@ -389,7 +389,7 @@ describe('苍木灵韵', () => {
     core.exec()
 
     expect(damage(core, '小纸人-纸人风暴')).toBe(
-      4513 * 1.25 * 11,
+      4513 * 2 * 1.25 * 11,
     )
     expect(count(core, '小纸人-纸人风暴')).toBe(11)
     expect(damage(core, '小纸人-攻击')).toBe(10022 * 1.25 * 3)
