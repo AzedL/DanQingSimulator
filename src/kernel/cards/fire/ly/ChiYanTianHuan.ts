@@ -8,6 +8,7 @@ import {
 } from '../dq/MengHu'
 import type { XingHongJuYi } from '../dq/XingHongJuYi'
 import { getCard } from '../../shared'
+import { triggerFireResonance } from '../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -35,6 +36,7 @@ export class ChiYanTianHuan extends Card {
 
     for (let index = 0; index < triggerCount; index++) {
       this.core.fire.add(this._damage, 1, '赤焰天环')
+      triggerFireResonance(this.core)
       const count = handleProbability(
         0.2,
         this.core.coreOptions.useRandom,

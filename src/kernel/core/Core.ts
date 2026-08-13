@@ -1,5 +1,11 @@
 import { applyTianGongDamageBoosts, getCards } from '../cards'
-import { isActiveCard, type ActiveCard, type Card, type CardId } from '../cards/Card'
+import {
+  isActiveCard,
+  type ActiveCard,
+  type Card,
+  type CardId,
+  type SkillUpgrade,
+} from '../cards/Card'
 import { Damage } from './Damage'
 import { Fire } from './Fire'
 import { Ice } from './Ice'
@@ -10,6 +16,7 @@ import { Wood } from './Wood'
 export interface CardOptions {
   id: CardId
   level: number
+  upgrade?: SkillUpgrade
 }
 
 export interface CoreOptions {
@@ -31,6 +38,7 @@ export class Core {
   readonly wood: Wood
   readonly cardsMap = new Map<CardId, Card>()
   readonly actions: ActiveCard[] = []
+  private _lingYunValueBoost = 0
 
   constructor(coreOptions: CoreOptions) {
     this.coreOptions = coreOptions
@@ -61,8 +69,21 @@ export class Core {
     this.ice.reset()
     this.thunder.reset()
     this.wood.reset()
+    this._lingYunValueBoost = 0
     applyTianGongDamageBoosts(this)
     this.cardsMap.forEach((card) => card.reset())
+  }
+
+  get lingYunValueMultiplier() {
+    return 1 + this._lingYunValueBoost
+  }
+
+  addLingYunValueBoost(boost: number) {
+    this._lingYunValueBoost += boost
+  }
+
+  removeLingYunValueBoost(boost: number) {
+    this._lingYunValueBoost -= boost
   }
 
   private tick() {

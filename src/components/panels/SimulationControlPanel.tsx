@@ -2,11 +2,14 @@ import CheckboxField from '@/components/form/CheckboxField'
 import Button from '@/components/form/Button'
 import CardGroupField from '@/components/form/CardGroupField'
 import InputField from '@/components/form/InputField'
+import SkillUpgradeField from '@/components/form/SkillUpgradeField'
 import TabsField from '@/components/navigation/TabsField'
 import type {
+  AutoMockSkillUpgrade,
   CardGroup,
   SimulatorTab,
 } from '@/features/config/simulatorUi'
+import type { SkillUpgrade } from '@/kernel'
 import lang from '@/lang/lang'
 
 interface Props {
@@ -16,6 +19,12 @@ interface Props {
   isAutoMock: boolean
   skillGroup: CardGroup
   setSkillGroup: (value: CardGroup) => void
+  skillUpgrade: SkillUpgrade
+  autoMockSkillUpgrade: AutoMockSkillUpgrade
+  skillUpgradeLevel: number
+  setSkillUpgrade: (upgrade: SkillUpgrade) => void
+  setAutoMockSkillUpgrade: (upgrade: AutoMockSkillUpgrade) => void
+  setSkillUpgradeLevel: (level: number) => void
   duration: string
   setDuration: (value: string) => void
   useRandom: boolean
@@ -31,6 +40,40 @@ interface Props {
 }
 
 export default function SimulationControlPanel(props: Props) {
+  const renderSkillSettings = (
+    label: string,
+    value: CardGroup,
+    onChange: (value: CardGroup) => void,
+    autoMock: boolean,
+  ) => (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+      <CardGroupField
+        label={label}
+        value={value}
+        onChange={onChange}
+      />
+      <div className="basis-full border-pink-200 pt-3 md:basis-auto md:border-l md:pl-4 md:pt-0">
+        <SkillUpgradeField
+          upgrade={
+            autoMock
+              ? props.autoMockSkillUpgrade
+              : props.skillUpgrade
+          }
+          level={props.skillUpgradeLevel}
+          allowBoth={autoMock}
+          onUpgradeChange={(upgrade) => {
+            if (autoMock) {
+              props.setAutoMockSkillUpgrade(upgrade)
+            } else if (upgrade !== 'both') {
+              props.setSkillUpgrade(upgrade)
+            }
+          }}
+          onLevelChange={props.setSkillUpgradeLevel}
+        />
+      </div>
+    </div>
+  )
+
   return (
     <div className="flex min-h-[400px] w-full min-w-72 flex-col gap-5 rounded-xl border border-pink-100 bg-linear-to-br from-pink-50 to-rose-50 p-6 text-pink-800 shadow-lg">
       <h2 className="mb-1 text-xl font-bold text-pink-950">{lang.mockConfig}</h2>
@@ -50,11 +93,12 @@ export default function SimulationControlPanel(props: Props) {
       <TabsField value={props.currentTab} onChange={props.setCurrentTab} list={props.tabValues} />
       {!props.isAutoMock && (
         <div className="flex flex-col gap-5">
-          <CardGroupField
-            label={lang.skillGroup}
-            value={props.skillGroup}
-            onChange={props.setSkillGroup}
-          />
+          {renderSkillSettings(
+            lang.skillGroup,
+            props.skillGroup,
+            props.setSkillGroup,
+            false,
+          )}
           <CheckboxField
             value={props.useRandom}
             onChange={props.setUseRandom}
@@ -65,11 +109,12 @@ export default function SimulationControlPanel(props: Props) {
       )}
       {props.isAutoMock && (
         <div className="flex flex-col gap-5">
-          <CardGroupField
-            label={lang.autoMockGroup}
-            value={props.autoMockGroup}
-            onChange={props.setAutoMockGroup}
-          />
+          {renderSkillSettings(
+            lang.autoMockGroup,
+            props.autoMockGroup,
+            props.setAutoMockGroup,
+            true,
+          )}
           <div className="grid gap-2">
             <div className="flex flex-wrap items-center gap-3">
               <span className="shrink-0 text-sm font-medium">

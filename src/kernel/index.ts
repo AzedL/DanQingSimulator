@@ -1,5 +1,7 @@
 export { CARD_IDS } from './cards/cardIds'
+export { SKILL_UPGRADES } from './cards/skillUpgrades'
 export type { CardId } from './cards/cardIds'
+export type { SkillUpgrade } from './cards/skillUpgrades'
 export { Core } from './core/Core'
 export type { CardOptions, CoreOptions } from './core/Core'
 export type { DamageOutput } from './core/Damage'

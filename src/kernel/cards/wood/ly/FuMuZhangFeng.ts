@@ -26,10 +26,19 @@ export class FuMuZhangFeng extends Card {
     return this._activationDamageMultiplier
   }
 
+  onPulse(count: number) {
+    if (!count) return
+    this.settleDamage(count)
+  }
+
   onBloom() {
+    this.settleDamage(1)
+  }
+
+  private settleDamage(count: number) {
     this.core.wood.add(
-      this._damage * this._activationDamageMultiplier,
-      1,
+      this._damage * this._activationDamageMultiplier * count,
+      count,
       '腐木瘴风',
     )
   }

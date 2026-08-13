@@ -8,6 +8,7 @@ import {
   type FuMuZhangFeng,
 } from '../ly/FuMuZhangFeng'
 import type { MuYinQingLing } from '../ly/MuYinQingLing'
+import type { QingWuFuSheng } from '../QingWuFuSheng'
 
 const PULSE_VALUE = [280, 300, 320, 340, 360, 380, 400]
 
@@ -44,7 +45,12 @@ export class QingLiangZhu extends Card {
           this.core,
           CARD_IDS.fuMuZhangFeng,
         )
-        const multiplier = this.activationDamageMultiplier
+        const multiplier =
+          this.activationDamageMultiplier +
+          (getCard<QingWuFuSheng>(
+            this.core,
+            CARD_IDS.qingWuFuSheng,
+          )?.bloomDamageBoost ?? 0)
         this.core.wood.add(
           72108 * multiplier * layers,
           1,
@@ -71,7 +77,7 @@ export class QingLiangZhu extends Card {
   }
 
   addWoodValue(value: number) {
-    this._woodValue += value
+    this._woodValue += value * this.core.lingYunValueMultiplier
 
     while (this._woodValue >= 10000) {
       this._woodValue -= 10000

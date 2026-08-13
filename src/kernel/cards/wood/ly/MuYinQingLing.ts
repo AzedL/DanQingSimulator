@@ -22,8 +22,14 @@ export class MuYinQingLing extends Card {
   }
 
   summon(count: number) {
+    const skill = getCard<QingWuFuSheng>(
+      this.core,
+      CARD_IDS.qingWuFuSheng,
+    )
     forEachIndependentCount(count, (weight) => {
-      for (let index = 0; index < 14; index++) {
+      skill?.beginSummon('spirit')
+      const attackCount = 14 + (skill?.summonAttackBonus ?? 0) * 2
+      for (let index = 0; index < attackCount; index++) {
         this.core.queue.enqueue(() => {
           this.core.wood.add(
             this._damage * weight,
@@ -42,6 +48,10 @@ export class MuYinQingLing extends Card {
           )?.onSummonAttack()
         }, 1 + index * 2)
       }
+      skill?.expireSummon(
+        'spirit',
+        30 * skill.summonDurationMultiplier,
+      )
     })
   }
 

@@ -3,6 +3,7 @@ import { CooldownTime } from '../../../utils/CooldownTime'
 import { StackedEffect } from '../../../utils/StackedEffect'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
+import { triggerFireResonance } from '../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -27,6 +28,7 @@ export class LieYanFenShen extends Card {
           1,
           '烈焰焚身',
         )
+        triggerFireResonance(this.core)
       },
     })
   }

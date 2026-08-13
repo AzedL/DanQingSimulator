@@ -1,9 +1,11 @@
 import type { Core } from '../../../core/Core'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
-import { enqueueRepeated } from '../../shared'
+import { enqueueRepeated, getCard } from '../../shared'
+import type { QingWuFuSheng } from '../QingWuFuSheng'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
+const ECHO_DURATION = 30
 
 export class LieDiBeng extends Card {
   declare private _damage: number
@@ -19,18 +21,29 @@ export class LieDiBeng extends Card {
   }
 
   onAttackStarted() {
+    const skill = getCard<QingWuFuSheng>(
+      this.core,
+      CARD_IDS.qingWuFuSheng,
+    )
     if (this.level >= 3) {
+      let echoDuration = ECHO_DURATION
+      if (skill) echoDuration += skill.echoDurationBonus
+
       this._echoActive = true
-      enqueueRepeated(this.core, 30, 1, () => {
+      enqueueRepeated(this.core, echoDuration, 1, () => {
         this.settleEcho()
       })
       this.core.queue.enqueue(() => {
         this._echoActive = false
-      }, 30)
+      }, echoDuration)
     }
 
     this.core.queue.enqueue(() => {
-      this.core.wood.add(this._damage, 1, '裂地崩')
+      this.core.wood.add(
+        this._damage * (skill?.treeSkillDamageMultiplier ?? 1),
+        1,
+        '裂地崩',
+      )
     }, 2)
   }
 
@@ -41,8 +54,12 @@ export class LieDiBeng extends Card {
   }
 
   private settleEcho() {
+    const multiplier = getCard<QingWuFuSheng>(
+      this.core,
+      CARD_IDS.qingWuFuSheng,
+    )?.echoDamageMultiplier ?? 1
     this.core.wood.add(
-      5774 * MULTIPLIER[this.level],
+      5774 * MULTIPLIER[this.level] * multiplier,
       1,
       '裂地崩 · 回响',
     )

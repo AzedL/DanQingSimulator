@@ -3,6 +3,7 @@ import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
 import { getCard } from '../../shared'
 import type { ZiXiaoHu } from '../dq/ZiXiaoHu'
+import type { LeiYouLingGuang } from '../LeiYouLingGuang'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -27,10 +28,14 @@ export class JiuXiaoLeiDong extends Card {
         '九霄雷动',
       )
       if (this.level >= 3) {
+        const multiplier = getCard<LeiYouLingGuang>(
+          this.core,
+          CARD_IDS.leiYouLingGuang,
+        )?.activationValueMultiplier ?? 1
         getCard<ZiXiaoHu>(
           this.core,
           CARD_IDS.ziXiaoHu,
-        )?.addThunderValue(100)
+        )?.addThunderValue(100 * multiplier)
       }
     }, 2)
   }

@@ -5,6 +5,7 @@ import { CARD_IDS } from '../../cardIds'
 import { getCard } from '../../shared'
 import type { LinShuangHanYong } from '../ly/LinShuangHanYong'
 import type { ShuangCiHanYu } from '../ly/ShuangCiHanYu'
+import type { NingBingShuangHua } from '../NingBingShuangHua'
 
 const ICE_ARROW_VALUE = [140, 150, 160, 170, 180, 190, 200]
 const FRACTURE_VALUE = [140, 150, 160, 170, 180, 190, 200]
@@ -47,7 +48,7 @@ export class ShangGuanCe extends Card {
   }
 
   addIceValue(value: number) {
-    this._iceValue += value
+    this._iceValue += value * this.core.lingYunValueMultiplier
 
     while (this._iceValue >= 10000) {
       this._iceValue -= 10000
@@ -63,11 +64,18 @@ export class ShangGuanCe extends Card {
     const multiplier =
       cold?.activationDamageMultiplier ??
       SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER
+    const skill = getCard<NingBingShuangHua>(
+      this.core,
+      CARD_IDS.ningBingShuangHua,
+    )
+    const activationMultiplier =
+      multiplier * (skill?.activationDamageMultiplier ?? 1)
 
-    this.core.ice.add(43534 * multiplier, 1, '玄冰激化')
+    this.core.ice.add(43534 * activationMultiplier, 1, '玄冰激化')
     this.core.queue.enqueue(() => {
-      this.core.ice.add(85327 * multiplier, 1, '玄冰激化')
+      this.core.ice.add(85327 * activationMultiplier, 1, '玄冰激化')
       cold?.onFreeze()
+      skill?.onFreeze()
       getCard<ShuangCiHanYu>(
         this.core,
         CARD_IDS.shuangCiHanYu,

@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 import {
   CARD_IDS,
   Core,
+  SKILL_UPGRADES,
   type CardId,
   type CardOptions,
   type CoreOptions,
   type DamageOutput,
+  type SkillUpgrade,
 } from '@/kernel'
 import { toInt, toNumber } from '@/kernel/utils/math'
 import {
@@ -13,7 +15,9 @@ import {
   SIMULATION_CONFIG_DEFAULTS,
 } from '@/features/config/simulatorDefaults'
 import {
+  AUTO_MOCK_SKILL_UPGRADES,
   skillCardIds,
+  type AutoMockSkillUpgrade,
   type CardGroup,
   type CardSelectOption,
 } from '@/features/config/simulatorUi'
@@ -55,6 +59,16 @@ export function useSimulation() {
   const [skillGroup, setSkillGroup] = useState(
     SIMULATION_CONFIG_DEFAULTS.skillGroup,
   )
+  const [skillUpgrade, setSkillUpgrade] = useState<SkillUpgrade>(
+    SIMULATION_CONFIG_DEFAULTS.skillUpgrade,
+  )
+  const [skillUpgradeLevel, setSkillUpgradeLevel] = useState(
+    SIMULATION_CONFIG_DEFAULTS.skillUpgradeLevel,
+  )
+  const [autoMockSkillUpgrade, setAutoMockSkillUpgrade] =
+    useState<AutoMockSkillUpgrade>(
+      SIMULATION_CONFIG_DEFAULTS.autoMockSkillUpgrade,
+    )
   const [duration, setDuration] = useState(
     SIMULATION_CONFIG_DEFAULTS.duration,
   )
@@ -71,25 +85,47 @@ export function useSimulation() {
 
   const isAutoMock = currentTab === 'autoMock'
   const simulationCards = useMemo(
-    () =>
-      [
-        {
-          id: skillCardIds[
-            isAutoMock ? autoMockGroup : skillGroup
-          ],
-          level: 0,
-        },
-        ...danQingCards,
-        ...lingYunCards.filter((card) => card.level > 0),
+    () => {
+      const resolvedAutoMockUpgrade: SkillUpgrade =
+        autoMockSkillUpgrade === AUTO_MOCK_SKILL_UPGRADES.both
+          ? SKILL_UPGRADES.benZhen
+          : autoMockSkillUpgrade
+      const skill: CardOptions = {
+        id: skillCardIds[
+          isAutoMock ? autoMockGroup : skillGroup
+        ],
+        level: skillUpgradeLevel,
+        ...(skillUpgradeLevel > 0
+          ? {
+              upgrade:
+                isAutoMock
+                  ? resolvedAutoMockUpgrade
+                  : skillUpgrade,
+            }
+          : {}),
+      }
+      return [
+        skill,
+        ...danQingCards
+          .filter((card): card is CardOptions => card.id !== '')
+          .map(({ id, level }) => ({ id, level })),
+        ...lingYunCards
+          .filter(
+            (card): card is CardOptions =>
+              card.id !== '' && card.level > 0,
+          )
+          .map(({ id, level }) => ({ id, level })),
       ]
-        .filter((card): card is CardOptions => card.id !== '')
-        .map(({ id, level }) => ({ id, level })),
+    },
     [
       autoMockGroup,
+      autoMockSkillUpgrade,
       danQingCards,
       isAutoMock,
       lingYunCards,
       skillGroup,
+      skillUpgrade,
+      skillUpgradeLevel,
     ],
   )
   const coreOptions = useMemo<CoreOptions>(
@@ -226,13 +262,19 @@ export function useSimulation() {
   function applyAutoMockResult(
     cards: CardOptions[],
     group: CardGroup,
+    upgrade: SkillUpgrade,
+    level: number,
   ) {
     const nextLingYunCards = cards.map(({ id, level }) => ({
       id,
       level,
     }))
     const nextCards = [
-      { id: skillCardIds[group], level: 0 },
+      {
+        id: skillCardIds[group],
+        level,
+        ...(level > 0 ? { upgrade } : {}),
+      },
       ...danQingCards
         .filter((card): card is CardOptions => card.id !== '')
         .map(({ id, level }) => ({ id, level })),
@@ -249,6 +291,8 @@ export function useSimulation() {
 
     setLingYunCards(nextLingYunCards)
     setSkillGroup(group)
+    setSkillUpgrade(upgrade)
+    setSkillUpgradeLevel(level)
     setCurrentTab('mock')
     executeMock(options)
   }
@@ -297,6 +341,12 @@ export function useSimulation() {
       isAutoMock,
       skillGroup,
       setSkillGroup,
+      skillUpgrade,
+      skillUpgradeLevel,
+      autoMockSkillUpgrade,
+      setSkillUpgrade,
+      setSkillUpgradeLevel,
+      setAutoMockSkillUpgrade,
       duration,
       setDuration,
       useRandom,

@@ -3,6 +3,7 @@ import {
   type CardId,
   type CardOptions,
   type CoreOptions,
+  type SkillUpgrade,
 } from '../../kernel'
 import { fixed } from '../../kernel/utils/math'
 import { calculateDps } from '../simulator/result'
@@ -16,6 +17,8 @@ export interface AutoMockInput {
   additionalValue: number
   maxCombinations: number
   topCount: number
+  skillCardId?: CardId
+  skillUpgrades?: SkillUpgrade[]
 }
 
 export interface AutoMockItem {
@@ -93,7 +96,8 @@ export function runAutoMockPartition(
     input.targetCardIds,
     input.additionalValue,
   )
-  const length = generatedLength || 1
+  const skillUpgrades = getSkillUpgrades(input)
+  const length = (generatedLength || 1) * skillUpgrades.length
 
   if (length > input.maxCombinations) {
     return { length, overflow: true, items: [] }
@@ -121,10 +125,22 @@ export function runAutoMockPartition(
     insertTop(items, item, input.topCount)
   }
 
+  let combinationIndex = 0
+  const simulateSkillUpgrades = (cards: CardOptions[]) => {
+    skillUpgrades.forEach((upgrade) => {
+      const currentIndex = combinationIndex
+      combinationIndex += 1
+      if (currentIndex % workerCount !== workerIndex) return
+
+      simulate(
+        applySkillUpgrade(cards, input.skillCardId, upgrade),
+        currentIndex,
+      )
+    })
+  }
+
   if (generatedLength === 0) {
-    if (workerIndex === 0) {
-      simulate(input.coreOptions.cards, 0)
-    }
+    simulateSkillUpgrades(input.coreOptions.cards)
     return { length, overflow: false, items }
   }
 
@@ -132,27 +148,50 @@ export function runAutoMockPartition(
     input.coreOptions.cards,
     input.targetCardIds,
   )
-  let combinationIndex = 0
   iterateDistributions(
     capacities,
     input.additionalValue,
     (increments) => {
-      const currentIndex = combinationIndex
-      combinationIndex += 1
-      if (currentIndex % workerCount !== workerIndex) return
-
-      simulate(
+      simulateSkillUpgrades(
         applyIncrements(
           input.coreOptions.cards,
           input.targetCardIds,
           increments,
         ),
-        currentIndex,
       )
     },
   )
 
   return { length, overflow: false, items }
+}
+
+function getSkillUpgrades(
+  input: AutoMockInput,
+): (SkillUpgrade | undefined)[] {
+  if (!input.skillCardId || !input.skillUpgrades?.length) {
+    return [undefined]
+  }
+
+  const skill = input.coreOptions.cards.find(
+    (card) => card.id === input.skillCardId,
+  )
+  if (!skill || skill.level <= 0) return [undefined]
+
+  return [...new Set(input.skillUpgrades)]
+}
+
+function applySkillUpgrade(
+  cards: CardOptions[],
+  skillCardId: CardId | undefined,
+  upgrade: SkillUpgrade | undefined,
+) {
+  if (!skillCardId || !upgrade) return cards
+
+  return cards.map((card) =>
+    card.id === skillCardId
+      ? { ...card, upgrade }
+      : card,
+  )
 }
 
 export function mergeAutoMockResults(

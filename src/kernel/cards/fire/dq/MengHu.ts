@@ -6,6 +6,8 @@ import type { ChiYanTianHuan } from '../ly/ChiYanTianHuan'
 import type { ShenHuoBengFa } from '../ly/ShenHuoBengFa'
 import { getCard } from '../../shared'
 import type { TianHuoYunXing } from '../ly/TianHuoYunXing'
+import type { ZhuoZhuoTianYan } from '../ZhuoZhuoTianYan'
+import { triggerFireResonance } from '../shared'
 
 const BURN_VALUE = [98, 105, 112, 119, 126, 133, 140]
 const EXPLOSION_VALUE = [532, 570, 608, 646, 684, 722, 760]
@@ -49,7 +51,7 @@ export class MengHu extends Card {
   }
 
   addFireValue(value: number) {
-    this._fireValue += value
+    this._fireValue += value * this.core.lingYunValueMultiplier
 
     while (this._fireValue >= 10000) {
       this._fireValue -= 10000
@@ -58,6 +60,11 @@ export class MengHu extends Card {
   }
 
   private activate() {
+    const skill = getCard<ZhuoZhuoTianYan>(
+      this.core,
+      CARD_IDS.zhuoZhuoTianYan,
+    )
+    skill?.onActivation()
     const ring = getCard<ChiYanTianHuan>(
       this.core,
       CARD_IDS.chiYanTianHuan,
@@ -93,12 +100,17 @@ export class MengHu extends Card {
     )?.onActivationDamage()
 
     const multiplier =
-      getCard<ShenHuoBengFa>(
+      MENG_HU_ACTIVATION_DAMAGE_MULTIPLIER +
+      (getCard<ShenHuoBengFa>(
         this.core,
         CARD_IDS.shenHuoBengFa,
-      )?.activationDamageMultiplier ??
-      MENG_HU_ACTIVATION_DAMAGE_MULTIPLIER
+      )?.activationDamageBoost ?? 0) +
+      (getCard<ZhuoZhuoTianYan>(
+        this.core,
+        CARD_IDS.zhuoZhuoTianYan,
+      )?.activationDamageBoost ?? 0)
     this.core.fire.add(39181 * multiplier, 1, '天火激化')
+    triggerFireResonance(this.core)
   }
 
   reset() {

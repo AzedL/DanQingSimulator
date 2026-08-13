@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { CardId, CardOptions, CoreOptions } from '@/kernel'
+import {
+  SKILL_UPGRADES,
+  type CardId,
+  type CardOptions,
+  type CoreOptions,
+  type SkillUpgrade,
+} from '@/kernel'
 import { toInt } from '@/kernel/utils/math'
 import {
   danQingList,
@@ -17,6 +23,7 @@ import {
   type AutoMockResult,
 } from './autoMock'
 import { getAutoMockWorkerCount } from './autoMockWorkerPool'
+import lang from '@/lang/lang'
 import type {
   AutoMockWorkerError,
   AutoMockWorkerSuccess,
@@ -33,11 +40,25 @@ const danQingNames = new Map(
   danQingList.map((card) => [card.value, card.label]),
 )
 
+function formatAutoMockCard(card: CardOptions) {
+  const name = cardNames.get(card.id) ?? card.id
+  if (!skillIds.has(card.id)) return `${name}${card.level}级`
+  if (!card.upgrade || card.level === 0) return name
+
+  const upgradeName =
+    card.upgrade === SKILL_UPGRADES.benZhen
+      ? lang.benZhen
+      : lang.lingTong
+  return `${name}·${upgradeName}${card.level}级`
+}
+
 export interface AutoMockViewItem {
   cards: string
   dps: number
   cardOptions: CardOptions[]
   skillGroup: CardGroup
+  skillUpgrade: SkillUpgrade
+  skillUpgradeLevel: number
 }
 
 export function useAutoMock(
@@ -45,6 +66,8 @@ export function useAutoMock(
   targetCardIds: CardId[],
   additionalValue: string,
   whitelistEnabled: boolean,
+  skillCardId: CardId,
+  skillUpgrades: SkillUpgrade[],
 ) {
   const [autoMockLengthOverflow, setAutoMockLengthOverflow] =
     useState(false)
@@ -64,21 +87,22 @@ export function useAutoMock(
         const skill = skillList.find((card) =>
           item.cards.some((itemCard) => itemCard.id === card.value),
         )!
+        const skillCard = item.cards.find(
+          (card) => card.id === skill.value,
+        )!
 
         return {
           cards: item.cards
-            .map(
-              (card) =>
-                skillIds.has(card.id)
-                  ? cardNames.get(card.id) ?? card.id
-                  : `${cardNames.get(card.id) ?? card.id}${card.level}级`,
-            )
+            .map(formatAutoMockCard)
             .join(' + '),
           dps: item.dps,
           cardOptions: item.cards.filter(
             (card) => !skillIds.has(card.id),
           ),
           skillGroup: skill.group,
+          skillUpgrade:
+            skillCard.upgrade ?? SKILL_UPGRADES.benZhen,
+          skillUpgradeLevel: skillCard.level,
         }
       }),
     [items],
@@ -193,6 +217,8 @@ export function useAutoMock(
           topCount,
           workerIndex,
           workerCount,
+          skillCardId,
+          skillUpgrades,
         })
       })
     } catch (error) {

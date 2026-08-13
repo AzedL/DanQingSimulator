@@ -11,6 +11,7 @@ import {
   type SuiShou,
 } from './SuiShou'
 import { getCard } from '../../shared'
+import { triggerFireResonance } from '../shared'
 
 const DAMAGE = [2209, 2369, 2529, 2689, 2849, 3009, 3169]
 
@@ -71,6 +72,7 @@ export class XingHongJuYi extends Card {
   private settleBurn() {
     const damage = this._damage * (1 + 0.05 * (this._burnLayers - 1))
     this.core.fire.add(damage, 1, '燃烧')
+    triggerFireResonance(this.core)
     getCard<MengHu>(this.core, CARD_IDS.mengHu)?.onBurnDamage()
     getCard<SuiShou>(this.core, CARD_IDS.suiShou)?.onBurnDamage()
   }

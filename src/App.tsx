@@ -13,6 +13,8 @@ import {
   lingYunLevelValues,
   lingYunList,
   tabValues,
+  resolveAutoMockSkillUpgrades,
+  skillCardIds,
 } from '@/features/config/simulatorUi'
 import { useAutoMock } from '@/features/autoMock/useAutoMock'
 import { mergeAutoMockCardIds } from '@/features/autoMock/autoMockSettings'
@@ -54,6 +56,10 @@ function App() {
     autoMockCardIds,
     simulation.simulationConfig.availableTianGongValue,
     autoMockWhitelistEnabled,
+    skillCardIds[simulation.simulationConfig.autoMockGroup],
+    resolveAutoMockSkillUpgrades(
+      simulation.simulationConfig.autoMockSkillUpgrade,
+    ),
   )
 
   const [currentTabResult, setCurrentTabResult] = useState(APP_VIEW_DEFAULTS.currentTabResult)
@@ -137,6 +143,12 @@ function App() {
           isAutoMock={simulation.simulationConfig.isAutoMock}
           skillGroup={simulation.simulationConfig.skillGroup}
           setSkillGroup={simulation.simulationConfig.setSkillGroup}
+          skillUpgrade={simulation.simulationConfig.skillUpgrade}
+          autoMockSkillUpgrade={simulation.simulationConfig.autoMockSkillUpgrade}
+          skillUpgradeLevel={simulation.simulationConfig.skillUpgradeLevel}
+          setSkillUpgrade={simulation.simulationConfig.setSkillUpgrade}
+          setAutoMockSkillUpgrade={simulation.simulationConfig.setAutoMockSkillUpgrade}
+          setSkillUpgradeLevel={simulation.simulationConfig.setSkillUpgradeLevel}
           duration={simulation.simulationConfig.duration}
           setDuration={simulation.simulationConfig.setDuration}
           useRandom={simulation.simulationConfig.useRandom}
@@ -164,8 +176,13 @@ function App() {
         setAutoMockCurrent={autoMock.setAutoMockCurrent}
         autoMockResult={autoMock.autoMockResult}
         autoMockDanQingCombination={autoMock.autoMockDanQingCombination}
-        onAutoMockResultDoubleClick={(cards, skillGroup) => {
-          simulation.applyAutoMockResult(cards, skillGroup)
+        onAutoMockResultDoubleClick={(cards, skillGroup, skillUpgrade, skillUpgradeLevel) => {
+          simulation.applyAutoMockResult(
+            cards,
+            skillGroup,
+            skillUpgrade,
+            skillUpgradeLevel,
+          )
           setCurrentTabResult('mock')
         }}
       />

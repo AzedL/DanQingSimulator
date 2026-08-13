@@ -16,10 +16,13 @@ export class ShenHuoBengFa extends Card {
     this._damage = 65290 * MULTIPLIER[this.level]
   }
 
+  get activationDamageBoost() {
+    return this.level >= 3 ? 0.2 : 0
+  }
+
   get activationDamageMultiplier() {
-    return this.level >= 3
-      ? 1.2
-      : MENG_HU_ACTIVATION_DAMAGE_MULTIPLIER
+    return MENG_HU_ACTIVATION_DAMAGE_MULTIPLIER +
+      this.activationDamageBoost
   }
 
   onActivation() {

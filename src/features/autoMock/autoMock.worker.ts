@@ -1,4 +1,8 @@
-import type { CardId, CoreOptions } from '../../kernel'
+import type {
+  CardId,
+  CoreOptions,
+  SkillUpgrade,
+} from '../../kernel'
 import {
   runAutoMockPartition,
   type AutoMockResult,
@@ -14,6 +18,8 @@ interface AutoMockWorkerRequest {
   topCount: number
   workerIndex: number
   workerCount: number
+  skillCardId?: CardId
+  skillUpgrades?: SkillUpgrade[]
 }
 
 interface AutoMockWorkerSuccess extends AutoMockResult {

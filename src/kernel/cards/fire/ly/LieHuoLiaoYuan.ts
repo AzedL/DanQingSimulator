@@ -3,6 +3,7 @@ import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
 import type { MengHu } from '../dq/MengHu'
 import { enqueueRepeated, getCard } from '../../shared'
+import { triggerFireResonance } from '../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -29,6 +30,7 @@ export class LieHuoLiaoYuan extends Card {
   onSkillEnd() {
     enqueueRepeated(this.core, 8, 1, () => {
       this.core.fire.add(this._damage, 1, '烈火燎原')
+      triggerFireResonance(this.core)
       if (this.level >= 3) {
         getCard<MengHu>(this.core, CARD_IDS.mengHu)?.addFireValue(1500)
       }

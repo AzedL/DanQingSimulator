@@ -5,6 +5,7 @@ import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
 import { getCard } from '../../shared'
 import type { ShangGuanCe } from './ShangGuanCe'
+import type { NingBingShuangHua } from '../NingBingShuangHua'
 
 const DAMAGE_BOOST = [0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2]
 const FRACTURE_DAMAGE = [8484, 9090, 9696, 10302, 10908, 11514, 12120]
@@ -21,7 +22,11 @@ export function settleFracture(
   const damage =
     getCard<ZuoGui>(core, CARD_IDS.zuoGui)?.fractureDamage ??
     ZUO_GUI_DEFAULT_FRACTURE_DAMAGE
-  core.ice.add(damage * count, count, key)
+  const multiplier = getCard<NingBingShuangHua>(
+    core,
+    CARD_IDS.ningBingShuangHua,
+  )?.fractureDamageMultiplier ?? 1
+  core.ice.add(damage * multiplier * count, count, key)
   getCard<ShangGuanCe>(core, CARD_IDS.shangGuanCe)?.onFracture(count)
 }
 

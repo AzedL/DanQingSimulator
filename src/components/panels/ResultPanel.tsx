@@ -6,7 +6,7 @@ import type {
 } from '@/features/config/simulatorUi'
 import { cn } from '@/lib/utils'
 import lang from '@/lang/lang'
-import type { CardOptions } from '@/kernel'
+import type { CardOptions, SkillUpgrade } from '@/kernel'
 import type { AutoMockViewItem } from '@/features/autoMock/useAutoMock'
 import type { SimulationDamageDetail } from '@/features/simulator/result'
 
@@ -25,6 +25,8 @@ interface Props {
   onAutoMockResultDoubleClick: (
     cards: CardOptions[],
     skillGroup: CardGroup,
+    skillUpgrade: SkillUpgrade,
+    skillUpgradeLevel: number,
   ) => void
 }
 
@@ -95,7 +97,14 @@ export default function ResultPanel(props: Props) {
             <hr className="border-0 border-t border-sky-200" />
             <div className="max-h-96 overflow-y-auto">
               {props.autoMockResult.map(
-                ({ cards, dps, cardOptions, skillGroup }, index) => {
+                ({
+                  cards,
+                  dps,
+                  cardOptions,
+                  skillGroup,
+                  skillUpgrade,
+                  skillUpgradeLevel,
+                }, index) => {
                   return (
                     <div
                       className={cn(
@@ -109,6 +118,8 @@ export default function ResultPanel(props: Props) {
                         props.onAutoMockResultDoubleClick(
                           cardOptions,
                           skillGroup,
+                          skillUpgrade,
+                          skillUpgradeLevel,
                         )
                       }
                     >

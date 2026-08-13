@@ -2,6 +2,8 @@ import type { Core } from '../../../core/Core'
 import { StackedEffect } from '../../../utils/StackedEffect'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
+import { getCard } from '../../shared'
+import type { LeiYouLingGuang } from '../LeiYouLingGuang'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -27,12 +29,18 @@ export class JingLeiJi extends Card {
   }
 
   onChain(count: number) {
-    const spearCount = count * this._countPerTrigger
+    const skill = getCard<LeiYouLingGuang>(
+      this.core,
+      CARD_IDS.leiYouLingGuang,
+    )
+    const spearCount = count *
+      (this._countPerTrigger + (skill?.extraSpearCount ?? 0))
     this.core.thunder.add(
       this._damage * spearCount,
       spearCount,
       '惊雷戟',
     )
+    skill?.onSpearHit(spearCount)
 
     if (this.level < 3) return
 

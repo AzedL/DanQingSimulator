@@ -54,7 +54,7 @@ afterEach(() => {
 })
 
 describe('玄冰技能', () => {
-  it('凝冰霜华施法4秒逐秒扣减本体伤害', () => {
+  it('玄冰霜华施法4秒逐秒扣减本体伤害', () => {
     const core = createCore(
       [{ id: CARD_IDS.ningBingShuangHua, level: 0 }],
       4,
@@ -68,7 +68,7 @@ describe('玄冰技能', () => {
     expect(count(core, '本体伤害扣减')).toBe(4)
   })
 
-  it('凝冰霜华立即造成首次伤害并在之后3秒各造成2次伤害', () => {
+  it('玄冰霜华立即造成首次伤害并在之后3秒各造成2次伤害', () => {
     const core = createCore(
       [{ id: CARD_IDS.ningBingShuangHua, level: 0 }],
       4,
@@ -76,9 +76,9 @@ describe('玄冰技能', () => {
 
     core.exec()
 
-    expect(damage(core, '凝冰霜华')).toBe(495005)
-    expect(count(core, '凝冰霜华')).toBe(7)
-    expect(core.damage.output().damageMapList.map((item) => item['凝冰霜华'])).toEqual([
+    expect(damage(core, '玄冰霜华')).toBe(495005)
+    expect(count(core, '玄冰霜华')).toBe(7)
+    expect(core.damage.output().damageMapList.map((item) => item['玄冰霜华'])).toEqual([
       70715,
       212145,
       353575,
@@ -86,7 +86,7 @@ describe('玄冰技能', () => {
     ])
   })
 
-  it('凝冰霜华将霜刺寒雨增伤与洞察增伤乘算并消费洞察', () => {
+  it('玄冰霜华将霜刺寒雨增伤与洞察增伤乘算并消费洞察', () => {
     const core = createCore(
       [
         { id: CARD_IDS.ningBingShuangHua, level: 0 },
@@ -98,7 +98,7 @@ describe('玄冰技能', () => {
 
     core.exec()
 
-    expect(damage(core, '凝冰霜华')).toBeCloseTo(495005 * 1.3 * 1.09)
+    expect(damage(core, '玄冰霜华')).toBeCloseTo(495005 * 1.3 * 1.09)
     expect(core.damage.insightLayers).toBe(0)
   })
 })
@@ -308,7 +308,7 @@ describe('玄冰灵韵', () => {
     expect(count(core, '霜寒破裂3')).toBe(3)
   })
 
-  it('霜寒破裂5使凝冰霜华额外召唤冰霜元素并使用齐昊负1级伤害', () => {
+  it('霜寒破裂5使玄冰霜华额外召唤冰霜元素并使用齐昊负1级伤害', () => {
     const core = createCore(
       [
         { id: CARD_IDS.ningBingShuangHua, level: 0 },
@@ -404,7 +404,7 @@ describe('玄冰灵韵', () => {
     expect(card<ShangGuanCe>(core, CARD_IDS.shangGuanCe).iceValue).toBe(4000)
   })
 
-  it('寒潮冰涌5在凝冰霜华4个伤害时点各触发1次且不影响正常冷却', () => {
+  it('寒潮冰涌5在玄冰霜华4个伤害时点各触发1次且不影响正常冷却', () => {
     const core = createCore(
       [
         { id: CARD_IDS.ningBingShuangHua, level: 0 },

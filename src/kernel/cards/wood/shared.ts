@@ -13,6 +13,7 @@ import type {
   PulseState,
   ShenMuTouLingYun,
 } from './ly/ShenMuTouLingYun'
+import type { QingWuFuSheng } from './QingWuFuSheng'
 
 export const DEFAULT_PULSE_DAMAGE = 9092
 export const DEFAULT_PULSE_KEY = '脉冲'
@@ -68,6 +69,10 @@ export function triggerPulse(
     CARD_IDS.shenMuTou_dq,
   )?.onPulse()
   dice?.afterPulse(pulseState)
+  getCard<QingWuFuSheng>(
+    core,
+    CARD_IDS.qingWuFuSheng,
+  )?.onPulse()
 
   if (allowLiuHeJing) {
     getCard<LiuHeJing>(

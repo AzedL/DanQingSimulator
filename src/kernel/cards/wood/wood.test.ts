@@ -6,6 +6,7 @@ import {
 } from '..'
 import type { CardId } from '../Card'
 import { CARD_IDS } from '../cardIds'
+import { SKILL_UPGRADES } from '../skillUpgrades'
 import { QingWuFuSheng } from './QingWuFuSheng'
 import { QingLiangZhu } from './dq/QingLiangZhu'
 import { LieDiBeng } from './ly/LieDiBeng'
@@ -391,6 +392,70 @@ describe('苍木灵韵', () => {
 
     expect(damage(core, '神木骰')).toBe(114514 * 2)
     expect(count(core, '神木骰')).toBe(2)
+  })
+
+  it('木本真三级按神木骰等级固定叠加3或6层', () => {
+    const lowLevel = createCore(
+      [
+        { id: CARD_IDS.shenMuTou_ly, level: 1 },
+        {
+          id: CARD_IDS.qingWuFuSheng,
+          level: 3,
+          upgrade: SKILL_UPGRADES.benZhen,
+        },
+      ],
+      1,
+    )
+    const highLevel = createCore(
+      [
+        { id: CARD_IDS.shenMuTou_ly, level: 3 },
+        {
+          id: CARD_IDS.qingWuFuSheng,
+          level: 3,
+          upgrade: SKILL_UPGRADES.benZhen,
+        },
+      ],
+      1,
+    )
+
+    lowLevel.exec()
+    highLevel.exec()
+    for (let index = 0; index < 7; index++) {
+      triggerPulse(lowLevel)
+      triggerPulse(highLevel)
+    }
+
+    expect(damage(lowLevel, '脉冲')).toBeCloseTo(
+      9092 * (1.4 * 4 + 3),
+    )
+    expect(damage(highLevel, '脉冲')).toBeCloseTo(
+      9092 * 1.7 * 7,
+    )
+  })
+
+  it('木本真三级将固定层数叠加到当前六六大顺', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.shenMuTou_ly, level: 1 },
+        {
+          id: CARD_IDS.qingWuFuSheng,
+          level: 3,
+          upgrade: SKILL_UPGRADES.benZhen,
+        },
+      ],
+      0,
+    )
+
+    for (let index = 0; index < 6; index++) triggerPulse(core)
+    core.coreOptions.duration = 1
+    core.exec()
+    const before = damage(core, '脉冲')
+    for (let index = 0; index < 6; index++) triggerPulse(core)
+
+    expect(damage(core, '脉冲') - before).toBeCloseTo(
+      9092 *
+        (1.4 * 4 + (1 + 0.4 * 2 / 3) + (1 + 0.4 / 3)),
+    )
   })
 
   it('一级苍林浮生召唤后每1.5秒攻击1次，共6次', () => {

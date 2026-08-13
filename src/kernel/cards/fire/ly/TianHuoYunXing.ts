@@ -5,6 +5,7 @@ import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
 import type { MengHu } from '../dq/MengHu'
 import { getCard } from '../../shared'
+import { triggerFireResonance } from '../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
@@ -26,6 +27,7 @@ export class TianHuoYunXing extends Card {
       maxLayers: 2,
       onTick: (layers) => {
         this.core.fire.add(5342 * layers, 1, '天火陨星3')
+        triggerFireResonance(this.core)
         getCard<MengHu>(
           this.core,
           CARD_IDS.mengHu,

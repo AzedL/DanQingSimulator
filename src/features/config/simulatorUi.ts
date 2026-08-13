@@ -1,7 +1,27 @@
-import { CARD_IDS, type CardId } from '@/kernel'
-import lang from '@/lang/lang'
+import {
+  CARD_IDS,
+  SKILL_UPGRADES,
+  type CardId,
+  type SkillUpgrade,
+} from '../../kernel'
+import lang from '../../lang/lang'
 
 export type SimulatorTab = 'mock' | 'autoMock'
+export const AUTO_MOCK_SKILL_UPGRADES = {
+  both: 'both',
+} as const
+export type AutoMockSkillUpgrade =
+  | SkillUpgrade
+  | (typeof AUTO_MOCK_SKILL_UPGRADES)['both']
+
+export function resolveAutoMockSkillUpgrades(
+  value: AutoMockSkillUpgrade,
+): SkillUpgrade[] {
+  return value === AUTO_MOCK_SKILL_UPGRADES.both
+    ? [SKILL_UPGRADES.benZhen, SKILL_UPGRADES.lingTong]
+    : [value]
+}
+
 export const cardGroups = ['天火', '玄冰', '苍木', '神雷'] as const
 export type CardGroup = (typeof cardGroups)[number]
 export const skillCardIds: Record<CardGroup, CardId> = {
@@ -20,7 +40,7 @@ export interface CardSelectOption {
 
 export const skillList: CardSelectOption[] = [
   { value: skillCardIds.天火, label: '灼灼天炎', group: '天火' },
-  { value: skillCardIds.玄冰, label: '凝冰霜华', group: '玄冰' },
+  { value: skillCardIds.玄冰, label: '玄冰霜华', group: '玄冰' },
   { value: skillCardIds.苍木, label: '青芜浮生', group: '苍木' },
   { value: skillCardIds.神雷, label: '雷佑灵光', group: '神雷' },
 ]

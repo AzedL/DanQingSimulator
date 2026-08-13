@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CARD_IDS,
   Core,
+  SKILL_UPGRADES,
   type CardId,
   type CoreOptions,
 } from '../../kernel'
@@ -88,6 +89,61 @@ function runLegacyAutoMock(
 }
 
 describe('自动模拟', () => {
+  it('本真与灵通同时参与时分别模拟并计入组合数', () => {
+    const skillCardId = CARD_IDS.zhuoZhuoTianYan
+    const result = runAutoMock({
+      coreOptions: {
+        ...baseOptions,
+        cards: [
+          {
+            id: skillCardId,
+            level: 1,
+            upgrade: SKILL_UPGRADES.benZhen,
+          },
+        ],
+      },
+      targetCardIds: [],
+      resultCardIds: [skillCardId],
+      additionalValue: 0,
+      maxCombinations: 2,
+      topCount: 2,
+      skillCardId,
+      skillUpgrades: [
+        SKILL_UPGRADES.benZhen,
+        SKILL_UPGRADES.lingTong,
+      ],
+    })
+
+    expect(result.length).toBe(2)
+    expect(result.items).toHaveLength(2)
+    expect(result.items.map((item) => item.cards[0].upgrade).sort())
+      .toEqual([
+        SKILL_UPGRADES.benZhen,
+        SKILL_UPGRADES.lingTong,
+      ].sort())
+  })
+
+  it('本真与灵通可限制为单一分支', () => {
+    const skillCardId = CARD_IDS.zhuoZhuoTianYan
+    const result = runAutoMock({
+      coreOptions: {
+        ...baseOptions,
+        cards: [{ id: skillCardId, level: 1 }],
+      },
+      targetCardIds: [],
+      resultCardIds: [skillCardId],
+      additionalValue: 0,
+      maxCombinations: 1,
+      topCount: 1,
+      skillCardId,
+      skillUpgrades: [SKILL_UPGRADES.lingTong],
+    })
+
+    expect(result.length).toBe(1)
+    expect(result.items[0].cards[0].upgrade)
+      .toBe(SKILL_UPGRADES.lingTong)
+  })
+
   it('只在目标系内基于当前等级追加并用完额度', () => {
     const combinations = buildAutoMockCards(
       baseOptions.cards,

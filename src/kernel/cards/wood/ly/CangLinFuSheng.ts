@@ -2,9 +2,10 @@ import type { Core } from '../../../core/Core'
 import { CooldownTime } from '../../../utils/CooldownTime'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
-import { enqueueRepeated, getCard } from '../../shared'
+import { getCard } from '../../shared'
 import type { QingLiangZhu } from '../dq/QingLiangZhu'
 import type { LieDiBeng } from './LieDiBeng'
+import type { QingWuFuSheng } from '../QingWuFuSheng'
 
 const MULTIPLIER = [0, 1, 1.125, 1.25, 1.375, 1.5]
 
@@ -29,10 +30,23 @@ export class CangLinFuSheng extends Card {
   }
 
   private summon() {
+    const skill = getCard<QingWuFuSheng>(
+      this.core,
+      CARD_IDS.qingWuFuSheng,
+    )
+    skill?.beginSummon('paper')
+    const attackBonus = skill?.summonAttackBonus ?? 0
     if (this.level < 3) {
-      enqueueRepeated(this.core, 6, 1.5, () => {
-        this.settleAttack()
-      })
+      for (let index = 0; index < 6 + attackBonus * 2; index++) {
+        this.core.queue.enqueue(
+          () => this.settleAttack(),
+          1 + index * 1.5,
+        )
+      }
+      skill?.expireSummon(
+        'paper',
+        10 * skill.summonDurationMultiplier,
+      )
       return
     }
 
@@ -53,11 +67,15 @@ export class CangLinFuSheng extends Card {
       }, tick)
     }
 
-    for (let index = 1; index <= 3; index++) {
+    for (let index = 0; index < 3 + attackBonus; index++) {
       this.core.queue.enqueue(() => {
         this.settleAttack()
-      }, 6 + index * 1.5)
+      }, 7 + index * 1.5)
     }
+    skill?.expireSummon(
+      'paper',
+      10 * skill.summonDurationMultiplier,
+    )
   }
 
   private settleAttack() {
