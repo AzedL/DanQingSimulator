@@ -56,7 +56,7 @@ export class CangLinFuSheng extends Card {
         this.core.wood.add(
           this._stormDamage * count,
           count,
-          '小纸人-纸人风暴',
+          '小纸人-旋风收割',
         )
         if (this.level >= 5) {
           getCard<QingLiangZhu>(

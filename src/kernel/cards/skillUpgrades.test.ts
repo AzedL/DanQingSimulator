@@ -495,7 +495,7 @@ describe('主动技能升级', () => {
     spirit.exec()
 
     expect(count(paperLowLevel, '小纸人-攻击')).toBe(8)
-    expect(count(paper, '小纸人-纸人风暴')).toBe(11)
+    expect(count(paper, '小纸人-旋风收割')).toBe(11)
     expect(count(paper, '小纸人-攻击')).toBe(4)
     expect(count(tree, '裂地崩')).toBe(1)
     expect(count(tree, '青芜浮生 · 攻击')).toBe(6)
