@@ -94,13 +94,13 @@ describe('苍木技能', () => {
     expect(core.damage.insightLayers).toBe(0)
   })
 
-  it('裂地崩替代1次苍木树人攻击', () => {
+  it('裂地崩替代第1次苍木树人攻击且不改变后续攻击时间', () => {
     const core = createCore(
       [
         { id: CARD_IDS.qingWuFuSheng, level: 0 },
         { id: CARD_IDS.lieDiBeng, level: 1 },
       ],
-      20,
+      23,
     )
 
     core.exec()
@@ -108,6 +108,42 @@ describe('苍木技能', () => {
     expect(damage(core, '裂地崩')).toBe(207708)
     expect(count(core, '裂地崩')).toBe(1)
     expect(count(core, '青芜浮生 · 攻击')).toBe(5)
+  })
+
+  it('裂地崩在攻击开始时附加回响并在2秒前摇后结算', () => {
+    const options: CardOptions[] = [
+      { id: CARD_IDS.qingWuFuSheng, level: 0 },
+      { id: CARD_IDS.lieDiBeng, level: 3 },
+    ]
+    const started = createCore(options, 5)
+    const echoed = createCore(options, 6)
+    const settled = createCore(options, 7)
+
+    started.exec()
+    echoed.exec()
+    settled.exec()
+
+    expect(count(started, '裂地崩')).toBe(0)
+    expect(count(started, '裂地崩 · 回响')).toBe(0)
+    expect(count(echoed, '裂地崩')).toBe(0)
+    expect(count(echoed, '裂地崩 · 回响')).toBe(1)
+    expect(count(settled, '裂地崩')).toBe(1)
+    expect(count(settled, '裂地崩 · 回响')).toBe(2)
+  })
+
+  it('裂地崩后的普通攻击在第10秒首次结算', () => {
+    const options: CardOptions[] = [
+      { id: CARD_IDS.qingWuFuSheng, level: 0 },
+      { id: CARD_IDS.lieDiBeng, level: 1 },
+    ]
+    const beforeAttack = createCore(options, 10)
+    const attacked = createCore(options, 11)
+
+    beforeAttack.exec()
+    attacked.exec()
+
+    expect(count(beforeAttack, '青芜浮生 · 攻击')).toBe(0)
+    expect(count(attacked, '青芜浮生 · 攻击')).toBe(1)
   })
 })
 
@@ -610,7 +646,7 @@ describe('苍木灵韵', () => {
     card<LieDiBeng>(
       core,
       CARD_IDS.lieDiBeng,
-    ).onSkillDamageSettled()
+    ).onAttackStarted()
     core.exec()
 
     expect(damage(core, '裂地崩')).toBe(207708 * 1.75)
@@ -626,7 +662,7 @@ describe('苍木灵韵', () => {
     )
     const collapse = card<LieDiBeng>(core, CARD_IDS.lieDiBeng)
 
-    collapse.onSkillDamageSettled()
+    collapse.onAttackStarted()
     collapse.onSummonAttack()
     collapse.onSummonAttack()
     collapse.onSummonAttack()

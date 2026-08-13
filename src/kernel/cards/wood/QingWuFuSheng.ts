@@ -54,13 +54,13 @@ export class QingWuFuSheng extends Card {
         this.core,
         CARD_IDS.lieDiBeng,
       )
-      collapse?.onSkillDamageSettled()
+      collapse?.onAttackStarted()
       getCard<FuMuZhangFeng>(
         this.core,
         CARD_IDS.fuMuZhangFeng,
       )?.onSkillDamageSettled()
-      const attackCount = collapse ? 5 : 6
-      for (let index = 1; index <= attackCount; index++) {
+      const firstAttackIndex = collapse ? 2 : 1
+      for (let index = firstAttackIndex; index <= 6; index++) {
         this.core.queue.enqueue(() => {
           this.core.wood.add(
             ATTACK_DAMAGE,

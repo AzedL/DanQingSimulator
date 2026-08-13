@@ -18,9 +18,7 @@ export class LieDiBeng extends Card {
     this._echoActive = false
   }
 
-  onSkillDamageSettled() {
-    this.core.wood.add(this._damage, 1, '裂地崩')
-
+  onAttackStarted() {
     if (this.level >= 3) {
       this._echoActive = true
       enqueueRepeated(this.core, 30, 1, () => {
@@ -30,6 +28,10 @@ export class LieDiBeng extends Card {
         this._echoActive = false
       }, 30)
     }
+
+    this.core.queue.enqueue(() => {
+      this.core.wood.add(this._damage, 1, '裂地崩')
+    }, 2)
   }
 
   onSummonAttack() {
