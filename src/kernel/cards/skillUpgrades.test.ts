@@ -182,7 +182,7 @@ describe('主动技能升级', () => {
       meteor,
       CARD_IDS.tianHuoYunXing,
     ).onActivation()
-    meteor.coreOptions.duration = 2
+    meteor.coreOptions.duration = 3
     meteor.exec()
 
     const activation = createCore([
@@ -251,6 +251,7 @@ describe('主动技能升级', () => {
     ])
 
     card<MengHu>(core, CARD_IDS.mengHu).addFireValue(10000)
+    processQueue(core, 1)
 
     expect(damage(core, '神火迸发')).toBeCloseTo(65290 * 1.12 * 1.002)
   })

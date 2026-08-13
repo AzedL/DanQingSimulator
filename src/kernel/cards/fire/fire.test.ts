@@ -316,7 +316,7 @@ describe('天火灵韵', () => {
     expect(count(core, '烈焰焚身')).toBe(12)
   })
 
-  it('神火迸发5立即结算并在2秒后再次结算且提高天火激化伤害', () => {
+  it('神火迸发5在触发1秒和2秒后分别结算伤害且提高天火激化伤害', () => {
     const core = createCore(
       [
         { id: CARD_IDS.mengHu, level: 0 },
@@ -331,6 +331,25 @@ describe('天火灵韵', () => {
     expect(damage(core, '神火迸发')).toBe(65290 * 2.5 * 2)
     expect(count(core, '神火迸发')).toBe(2)
     expect(damage(core, '天火激化')).toBeCloseTo(39181 * 1.2 * 5)
+  })
+
+  it('神火迸发5按照第1秒和第2秒的时间轴结算', () => {
+    const core = createCore(
+      [{ id: CARD_IDS.shenHuoBengFa, level: 5 }],
+      0,
+    )
+    card<ShenHuoBengFa>(
+      core,
+      CARD_IDS.shenHuoBengFa,
+    ).onActivation()
+
+    expect(count(core, '神火迸发')).toBe(0)
+    core.queue.process(0.5)
+    expect(count(core, '神火迸发')).toBe(0)
+    core.queue.process(0.5)
+    expect(count(core, '神火迸发')).toBe(1)
+    core.queue.process(1)
+    expect(count(core, '神火迸发')).toBe(2)
   })
 
   it('赤焰天环5把自身和天火激化改为1.5秒间隔并持续12秒', () => {
@@ -405,8 +424,8 @@ describe('天火灵韵', () => {
     expect(count(core, '天火激化')).toBe(6)
   })
 
-  it('天火陨星3立即结算本体并生成5次固定伤害', () => {
-    const core = createCore([{ id: CARD_IDS.tianHuoYunXing, level: 3 }], 11)
+  it('天火陨星3延迟1秒结算本体并生成5次固定伤害', () => {
+    const core = createCore([{ id: CARD_IDS.tianHuoYunXing, level: 3 }], 12)
 
     core.exec()
 
@@ -432,6 +451,33 @@ describe('天火灵韵', () => {
     expect(count(core, '天火陨星')).toBe(2)
     expect(damage(core, '天火陨星3')).toBe(5342 * 10)
     expect(count(core, '天火陨星3')).toBe(5)
+  })
+
+  it('天火陨星在第1秒生效并在第3秒结算首次持续伤害', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.mengHu, level: 0 },
+        { id: CARD_IDS.tianHuoYunXing, level: 5 },
+      ],
+      0,
+    )
+    card<TianHuoYunXing>(
+      core,
+      CARD_IDS.tianHuoYunXing,
+    ).onActivation()
+
+    expect(count(core, '天火陨星')).toBe(0)
+    expect(tigerValue(core)).toBe(0)
+    core.queue.process(0.5)
+    expect(count(core, '天火陨星')).toBe(0)
+    core.queue.process(0.5)
+    expect(count(core, '天火陨星')).toBe(1)
+    expect(tigerValue(core)).toBe(2000)
+    expect(count(core, '天火陨星3')).toBe(0)
+    core.queue.process(1)
+    expect(count(core, '天火陨星3')).toBe(0)
+    core.queue.process(1)
+    expect(count(core, '天火陨星3')).toBe(1)
   })
 
   it('天火陨星3最多按2层结算', () => {
@@ -462,7 +508,7 @@ describe('天火灵韵', () => {
         { id: CARD_IDS.tianHuoYunXing, level: 1 },
         { id: CARD_IDS.lieYanFenShen, level: 1 },
       ],
-      1,
+      2,
     )
     const ant = card<XingHongJuYi>(core, CARD_IDS.xingHongJuYi)
     const tiger = card<MengHu>(core, CARD_IDS.mengHu)

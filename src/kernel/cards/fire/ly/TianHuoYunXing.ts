@@ -8,6 +8,7 @@ import { getCard } from '../../shared'
 import { triggerFireResonance } from '../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
+const EFFECT_DELAY = 1
 
 export class TianHuoYunXing extends Card {
   declare private _damage: number
@@ -46,12 +47,14 @@ export class TianHuoYunXing extends Card {
   }
 
   private trigger() {
-    this.core.fire.add(this._damage, 1, '天火陨星')
-    getCard<MengHu>(this.core, CARD_IDS.mengHu)?.addFireValue(2000)
+    this.core.queue.enqueue(() => {
+      this.core.fire.add(this._damage, 1, '天火陨星')
+      getCard<MengHu>(this.core, CARD_IDS.mengHu)?.addFireValue(2000)
 
-    if (this.level < 3) return
+      if (this.level < 3) return
 
-    this._effect.add()
+      this._effect.add()
+    }, EFFECT_DELAY)
   }
 
   reset() {
