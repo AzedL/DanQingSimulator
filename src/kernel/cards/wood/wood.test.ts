@@ -557,6 +557,45 @@ describe('苍木灵韵', () => {
     expect(count(core, '木引青灵')).toBe(14)
   })
 
+  it('苍木激化在10秒冷却内不重复召唤木引青灵', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.qingLiangZhu, level: 0 },
+        { id: CARD_IDS.muYinQingLing, level: 1 },
+      ],
+      28,
+    )
+
+    card<QingLiangZhu>(
+      core,
+      CARD_IDS.qingLiangZhu,
+    ).addWoodValue(20000)
+    core.exec()
+
+    expect(count(core, '木引青灵')).toBe(14)
+  })
+
+  it('苍木激化召唤冷却10秒后可再次召唤', () => {
+    const core = createCore(
+      [{ id: CARD_IDS.muYinQingLing, level: 1 }],
+      0,
+    )
+    const spirit = card<MuYinQingLing>(
+      core,
+      CARD_IDS.muYinQingLing,
+    )
+    const summon = vi.spyOn(spirit, 'summon')
+
+    spirit.onActivation()
+    spirit.onActivation()
+    core.queue.process(10)
+    spirit.onActivation()
+
+    expect(summon).toHaveBeenCalledTimes(2)
+    expect(summon).toHaveBeenNthCalledWith(1, 1)
+    expect(summon).toHaveBeenNthCalledWith(2, 1)
+  })
+
   it('三级木引青灵每次攻击使青芜浮生冷却缩短1秒', () => {
     const core = createCore(
       [

@@ -89,7 +89,7 @@ export class QingLiangZhu extends Card {
     getCard<MuYinQingLing>(
       this.core,
       CARD_IDS.muYinQingLing,
-    )?.summon(1)
+    )?.onActivation()
 
     this._activation.add()
     this._bloom.add()

@@ -9,9 +9,11 @@ import type { QingWuFuSheng } from '../QingWuFuSheng'
 import type { LieDiBeng } from './LieDiBeng'
 
 const MULTIPLIER = [0, 1, 1.125, 1.25, 1.375, 1.5]
+const ACTIVATION_COOLDOWN = 10
 
 export class MuYinQingLing extends Card {
   declare private _damage: number
+  declare private _activationReady: boolean
 
   constructor(core: Core, level: number) {
     super(core, 'passive', CARD_IDS.muYinQingLing, '木引青灵', level)
@@ -19,6 +21,17 @@ export class MuYinQingLing extends Card {
 
   protected init() {
     this._damage = 5992 * MULTIPLIER[this.level]
+    this._activationReady = true
+  }
+
+  onActivation() {
+    if (!this._activationReady) return
+
+    this._activationReady = false
+    this.summon(1)
+    this.core.queue.enqueue(() => {
+      this._activationReady = true
+    }, ACTIVATION_COOLDOWN)
   }
 
   summon(count: number) {
@@ -59,5 +72,7 @@ export class MuYinQingLing extends Card {
     if (this.level >= 5) this.summon(2)
   }
 
-  reset() {}
+  reset() {
+    this._activationReady = true
+  }
 }
