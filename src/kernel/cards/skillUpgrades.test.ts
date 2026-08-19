@@ -21,6 +21,7 @@ import { NingBingShuangHua } from './ice/NingBingShuangHua'
 import { LieYanFenShen } from './fire/ly/LieYanFenShen'
 import { TianHuoYunXing } from './fire/ly/TianHuoYunXing'
 import { LieHuoLiaoYuan } from './fire/ly/LieHuoLiaoYuan'
+import { TianLeiHuYou } from './thunder/ly/TianLeiHuYou'
 
 function createCore(
   cards: CardOptions[],
@@ -292,6 +293,42 @@ describe('主动技能升级', () => {
     expect(thunder.damage.boost).toBeCloseTo(0.2)
     processQueue(thunder, 4)
     expect(thunder.damage.boost).toBeCloseTo(0)
+  })
+
+  it('雷本真一级与天雷护佑五级乘算', () => {
+    const core = createCore([
+      { id: CARD_IDS.ziXiaoHu, level: 0 },
+      { id: CARD_IDS.tianLeiHuYou, level: 5 },
+      {
+        id: CARD_IDS.leiYouLingGuang,
+        level: 1,
+        upgrade: SKILL_UPGRADES.benZhen,
+      },
+    ])
+
+    const gourd = card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu)
+    gourd.addThunderValue(10000)
+    card<TianLeiHuYou>(core, CARD_IDS.tianLeiHuYou).onSkillDamage()
+
+    expect(core.damage.boost).toBeCloseTo((1 + 0.2) * (1 + 0.7) - 1)
+  })
+
+  it('火本真三级与烈火燎原五级乘算', () => {
+    const core = createCore([
+      { id: CARD_IDS.mengHu, level: 0 },
+      { id: CARD_IDS.lieHuoLiaoYuan, level: 5 },
+      {
+        id: CARD_IDS.zhuoZhuoTianYan,
+        level: 3,
+        upgrade: SKILL_UPGRADES.benZhen,
+      },
+    ])
+
+    const tiger = card<MengHu>(core, CARD_IDS.mengHu)
+    tiger.addFireValue(10000)
+    card<LieHuoLiaoYuan>(core, CARD_IDS.lieHuoLiaoYuan).onSkillStart()
+
+    expect(core.damage.boost).toBeCloseTo((1 + 0.12) * (1 + 0.33) - 1)
   })
 
   it('火本真一级在六段伤害后累计5000天火值', () => {

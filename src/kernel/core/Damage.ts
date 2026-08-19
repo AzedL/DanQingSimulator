@@ -22,7 +22,8 @@ export class Damage {
   private _countMapList: Record<string, number>[] = []
   private _tickCount = 0
   private _totalDamage = 0
-  private _boost = 0
+  private _skillBoost = 0
+  private _cardBoost = 0
   private _insightLayers = 0
 
   constructor(core: Core) {
@@ -45,16 +46,40 @@ export class Damage {
     this.add(-damage, 1, '本体伤害扣减')
   }
 
+  get skillBoost() {
+    return this._skillBoost
+  }
+
+  addSkillBoost(boost: number) {
+    this._skillBoost += boost
+  }
+
+  removeSkillBoost(boost: number) {
+    this._skillBoost -= boost
+  }
+
+  get cardBoost() {
+    return this._cardBoost
+  }
+
+  addCardBoost(boost: number) {
+    this._cardBoost += boost
+  }
+
+  removeCardBoost(boost: number) {
+    this._cardBoost -= boost
+  }
+
   get boost() {
-    return this._boost
+    return (1 + this._skillBoost) * (1 + this._cardBoost) - 1
   }
 
   addBoost(boost: number) {
-    this._boost += boost
+    this.addCardBoost(boost)
   }
 
   removeBoost(boost: number) {
-    this._boost -= boost
+    this.removeCardBoost(boost)
   }
 
   get insightLayers() {
@@ -103,7 +128,8 @@ export class Damage {
     this._countMapList = []
     this._tickCount = 0
     this._totalDamage = 0
-    this._boost = 0
+    this._skillBoost = 0
+    this._cardBoost = 0
     this._insightLayers = 0
   }
 }

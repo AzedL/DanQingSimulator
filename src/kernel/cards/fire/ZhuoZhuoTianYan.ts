@@ -24,8 +24,8 @@ export class ZhuoZhuoTianYan extends Card {
   protected init() {
     this._cooldown = new CooldownTime(120, true)
     this._damageBuff = new RefreshableBuff(this.core.queue, {
-      onStart: () => this.core.damage.addBoost(0.12),
-      onEnd: () => this.core.damage.removeBoost(0.12),
+      onStart: () => this.core.damage.addSkillBoost(0.12),
+      onEnd: () => this.core.damage.removeSkillBoost(0.12),
     })
     this.addInitialInsight()
   }

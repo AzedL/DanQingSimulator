@@ -21,9 +21,9 @@ export class LieHuoLiaoYuan extends Card {
   onSkillStart() {
     if (this.level < 5) return
 
-    this.core.damage.addBoost(0.33)
+    this.core.damage.addCardBoost(0.33)
     this.core.queue.enqueue(() => {
-      this.core.damage.removeBoost(0.33)
+      this.core.damage.removeCardBoost(0.33)
     }, 15)
   }
 

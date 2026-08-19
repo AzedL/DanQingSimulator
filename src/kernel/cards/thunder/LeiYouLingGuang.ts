@@ -26,8 +26,8 @@ export class LeiYouLingGuang extends Card {
     this._spearHits = 0
     this._lingTongActive = false
     this._activationBuff = new RefreshableBuff(this.core.queue, {
-      onStart: () => this.core.damage.addBoost(0.2),
-      onEnd: () => this.core.damage.removeBoost(0.2),
+      onStart: () => this.core.damage.addSkillBoost(0.2),
+      onEnd: () => this.core.damage.removeSkillBoost(0.2),
     })
   }
 

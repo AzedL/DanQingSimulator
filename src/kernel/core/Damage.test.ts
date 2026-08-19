@@ -88,11 +88,13 @@ describe('Damage', () => {
     expect(output.totalDamage).toBe(100)
   })
 
-  it('全系增伤之间加算并与单系增伤乘算', () => {
+  it('全系增伤同组内加算，不同组之间乘算，并与单系增伤乘算', () => {
     const core = new Core(createOptions())
 
-    core.damage.addBoost(0.33)
-    core.damage.addBoost(0.2)
+    core.damage.addSkillBoost(0.2)
+    core.damage.addSkillBoost(0.12)
+    core.damage.addCardBoost(0.33)
+    core.damage.addCardBoost(0.7)
     core.fire.addBoost(0.5)
     core.ice.addBoost(0.2)
 
@@ -101,21 +103,23 @@ describe('Damage', () => {
     core.thunder.add(100, 1, '神雷伤害')
     core.wood.add(100, 1, '苍木伤害')
 
+    const globalMultiplier = (1 + 0.32) * (1 + 1.03) // 1.32 * 2.03 = 2.6796
+
     expect(core.damage.output().damageMap).toEqual({
-      天火伤害: 100 * 1.53 * 1.5,
-      玄冰伤害: 100 * 1.53 * 1.2,
-      神雷伤害: 100 * 1.53,
-      苍木伤害: 100 * 1.53,
+      天火伤害: 100 * globalMultiplier * 1.5,
+      玄冰伤害: 100 * globalMultiplier * 1.2,
+      神雷伤害: 100 * globalMultiplier,
+      苍木伤害: 100 * globalMultiplier,
     })
   })
 
   it('可以分别移除全系增伤和单系增伤', () => {
     const core = new Core(createOptions())
 
-    core.damage.addBoost(0.33)
-    core.damage.addBoost(0.2)
+    core.damage.addSkillBoost(0.2)
+    core.damage.addCardBoost(0.33)
     core.fire.addBoost(0.5)
-    core.damage.removeBoost(0.2)
+    core.damage.removeSkillBoost(0.2)
     core.fire.removeBoost(0.5)
     core.fire.add(100, 1, '伤害')
 

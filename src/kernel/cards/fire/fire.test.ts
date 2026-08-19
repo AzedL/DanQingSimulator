@@ -273,10 +273,10 @@ describe('天火灵韵', () => {
     const field = card<LieHuoLiaoYuan>(core, CARD_IDS.lieHuoLiaoYuan)
 
     field.onSkillStart()
-    expect(core.damage.boost).toBe(0.33)
+    expect(core.damage.boost).toBeCloseTo(0.33)
     core.exec()
 
-    expect(core.damage.boost).toBe(0)
+    expect(core.damage.boost).toBeCloseTo(0)
   })
 
   it('烈焰焚身首次在第16秒获得并将3层合并结算', () => {

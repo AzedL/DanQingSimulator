@@ -38,13 +38,13 @@ export class TianLeiHuYou extends Card {
     }
 
     if (this.level >= 5) {
-      this.core.damage.addBoost(DAMAGE_BOOST)
+      this.core.damage.addCardBoost(DAMAGE_BOOST)
     }
 
     this.core.queue.enqueue(() => {
       this._active = false
       if (this.level >= 5) {
-        this.core.damage.removeBoost(DAMAGE_BOOST)
+        this.core.damage.removeCardBoost(DAMAGE_BOOST)
       }
     }, DURATION)
   }
