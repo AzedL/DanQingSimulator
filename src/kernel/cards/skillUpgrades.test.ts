@@ -219,7 +219,7 @@ describe('主动技能升级', () => {
     expect(count(field, '焚心')).toBeCloseTo(0.1)
   })
 
-  it('火本真将神火迸发与技能的激化基础增伤加算', () => {
+  it('火本真将神火迸发与技能的激化基础增伤乘算', () => {
     const core = createCore(
       [
         { id: CARD_IDS.mengHu, level: 0 },
@@ -236,7 +236,9 @@ describe('主动技能升级', () => {
     card<MengHu>(core, CARD_IDS.mengHu).addFireValue(10000)
     core.exec()
 
-    expect(damage(core, '天火激化')).toBeCloseTo(39181 * 1.3 * 1.006)
+    expect(damage(core, '天火激化')).toBeCloseTo(
+      39181 * 1.2 * 1.1 * 1.006,
+    )
   })
 
   it('火本真三级在激化时立即增幅同步伤害', () => {
@@ -438,6 +440,31 @@ describe('主动技能升级', () => {
 
     expect(damage(core, '苍木激化')).toBe(24916 * 3)
     expect(damage(core, '苍木激化 · 绽放')).toBeCloseTo(72108 * 1.1)
+  })
+
+  it('木本真二级与腐木瘴风三级乘算', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.qingLiangZhu, level: 0 },
+        { id: CARD_IDS.fuMuZhangFeng, level: 3 },
+        {
+          id: CARD_IDS.qingWuFuSheng,
+          level: 2,
+          upgrade: SKILL_UPGRADES.benZhen,
+        },
+      ],
+      3,
+    )
+
+    card<QingLiangZhu>(
+      core,
+      CARD_IDS.qingLiangZhu,
+    ).addWoodValue(10000)
+    core.exec()
+
+    expect(damage(core, '苍木激化 · 绽放')).toBeCloseTo(
+      72108 * 1.4 * 1.1 * 1.006,
+    )
   })
 
   it('木灵通一级提高三种召唤物攻击次数', () => {
@@ -658,7 +685,7 @@ describe('主动技能升级', () => {
 
     expect(count(core, '寒晶刺')).toBe(6)
     expect(damage(core, '寒晶刺')).toBeCloseTo(
-      10992 * (1.75 + 0.05) * 6 * 1.006,
+      10992 * 1.75 * 1.05 * 6 * 1.006,
     )
     expect(damage(core, '碎裂-寒晶刺')).toBeCloseTo(
       7878 * 1.05 * 6 * 1.006,

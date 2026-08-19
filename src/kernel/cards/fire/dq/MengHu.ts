@@ -99,16 +99,20 @@ export class MengHu extends Card {
       CARD_IDS.chiYanTianHuan,
     )?.onActivationDamage()
 
-    const multiplier =
-      MENG_HU_ACTIVATION_DAMAGE_MULTIPLIER +
-      (getCard<ShenHuoBengFa>(
+    const shenHuoBoost =
+      getCard<ShenHuoBengFa>(
         this.core,
         CARD_IDS.shenHuoBengFa,
-      )?.activationDamageBoost ?? 0) +
-      (getCard<ZhuoZhuoTianYan>(
+      )?.activationDamageBoost ?? 0
+    const zhuoZhuoBoost =
+      getCard<ZhuoZhuoTianYan>(
         this.core,
         CARD_IDS.zhuoZhuoTianYan,
-      )?.activationDamageBoost ?? 0)
+      )?.activationDamageBoost ?? 0
+    const multiplier =
+      MENG_HU_ACTIVATION_DAMAGE_MULTIPLIER *
+      (1 + shenHuoBoost) *
+      (1 + zhuoZhuoBoost)
     this.core.fire.add(39181 * multiplier, 1, '天火激化')
     triggerFireResonance(this.core)
   }

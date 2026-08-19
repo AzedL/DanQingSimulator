@@ -45,12 +45,13 @@ export class QingLiangZhu extends Card {
           this.core,
           CARD_IDS.fuMuZhangFeng,
         )
-        const multiplier =
-          this.activationDamageMultiplier +
-          (getCard<QingWuFuSheng>(
+        const bloomBoost =
+          getCard<QingWuFuSheng>(
             this.core,
             CARD_IDS.qingWuFuSheng,
-          )?.bloomDamageBoost ?? 0)
+          )?.bloomDamageBoost ?? 0
+        const multiplier =
+          this.activationDamageMultiplier * (1 + bloomBoost)
         this.core.wood.add(
           72108 * multiplier * layers,
           1,

@@ -50,8 +50,10 @@ export class HanJingCi extends Card {
         this.core,
         CARD_IDS.ningBingShuangHua,
       )
-      const damage = 10992 *
-        (this._damageMultiplier + (skill?.coldSpikeBaseDamageBoost ?? 0))
+      const damage =
+        10992 *
+        this._damageMultiplier *
+        (1 + (skill?.coldSpikeBaseDamageBoost ?? 0))
       this.core.ice.add(damage * 3, 3, '寒晶刺')
       skill?.onColdSpikeDamage(3)
       if (this.level >= 3) {
