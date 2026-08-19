@@ -375,7 +375,7 @@ describe('主动技能升级', () => {
           upgrade: SKILL_UPGRADES.lingTong,
         },
       ],
-      2,
+      1,
     )
 
     core.exec()

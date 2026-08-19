@@ -10,19 +10,24 @@ import { triggerChainLightning } from './shared'
 
 const DAMAGE = 187960
 const CAST_DURATION = 1.3
+const CAST_DELAY = 1
+const COOLDOWN = 60
+const TOTAL_COOLDOWN = COOLDOWN + CAST_DELAY
 
 export class LeiYouLingGuang extends Card {
   declare private _cooldown: CooldownTime
   declare private _activationBuff: RefreshableBuff
   declare private _spearHits: number
   declare private _lingTongActive: boolean
+  declare private _isFirstCast: boolean
 
   constructor(core: Core, level: number) {
     super(core, 'active', CARD_IDS.leiYouLingGuang, '雷佑灵光', level)
   }
 
   protected init() {
-    this._cooldown = new CooldownTime(60, true)
+    this._isFirstCast = true
+    this._cooldown = new CooldownTime(TOTAL_COOLDOWN, true)
     this._spearHits = 0
     this._lingTongActive = false
     this._activationBuff = new RefreshableBuff(this.core.queue, {
@@ -68,42 +73,59 @@ export class LeiYouLingGuang extends Card {
     this._cooldown.tick()
   }
 
+  reduceCooldown(time: number) {
+    this._cooldown.tick(time)
+  }
+
   private cast() {
-    deductBaseDamageDuringCast(this.core, CAST_DURATION)
     const insightMultiplier = this.core.damage.consumeInsightMultiplier()
 
+    if (this._isFirstCast) {
+      this._isFirstCast = false
+      this._cooldown.tick(CAST_DELAY)
+      this.settleSkillEffect(insightMultiplier)
+      return
+    }
+
+    deductBaseDamageDuringCast(this.core, CAST_DURATION)
     this.core.queue.enqueue(() => {
-      for (let index = 1; index <= 5; index++) {
-        this.core.queue.enqueue(() => {
-          triggerChainLightning(this.core, {
-            key: '连锁闪电-雷佑灵光',
-            allowOverload: false,
-          })
-        }, index * 2)
-      }
+      this.settleSkillEffect(insightMultiplier)
+    }, CAST_DELAY)
+  }
 
-      getCard<TianLeiHuYou>(
-        this.core,
-        CARD_IDS.tianLeiHuYou,
-      )?.onSkillDamage()
+  private settleSkillEffect(insightMultiplier: number) {
+    for (let index = 1; index <= 5; index++) {
+      this.core.queue.enqueue(() => {
+        triggerChainLightning(this.core, {
+          key: '连锁闪电-雷佑灵光',
+          allowOverload: false,
+        })
+      }, index * 2)
+    }
 
-      this.core.thunder.add(
-        DAMAGE *
-          (this.upgrade === SKILL_UPGRADES.lingTong && this.level >= 2 ? 1.1 : 1) *
-          insightMultiplier,
-        1,
-        '雷佑灵光',
-      )
-      if (this.upgrade === SKILL_UPGRADES.lingTong && this.level >= 3) {
-        this._lingTongActive = true
-        this.core.queue.enqueue(() => {
-          this._lingTongActive = false
-        }, 10)
-      }
-    }, 1)
+    getCard<TianLeiHuYou>(
+      this.core,
+      CARD_IDS.tianLeiHuYou,
+    )?.onSkillDamage()
+
+    this.core.thunder.add(
+      DAMAGE *
+        (this.upgrade === SKILL_UPGRADES.lingTong && this.level >= 2 ? 1.1 : 1) *
+        insightMultiplier,
+      1,
+      '雷佑灵光',
+    )
+
+    if (this.upgrade === SKILL_UPGRADES.lingTong && this.level >= 3) {
+      this._lingTongActive = true
+      this.core.queue.enqueue(() => {
+        this._lingTongActive = false
+      }, 10)
+    }
   }
 
   reset() {
+    this._isFirstCast = true
     this._cooldown.reset()
     this._activationBuff.reset()
     this._spearHits = 0

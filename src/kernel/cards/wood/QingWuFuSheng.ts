@@ -16,19 +16,23 @@ import type { ShenMuTouLingYun } from './ly/ShenMuTouLingYun'
 const DAMAGE = 279564
 const ATTACK_DAMAGE = 36667
 const CAST_DURATION = 2
+const COOLDOWN = 120
+const TOTAL_COOLDOWN = COOLDOWN + CAST_DURATION
 const ECHO_DURATION_BONUS = 5
 type SummonType = 'paper' | 'tree' | 'spirit'
 
 export class QingWuFuSheng extends Card {
   declare private _cooldown: CooldownTime
   declare private _summons: Record<SummonType, number>
+  declare private _isFirstCast: boolean
 
   constructor(core: Core, level: number) {
     super(core, 'active', CARD_IDS.qingWuFuSheng, '青芜浮生', level)
   }
 
   protected init() {
-    this._cooldown = new CooldownTime(120, true)
+    this._isFirstCast = true
+    this._cooldown = new CooldownTime(TOTAL_COOLDOWN, true)
     this._summons = { paper: 0, tree: 0, spirit: 0 }
   }
 
@@ -95,7 +99,7 @@ export class QingWuFuSheng extends Card {
   expireSummon(type: SummonType, delay: number) {
     if (this.upgrade !== SKILL_UPGRADES.lingTong || this.level < 3) return
     this.core.queue.enqueue(() => {
-      this._summons[type] = Math.max(0, this._summons[type] - 1)
+      this._summons[type]--
     }, delay)
   }
 
@@ -109,23 +113,34 @@ export class QingWuFuSheng extends Card {
   }
 
   private cast() {
-    deductBaseDamageDuringCast(this.core, CAST_DURATION)
+    const insightMultiplier =
+      this.core.damage.consumeInsightMultiplier()
     if (this.upgrade === SKILL_UPGRADES.benZhen && this.level >= 3) {
       getCard<ShenMuTouLingYun>(
         this.core,
         CARD_IDS.shenMuTou_ly,
       )?.triggerFixed()
     }
-    const insightMultiplier =
-      this.core.damage.consumeInsightMultiplier()
 
+    if (this._isFirstCast) {
+      this._isFirstCast = false
+      this._cooldown.tick(CAST_DURATION)
+      this.completeCast(insightMultiplier)
+      return
+    }
+
+    deductBaseDamageDuringCast(this.core, CAST_DURATION)
     this.core.queue.enqueue(() => {
-      this.beginSummon('tree')
-      getCard<MuYinQingLing>(
-        this.core,
-        CARD_IDS.muYinQingLing,
-      )?.onSkillCastCompleted()
+      this.completeCast(insightMultiplier)
     }, CAST_DURATION)
+  }
+
+  private completeCast(insightMultiplier: number) {
+    this.beginSummon('tree')
+    getCard<MuYinQingLing>(
+      this.core,
+      CARD_IDS.muYinQingLing,
+    )?.onSkillCastCompleted()
 
     this.core.queue.enqueue(() => {
       this.core.wood.add(
@@ -159,10 +174,11 @@ export class QingWuFuSheng extends Card {
         'tree',
         20 * this.summonDurationMultiplier - 2,
       )
-    }, 4)
+    }, 2)
   }
 
   reset() {
+    this._isFirstCast = true
     this._cooldown.reset()
     this._summons = { paper: 0, tree: 0, spirit: 0 }
   }

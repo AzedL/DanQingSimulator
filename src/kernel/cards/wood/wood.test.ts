@@ -53,24 +53,31 @@ afterEach(() => {
 })
 
 describe('苍木技能', () => {
-  it('青芜浮生施法2秒逐秒扣减本体伤害', () => {
-    const core = createCore(
+  it('青芜浮生开局预读不扣减本体伤害，后续施法2秒逐秒扣减本体伤害', () => {
+    const precast = createCore(
       [{ id: CARD_IDS.qingWuFuSheng, level: 0 }],
       2,
       false,
       100,
     )
+    precast.exec()
+    expect(damage(precast, '本体伤害扣减')).toBe(0)
 
-    core.exec()
-
-    expect(damage(core, '本体伤害扣减')).toBe(-200)
-    expect(count(core, '本体伤害扣减')).toBe(2)
+    const subsequent = createCore(
+      [{ id: CARD_IDS.qingWuFuSheng, level: 0 }],
+      122,
+      false,
+      100,
+    )
+    subsequent.exec()
+    expect(damage(subsequent, '本体伤害扣减')).toBe(-200)
+    expect(count(subsequent, '本体伤害扣减')).toBe(2)
   })
 
-  it('青芜浮生在第4秒结算伤害并在之后每3秒攻击1次', () => {
+  it('青芜浮生在第2秒结算伤害并在之后每3秒攻击1次', () => {
     const core = createCore(
       [{ id: CARD_IDS.qingWuFuSheng, level: 0 }],
-      23,
+      21,
     )
 
     core.exec()
@@ -79,6 +86,35 @@ describe('苍木技能', () => {
     expect(count(core, '青芜浮生')).toBe(1)
     expect(damage(core, '青芜浮生 · 攻击')).toBe(36667 * 6)
     expect(count(core, '青芜浮生 · 攻击')).toBe(6)
+  })
+
+  it('青芜浮生后续以122秒为循环周期在120秒和242秒施法并在124秒和246秒结算直伤', () => {
+    const beforeSecondDirect = createCore(
+      [{ id: CARD_IDS.qingWuFuSheng, level: 0 }],
+      124,
+    )
+    const afterSecondDirect = createCore(
+      [{ id: CARD_IDS.qingWuFuSheng, level: 0 }],
+      125,
+    )
+    const beforeThirdDirect = createCore(
+      [{ id: CARD_IDS.qingWuFuSheng, level: 0 }],
+      246,
+    )
+    const afterThirdDirect = createCore(
+      [{ id: CARD_IDS.qingWuFuSheng, level: 0 }],
+      247,
+    )
+
+    beforeSecondDirect.exec()
+    afterSecondDirect.exec()
+    beforeThirdDirect.exec()
+    afterThirdDirect.exec()
+
+    expect(count(beforeSecondDirect, '青芜浮生')).toBe(1)
+    expect(count(afterSecondDirect, '青芜浮生')).toBe(2)
+    expect(count(beforeThirdDirect, '青芜浮生')).toBe(2)
+    expect(count(afterThirdDirect, '青芜浮生')).toBe(3)
   })
 
   it('青芜浮生消费洞察且洞察只增幅技能直伤', () => {
@@ -116,9 +152,9 @@ describe('苍木技能', () => {
       { id: CARD_IDS.qingWuFuSheng, level: 0 },
       { id: CARD_IDS.lieDiBeng, level: 3 },
     ]
-    const started = createCore(options, 5)
-    const settled = createCore(options, 7)
-    const echoed = createCore(options, 8)
+    const started = createCore(options, 3)
+    const settled = createCore(options, 5)
+    const echoed = createCore(options, 6)
 
     started.exec()
     settled.exec()
@@ -132,13 +168,13 @@ describe('苍木技能', () => {
     expect(count(echoed, '裂地崩 · 回响')).toBe(1)
   })
 
-  it('裂地崩后的普通攻击在第10秒首次结算', () => {
+  it('裂地崩后的普通攻击在第8秒首次结算', () => {
     const options: CardOptions[] = [
       { id: CARD_IDS.qingWuFuSheng, level: 0 },
       { id: CARD_IDS.lieDiBeng, level: 1 },
     ]
-    const beforeAttack = createCore(options, 10)
-    const attacked = createCore(options, 11)
+    const beforeAttack = createCore(options, 8)
+    const attacked = createCore(options, 9)
 
     beforeAttack.exec()
     attacked.exec()
@@ -690,7 +726,7 @@ describe('苍木灵韵', () => {
         { id: CARD_IDS.fuMuZhangFeng, level: 5 },
         { id: CARD_IDS.muYinQingLing, level: 5 },
       ],
-      3,
+      1,
     )
     const attacked = createCore(
       [
@@ -699,7 +735,7 @@ describe('苍木灵韵', () => {
         { id: CARD_IDS.fuMuZhangFeng, level: 5 },
         { id: CARD_IDS.muYinQingLing, level: 5 },
       ],
-      4,
+      2,
     )
     const settled = createCore(
       [
@@ -708,7 +744,7 @@ describe('苍木灵韵', () => {
         { id: CARD_IDS.fuMuZhangFeng, level: 5 },
         { id: CARD_IDS.muYinQingLing, level: 5 },
       ],
-      5,
+      3,
     )
     const summonedValue = vi.spyOn(
       card<QingLiangZhu>(summoned, CARD_IDS.qingLiangZhu),

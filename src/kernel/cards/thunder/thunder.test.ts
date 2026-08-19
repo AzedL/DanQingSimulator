@@ -61,25 +61,33 @@ afterEach(() => {
 })
 
 describe('神雷技能', () => {
-  it('雷佑灵光按1倍和0.3倍分两次扣减本体伤害', () => {
-    const core = createCore(
+  it('雷佑灵光开局预读不扣减本体伤害，后续施法按1倍和0.3倍分两次扣减本体伤害', () => {
+    const precast = createCore(
       [{ id: CARD_IDS.leiYouLingGuang, level: 0 }],
       2,
       false,
       0,
       100,
     )
+    precast.exec()
+    expect(damage(precast, '本体伤害扣减')).toBe(0)
 
-    core.exec()
-
-    expect(damage(core, '本体伤害扣减')).toBeCloseTo(-130)
-    expect(count(core, '本体伤害扣减')).toBe(2)
+    const subsequent = createCore(
+      [{ id: CARD_IDS.leiYouLingGuang, level: 0 }],
+      62,
+      false,
+      0,
+      100,
+    )
+    subsequent.exec()
+    expect(damage(subsequent, '本体伤害扣减')).toBeCloseTo(-130)
+    expect(count(subsequent, '本体伤害扣减')).toBe(2)
   })
 
-  it('雷佑灵光在1秒后结算直伤并在之后每2秒触发连锁闪电', () => {
+  it('雷佑灵光开局预读在第0秒同步结算直伤并在之后每2秒触发连锁闪电', () => {
     const core = createCore(
       [{ id: CARD_IDS.leiYouLingGuang, level: 0 }],
-      12,
+      11,
     )
 
     core.exec()
@@ -88,6 +96,35 @@ describe('神雷技能', () => {
     expect(count(core, '雷佑灵光')).toBe(1)
     expect(damage(core, '连锁闪电-雷佑灵光')).toBe(8970 * 5)
     expect(count(core, '连锁闪电-雷佑灵光')).toBe(5)
+  })
+
+  it('雷佑灵光后续以61秒为循环周期在60秒和121秒施法并在61秒和122秒结算直伤', () => {
+    const beforeSecondCast = createCore(
+      [{ id: CARD_IDS.leiYouLingGuang, level: 0 }],
+      61,
+    )
+    const afterSecondCast = createCore(
+      [{ id: CARD_IDS.leiYouLingGuang, level: 0 }],
+      62,
+    )
+    const beforeThirdCast = createCore(
+      [{ id: CARD_IDS.leiYouLingGuang, level: 0 }],
+      122,
+    )
+    const afterThirdCast = createCore(
+      [{ id: CARD_IDS.leiYouLingGuang, level: 0 }],
+      123,
+    )
+
+    beforeSecondCast.exec()
+    afterSecondCast.exec()
+    beforeThirdCast.exec()
+    afterThirdCast.exec()
+
+    expect(count(beforeSecondCast, '雷佑灵光')).toBe(1)
+    expect(count(afterSecondCast, '雷佑灵光')).toBe(2)
+    expect(count(beforeThirdCast, '雷佑灵光')).toBe(2)
+    expect(count(afterThirdCast, '雷佑灵光')).toBe(3)
   })
 
   it('雷佑灵光的连锁闪电使用引雷幡等级伤害', () => {
@@ -161,6 +198,26 @@ describe('神雷技能', () => {
     core.exec()
 
     expect(damage(core, '雷佑灵光')).toBeCloseTo(187960 * 1.7)
+  })
+
+  it('第0秒第一次狂雷享受天雷护佑5级70%全系增伤及40%连锁增伤', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.leiYouLingGuang, level: 0 },
+        { id: CARD_IDS.tianLeiHuYou, level: 5 },
+        { id: CARD_IDS.yinLeiFan, level: 6 },
+        { id: CARD_IDS.ziDianChiWen, level: 6 },
+      ],
+      1,
+    )
+
+    core.exec()
+
+    // 13800 * 1.4 (40% chain boost) * 1.2 (fury efficiency) * 1.7 (70% all-element boost) * 6 hits
+    expect(count(core, '连锁闪电-紫电螭吻')).toBe(6)
+    expect(damage(core, '连锁闪电-紫电螭吻')).toBeCloseTo(
+      13800 * 1.4 * 1.2 * 1.7 * 6,
+    )
   })
 })
 
