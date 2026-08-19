@@ -27,18 +27,6 @@ export class LieDiBeng extends Card {
       this.core,
       CARD_IDS.qingWuFuSheng,
     )
-    if (this.level >= 3) {
-      let echoDuration = ECHO_DURATION
-      if (skill) echoDuration += skill.echoDurationBonus
-
-      this._echoActive = true
-      enqueueRepeated(this.core, echoDuration, 1, () => {
-        this.settleEcho()
-      })
-      this.core.queue.enqueue(() => {
-        this._echoActive = false
-      }, echoDuration)
-    }
 
     this.core.queue.enqueue(() => {
       this.core.wood.add(
@@ -46,6 +34,18 @@ export class LieDiBeng extends Card {
         1,
         '裂地崩',
       )
+      if (this.level >= 3) {
+        let echoDuration = ECHO_DURATION
+        if (skill) echoDuration += skill.echoDurationBonus
+
+        this._echoActive = true
+        enqueueRepeated(this.core, echoDuration, 1, () => {
+          this.settleEcho()
+        })
+        this.core.queue.enqueue(() => {
+          this._echoActive = false
+        }, echoDuration)
+      }
     }, 2)
   }
 

@@ -1,4 +1,4 @@
-﻿import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { Core, type CardOptions } from '../core/Core'
 import { CARD_IDS } from './cardIds'
 import { SKILL_UPGRADES } from './skillUpgrades'
@@ -540,8 +540,7 @@ describe('主动技能升级', () => {
     skill.beginSummon('spirit')
 
     card<LieDiBeng>(core, CARD_IDS.lieDiBeng).onAttackStarted()
-    core.coreOptions.duration = 1
-    core.exec()
+    processQueue(core, 3)
 
     expect(damage(core, '裂地崩 · 回响')).toBeCloseTo(
       10896 * 1.3 * 1.006,
@@ -563,9 +562,9 @@ describe('主动技能升级', () => {
     )
     skill.beginSummon('paper')
     card<LieDiBeng>(core, CARD_IDS.lieDiBeng).onAttackStarted()
-    skill.expireSummon('paper', 1)
+    skill.expireSummon('paper', 3.5)
 
-    processQueue(core, 2)
+    processQueue(core, 4)
 
     expect(damage(core, '裂地崩 · 回响')).toBeCloseTo(
       10896 * (1.1 + 1) * 1.006,
@@ -577,7 +576,7 @@ describe('主动技能升级', () => {
       { id: CARD_IDS.lieDiBeng, level: 3 },
     ])
     card<LieDiBeng>(base, CARD_IDS.lieDiBeng).onAttackStarted()
-    processQueue(base, 35)
+    processQueue(base, 37)
 
     const upgraded = createCore([
       { id: CARD_IDS.lieDiBeng, level: 3 },
@@ -591,7 +590,7 @@ describe('主动技能升级', () => {
       upgraded,
       CARD_IDS.lieDiBeng,
     ).onAttackStarted()
-    processQueue(upgraded, 35)
+    processQueue(upgraded, 37)
 
     expect(count(base, '裂地崩 · 回响')).toBe(30)
     expect(count(upgraded, '裂地崩 · 回响')).toBe(35)

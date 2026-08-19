@@ -111,25 +111,25 @@ describe('苍木技能', () => {
     expect(count(core, '青芜浮生 · 攻击')).toBe(5)
   })
 
-  it('裂地崩在攻击开始时附加回响并在2秒前摇后结算', () => {
+  it('裂地崩在2秒前摇后结算直伤并随之附加回响', () => {
     const options: CardOptions[] = [
       { id: CARD_IDS.qingWuFuSheng, level: 0 },
       { id: CARD_IDS.lieDiBeng, level: 3 },
     ]
     const started = createCore(options, 5)
-    const echoed = createCore(options, 6)
     const settled = createCore(options, 7)
+    const echoed = createCore(options, 8)
 
     started.exec()
-    echoed.exec()
     settled.exec()
+    echoed.exec()
 
     expect(count(started, '裂地崩')).toBe(0)
     expect(count(started, '裂地崩 · 回响')).toBe(0)
-    expect(count(echoed, '裂地崩')).toBe(0)
-    expect(count(echoed, '裂地崩 · 回响')).toBe(1)
     expect(count(settled, '裂地崩')).toBe(1)
-    expect(count(settled, '裂地崩 · 回响')).toBe(2)
+    expect(count(settled, '裂地崩 · 回响')).toBe(0)
+    expect(count(echoed, '裂地崩')).toBe(1)
+    expect(count(echoed, '裂地崩 · 回响')).toBe(1)
   })
 
   it('裂地崩后的普通攻击在第10秒首次结算', () => {
@@ -744,7 +744,7 @@ describe('苍木灵韵', () => {
   it('三级裂地崩附加30次回响伤害', () => {
     const core = createCore(
       [{ id: CARD_IDS.lieDiBeng, level: 3 }],
-      30,
+      32,
     )
 
     card<LieDiBeng>(
@@ -767,6 +767,7 @@ describe('苍木灵韵', () => {
     const collapse = card<LieDiBeng>(core, CARD_IDS.lieDiBeng)
 
     collapse.onAttackStarted()
+    core.queue.process(2)
     collapse.onSummonAttack()
     collapse.onSummonAttack()
     collapse.onSummonAttack()
