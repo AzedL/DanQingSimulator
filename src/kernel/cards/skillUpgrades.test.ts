@@ -544,7 +544,7 @@ describe('主动技能升级', () => {
     core.exec()
 
     expect(damage(core, '裂地崩 · 回响')).toBeCloseTo(
-      5774 * 1.75 * 1.3 * 1.006,
+      10896 * 1.3 * 1.006,
     )
   })
 
@@ -568,7 +568,7 @@ describe('主动技能升级', () => {
     processQueue(core, 2)
 
     expect(damage(core, '裂地崩 · 回响')).toBeCloseTo(
-      5774 * 1.75 * (1.1 + 1) * 1.006,
+      10896 * (1.1 + 1) * 1.006,
     )
   })
 

@@ -755,7 +755,7 @@ describe('苍木灵韵', () => {
 
     expect(damage(core, '裂地崩')).toBe(207708 * 1.75)
     expect(count(core, '裂地崩')).toBe(1)
-    expect(damage(core, '裂地崩 · 回响')).toBe(5774 * 1.75 * 30)
+    expect(damage(core, '裂地崩 · 回响')).toBe(10896 * 30)
     expect(count(core, '裂地崩 · 回响')).toBe(30)
   })
 
@@ -771,7 +771,7 @@ describe('苍木灵韵', () => {
     collapse.onSummonAttack()
     collapse.onSummonAttack()
 
-    expect(damage(core, '裂地崩 · 回响')).toBe(5774 * 2.5 * 3)
+    expect(damage(core, '裂地崩 · 回响')).toBe(10896 * 3)
     expect(count(core, '裂地崩 · 回响')).toBe(3)
   })
 

@@ -4,7 +4,9 @@ import { CARD_IDS } from '../../cardIds'
 import { enqueueRepeated, getCard } from '../../shared'
 import type { QingWuFuSheng } from '../QingWuFuSheng'
 
-const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
+const DAMAGE = 207708
+const ECHO_DAMAGE = 10896
+const DAMAGE_MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 const ECHO_DURATION = 30
 
 export class LieDiBeng extends Card {
@@ -16,7 +18,7 @@ export class LieDiBeng extends Card {
   }
 
   protected init() {
-    this._damage = 207708 * MULTIPLIER[this.level]
+    this._damage = DAMAGE * DAMAGE_MULTIPLIER[this.level]
     this._echoActive = false
   }
 
@@ -59,7 +61,7 @@ export class LieDiBeng extends Card {
       CARD_IDS.qingWuFuSheng,
     )?.echoDamageMultiplier ?? 1
     this.core.wood.add(
-      5774 * MULTIPLIER[this.level] * multiplier,
+      ECHO_DAMAGE * multiplier,
       1,
       '裂地崩 · 回响',
     )
