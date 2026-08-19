@@ -35,7 +35,7 @@ export class JiuXiaoLeiDong extends Card {
         getCard<ZiXiaoHu>(
           this.core,
           CARD_IDS.ziXiaoHu,
-        )?.addThunderValue(100 * multiplier)
+        )?.addThunderValue(100 * this._count * multiplier)
       }
     }, 2)
   }

@@ -413,7 +413,7 @@ describe('主动技能升级', () => {
     core.exec()
 
     expect(card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).thunderValue).toBe(
-      1200,
+      1600,
     )
   })
 

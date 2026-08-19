@@ -611,7 +611,27 @@ describe('神雷灵韵', () => {
     expect(count(core, '九霄雷动')).toBe(2)
   })
 
-  it('五级九霄雷动结算4道雷电并累积100神雷值', () => {
+  it('三级九霄雷动结算3道雷电并累积300神雷值', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.ziXiaoHu, level: 0 },
+        { id: CARD_IDS.jiuXiaoLeiDong, level: 3 },
+      ],
+      2,
+    )
+
+    card<JiuXiaoLeiDong>(
+      core,
+      CARD_IDS.jiuXiaoLeiDong,
+    ).onActivation()
+    core.exec()
+
+    expect(damage(core, '九霄雷动')).toBe(27506 * 1.75 * 3)
+    expect(count(core, '九霄雷动')).toBe(3)
+    expect(card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).thunderValue).toBe(300)
+  })
+
+  it('五级九霄雷动结算4道雷电并累积400神雷值', () => {
     const core = createCore(
       [
         { id: CARD_IDS.ziXiaoHu, level: 0 },
@@ -628,7 +648,7 @@ describe('神雷灵韵', () => {
 
     expect(damage(core, '九霄雷动')).toBe(27506 * 2.5 * 4)
     expect(count(core, '九霄雷动')).toBe(4)
-    expect(card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).thunderValue).toBe(100)
+    expect(card<ZiXiaoHu>(core, CARD_IDS.ziXiaoHu).thunderValue).toBe(400)
   })
 
   it('全部神雷卡片可以重置', () => {
