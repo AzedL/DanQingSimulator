@@ -137,7 +137,7 @@ export class QingWuFuSheng extends Card {
       for (let index = firstAttackIndex; index <= lastAttackIndex; index++) {
         this.core.queue.enqueue(() => {
           this.core.wood.add(
-            ATTACK_DAMAGE,
+            ATTACK_DAMAGE * this.treeSkillDamageMultiplier,
             1,
             '青芜浮生 · 攻击',
           )

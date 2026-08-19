@@ -503,7 +503,7 @@ describe('主动技能升级', () => {
     expect(count(spirit, '木引青灵')).toBe(16)
   })
 
-  it('木灵通二级提高青芜浮生和裂地崩伤害', () => {
+  it('木灵通二级提高青芜浮生、青芜浮生攻击和裂地崩伤害', () => {
     const core = createCore(
       [
         { id: CARD_IDS.lieDiBeng, level: 1 },
@@ -513,13 +513,14 @@ describe('主动技能升级', () => {
           upgrade: SKILL_UPGRADES.lingTong,
         },
       ],
-      7,
+      11,
     )
 
     core.exec()
 
     expect(damage(core, '青芜浮生')).toBeCloseTo(279564 * 1.1 * 1.002)
     expect(damage(core, '裂地崩')).toBeCloseTo(207708 * 1.1 * 1.002)
+    expect(damage(core, '青芜浮生 · 攻击')).toBeCloseTo(36667 * 1.1 * 1.002)
   })
 
   it('木灵通三级按存在的召唤物种类动态增幅回响', () => {
