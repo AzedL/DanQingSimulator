@@ -7,6 +7,7 @@ import type { QingLiangZhu } from '../dq/QingLiangZhu'
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
 
 export const FU_MU_ACTIVATION_DAMAGE_MULTIPLIER = 1
+export const DEFAULT_FU_MU_DAMAGE = 25042 * (1 - 0.375)
 
 export class FuMuZhangFeng extends Card {
   declare private _damage: number

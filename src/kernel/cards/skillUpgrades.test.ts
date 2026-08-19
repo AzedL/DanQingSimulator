@@ -731,7 +731,7 @@ describe('主动技能升级', () => {
     expect(core.damage.output().totalDamage).toBe(0)
   })
 
-  it('木本真一级未携带腐木瘴风时不触发伤害', () => {
+  it('木本真一级未携带腐木瘴风时按-1级腐木瘴风生效', () => {
     const core = createCore([
       {
         id: CARD_IDS.qingWuFuSheng,
@@ -745,6 +745,34 @@ describe('主动技能升级', () => {
       CARD_IDS.qingWuFuSheng,
     ).onPulse()
 
+    expect(damage(core, '腐木瘴风')).toBeCloseTo(
+      25042 * (1 - 0.375) * 0.1,
+    )
+  })
+
+  it('木本真三级未携带神木骰时不生效', () => {
+    const core = createCore([
+      {
+        id: CARD_IDS.qingWuFuSheng,
+        level: 3,
+        upgrade: SKILL_UPGRADES.benZhen,
+      },
+    ])
+
+    expect(() => card<QingWuFuSheng>(core, CARD_IDS.qingWuFuSheng).tick()).not.toThrow()
     expect(core.damage.output().totalDamage).toBe(0)
+  })
+
+  it('冰灵通三级未携带寒晶刺时不触发寒晶刺联动', () => {
+    const core = createCore([
+      {
+        id: CARD_IDS.ningBingShuangHua,
+        level: 3,
+        upgrade: SKILL_UPGRADES.lingTong,
+      },
+    ])
+
+    const skill = card<NingBingShuangHua>(core, CARD_IDS.ningBingShuangHua)
+    expect(() => skill.tick()).not.toThrow()
   })
 })

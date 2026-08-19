@@ -5,7 +5,10 @@ import { Card } from '../Card'
 import { CARD_IDS } from '../cardIds'
 import { SKILL_UPGRADES } from '../skillUpgrades'
 import { deductBaseDamageDuringCast, getCard } from '../shared'
-import type { FuMuZhangFeng } from './ly/FuMuZhangFeng'
+import {
+  DEFAULT_FU_MU_DAMAGE,
+  type FuMuZhangFeng,
+} from './ly/FuMuZhangFeng'
 import type { LieDiBeng } from './ly/LieDiBeng'
 import type { MuYinQingLing } from './ly/MuYinQingLing'
 import type { ShenMuTouLingYun } from './ly/ShenMuTouLingYun'
@@ -63,17 +66,25 @@ export class QingWuFuSheng extends Card {
   onPulse() {
     if (this.upgrade !== SKILL_UPGRADES.benZhen || this.level < 1) return
 
-    const plague = getCard<FuMuZhangFeng>(
-      this.core,
-      CARD_IDS.fuMuZhangFeng,
-    )
-    if (!plague) return
-
     const count = handleProbability(
       0.1,
       this.core.coreOptions.useRandom,
     )
-    plague.onPulse(count)
+    if (!count) return
+
+    const plague = getCard<FuMuZhangFeng>(
+      this.core,
+      CARD_IDS.fuMuZhangFeng,
+    )
+    if (plague) {
+      plague.onPulse(count)
+    } else {
+      this.core.wood.add(
+        DEFAULT_FU_MU_DAMAGE * count,
+        count,
+        '腐木瘴风',
+      )
+    }
   }
 
   beginSummon(type: SummonType) {
