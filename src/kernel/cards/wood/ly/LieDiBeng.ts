@@ -49,9 +49,11 @@ export class LieDiBeng extends Card {
     }, 2)
   }
 
-  onSummonAttack() {
+  onSummonAttack(count = 1) {
     if (this.level >= 5 && this._echoActive) {
-      this.settleEcho()
+      for (let index = 0; index < count; index++) {
+        this.settleEcho()
+      }
     }
   }
 

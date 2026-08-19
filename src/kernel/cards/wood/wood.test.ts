@@ -776,6 +776,24 @@ describe('苍木灵韵', () => {
     expect(count(core, '裂地崩 · 回响')).toBe(3)
   })
 
+  it('五级裂地崩使纸人风暴也可以触发回响', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.cangLinFuSheng, level: 3 },
+        { id: CARD_IDS.lieDiBeng, level: 5 },
+      ],
+      7,
+    )
+    const collapse = card<LieDiBeng>(core, CARD_IDS.lieDiBeng)
+    collapse.onAttackStarted()
+    core.queue.process(2)
+
+    core.exec()
+
+    expect(count(core, '小纸人-旋风收割')).toBe(11)
+    expect(count(core, '裂地崩 · 回响')).toBe(11 + 7)
+  })
+
   it('全部苍木卡片可以重置', () => {
     const core = createCore(
       [

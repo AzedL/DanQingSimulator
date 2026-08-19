@@ -64,6 +64,10 @@ export class CangLinFuSheng extends Card {
             CARD_IDS.qingLiangZhu,
           )?.addWoodValue(80 * count)
         }
+        getCard<LieDiBeng>(
+          this.core,
+          CARD_IDS.lieDiBeng,
+        )?.onSummonAttack(count)
       }, tick)
     }
 
