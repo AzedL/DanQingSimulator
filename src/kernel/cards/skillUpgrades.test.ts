@@ -684,7 +684,7 @@ describe('主动技能升级', () => {
     expect(count(core, '深度激化')).toBe(3)
   })
 
-  it('冰本真二级与凛霜寒涌三级乘算', () => {
+  it('冰本真二级暂不生效（倍率为1），凛霜寒涌三级为50%增伤', () => {
     const core = createCore([
       { id: CARD_IDS.shangGuanCe, level: 0 },
       { id: CARD_IDS.linShuangHanYong, level: 3 },
@@ -701,7 +701,7 @@ describe('主动技能升级', () => {
     ).addIceValue(10000)
 
     expect(damage(core, '玄冰激化')).toBeCloseTo(
-      43534 * 1.5 * 1.2 * 1.006,
+      43534 * 1.5 * 1.0 * 1.006,
     )
   })
 

@@ -21,9 +21,9 @@ export class LinShuangHanYong extends Card {
   }
 
   get activationDamageMultiplier() {
-    return this.level >= 3
-      ? 1.5
-      : SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER
+    if (this.level >= 3) return 1.5
+    if (this.level >= 2) return 1.2
+    return SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER
   }
 
   onFreeze() {

@@ -40,7 +40,7 @@ export class NingBingShuangHua extends Card {
   }
 
   get activationDamageMultiplier() {
-    return this.upgrade === SKILL_UPGRADES.benZhen && this.level >= 2 ? 1.2 : 1
+    return this.upgrade === SKILL_UPGRADES.benZhen && this.level >= 2 ? 1 : 1
   }
 
   get coldSpikeBaseDamageBoost() {

@@ -357,6 +357,22 @@ describe('玄冰灵韵', () => {
     expect(damage(core, '玄冰风暴-霜寒破裂')).toBe(128000)
   })
 
+  it('凛霜寒涌2提高玄冰激化两段伤害20%', () => {
+    const core = createCore(
+      [
+        { id: CARD_IDS.shangGuanCe, level: 0 },
+        { id: CARD_IDS.linShuangHanYong, level: 2 },
+      ],
+      2,
+    )
+
+    card<ShangGuanCe>(core, CARD_IDS.shangGuanCe).addIceValue(10000)
+    core.exec()
+
+    expect(damage(core, '玄冰激化')).toBeCloseTo((43534 + 85327) * 1.2)
+    expect(damage(core, '凛霜寒涌')).toBe(75540 * 1.375)
+  })
+
   it('凛霜寒涌3同步冻结结算并提高玄冰激化两段伤害', () => {
     const core = createCore(
       [
