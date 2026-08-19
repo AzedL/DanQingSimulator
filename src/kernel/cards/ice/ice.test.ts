@@ -308,6 +308,24 @@ describe('玄冰灵韵', () => {
     expect(count(core, '霜寒破裂3')).toBe(3)
   })
 
+  it('霜寒破裂3使用通用叠层模型合并多层伤害', () => {
+    const core = createCore(
+      [{ id: CARD_IDS.shuangHanPoLie, level: 3 }],
+      9,
+    )
+    const fracture = card<ShuangHanPoLie>(core, CARD_IDS.shuangHanPoLie)
+
+    fracture.onFrostElement()
+    core.queue.enqueue(() => {
+      fracture.onFrostElement()
+    }, 1)
+
+    core.exec()
+
+    expect(count(core, '霜寒破裂')).toBe(2)
+    expect(damage(core, '霜寒破裂3')).toBe(76692 * 2)
+  })
+
   it('霜寒破裂5使玄冰霜华额外召唤冰霜元素并使用齐昊负1级伤害', () => {
     const core = createCore(
       [

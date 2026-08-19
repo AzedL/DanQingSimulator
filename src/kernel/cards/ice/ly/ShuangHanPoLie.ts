@@ -1,14 +1,17 @@
 import type { Core } from '../../../core/Core'
+import { StackedEffect } from '../../../utils/StackedEffect'
 import { Card } from '../../Card'
 import { CARD_IDS } from '../../cardIds'
-import { enqueueRepeated, getCard } from '../../shared'
+import { getCard } from '../../shared'
 import { QI_HAO_DEFAULT_DAMAGE, type QiHao } from '../dq/QiHao'
 import { summonFrostElement } from '../shared'
 
 const MULTIPLIER = [0, 1, 1.375, 1.75, 2.125, 2.5]
+const DAMAGE_3 = 76692 / 3
 
 export class ShuangHanPoLie extends Card {
   declare private _damage: number
+  declare private _effect: StackedEffect
 
   constructor(core: Core, level: number) {
     super(core, 'passive', CARD_IDS.shuangHanPoLie, '霜寒破裂', level)
@@ -16,15 +19,20 @@ export class ShuangHanPoLie extends Card {
 
   protected init() {
     this._damage = 60632 * MULTIPLIER[this.level]
+    this._effect = new StackedEffect(this.core.queue, {
+      interval: 2,
+      duration: 6,
+      onTick: (layers) => {
+        this.core.ice.add(DAMAGE_3 * layers, 1, '霜寒破裂3')
+      },
+    })
   }
 
   onFrostElement() {
     this.core.ice.add(this._damage, 1, '霜寒破裂')
 
     if (this.level >= 3) {
-      enqueueRepeated(this.core, 3, 2, () => {
-        this.core.ice.add(76692 / 3, 1, '霜寒破裂3')
-      })
+      this._effect.add()
     }
   }
 
@@ -41,5 +49,7 @@ export class ShuangHanPoLie extends Card {
     )
   }
 
-  reset() {}
+  reset() {
+    this._effect.reset()
+  }
 }
