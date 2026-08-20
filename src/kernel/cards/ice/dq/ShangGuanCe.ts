@@ -11,14 +11,14 @@ const ICE_ARROW_VALUE = [140, 150, 160, 170, 180, 190, 200]
 const FRACTURE_VALUE = [140, 150, 160, 170, 180, 190, 200]
 const STORM_VALUE = [1400, 1500, 1600, 1700, 1800, 1900, 2000]
 
-export const SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER =
-  DEFAULT_DAMAGE_MULTIPLIER
+export const SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER = DEFAULT_DAMAGE_MULTIPLIER
 
 export class ShangGuanCe extends Card {
   declare private _iceArrowValue: number
   declare private _fractureValue: number
   declare private _stormValue: number
   declare private _iceValue: number
+  declare private _isActivating: boolean
 
   constructor(core: Core, level: number) {
     super(core, 'passive', CARD_IDS.shangGuanCe, '上官策', level)
@@ -29,6 +29,7 @@ export class ShangGuanCe extends Card {
     this._fractureValue = FRACTURE_VALUE[this.level]
     this._stormValue = STORM_VALUE[this.level]
     this._iceValue = 0
+    this._isActivating = false
   }
 
   get iceValue() {
@@ -57,33 +58,28 @@ export class ShangGuanCe extends Card {
   }
 
   private activate() {
-    const cold = getCard<LinShuangHanYong>(
-      this.core,
-      CARD_IDS.linShuangHanYong,
-    )
-    const multiplier =
-      cold?.activationDamageMultiplier ??
-      SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER
-    const skill = getCard<NingBingShuangHua>(
-      this.core,
-      CARD_IDS.ningBingShuangHua,
-    )
-    const activationMultiplier =
-      multiplier * (skill?.activationDamageMultiplier ?? 1)
+    if (this._isActivating) return
+    this._isActivating = true
+
+    const cold = getCard<LinShuangHanYong>(this.core, CARD_IDS.linShuangHanYong)
+    const multiplier = cold?.activationDamageMultiplier ?? SHANG_GUAN_CE_ACTIVATION_DAMAGE_MULTIPLIER
+    const skill = getCard<NingBingShuangHua>(this.core, CARD_IDS.ningBingShuangHua)
+    const activationMultiplier = multiplier * (skill?.activationDamageMultiplier ?? 1)
 
     this.core.ice.add(43534 * activationMultiplier, 1, '玄冰激化')
     this.core.queue.enqueue(() => {
-      this.core.ice.add(85327 * activationMultiplier, 1, '玄冰激化')
-      cold?.onFreeze()
-      skill?.onFreeze()
-      getCard<ShuangCiHanYu>(
-        this.core,
-        CARD_IDS.shuangCiHanYu,
-      )?.onFreeze()
+      getCard<ShuangCiHanYu>(this.core, CARD_IDS.shuangCiHanYu)?.onFreeze()
+      this.core.queue.enqueue(() => {
+        this._isActivating = false
+        this.core.ice.add(85327 * activationMultiplier, 1, '玄冰激化')
+        cold?.onFreeze()
+        skill?.onFreeze()
+      }, 0.1)
     }, 2)
   }
 
   reset() {
     this._iceValue = 0
+    this._isActivating = false
   }
 }

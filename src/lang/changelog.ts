@@ -1,6 +1,10 @@
-export const updatedAt = '2026-08-19'
+export const updatedAt = '2026-08-20'
 
 export const changelog = [
+  {
+    date: '2026-08-20',
+    changes: ['修正：玄冰激化冻结buff持续时间内重复触发的激化无效。冰系伤害降低。'],
+  },
   {
     date: '2026-08-19',
     changes: [

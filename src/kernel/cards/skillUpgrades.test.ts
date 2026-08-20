@@ -671,7 +671,7 @@ describe('主动技能升级', () => {
           upgrade: SKILL_UPGRADES.benZhen,
         },
       ],
-      5,
+      6,
     )
 
     card<ShangGuanCe>(
