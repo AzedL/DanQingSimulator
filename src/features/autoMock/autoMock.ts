@@ -23,6 +23,7 @@ export interface AutoMockInput {
 
 export interface AutoMockItem {
   cards: CardOptions[]
+  damage: number
   dps: number
   combinationIndex: number
 }
@@ -118,6 +119,7 @@ export function runAutoMockPartition(
     const output = core.damage.output()
     const item = {
       cards: cards.filter((card) => resultIds.has(card.id)),
+      damage: fixed(output.totalDamage),
       dps: fixed(calculateDps(output, options)),
       combinationIndex,
     }

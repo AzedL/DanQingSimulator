@@ -3,6 +3,7 @@ import type { CoreOptions, DamageOutput } from '../../kernel'
 import {
   buildDamageDetails,
   calculateDps,
+  formatDamage,
   mergeDamageDetails,
 } from './result'
 
@@ -32,12 +33,18 @@ describe('模拟结果转换', () => {
     expect(calculateDps(output, options)).toBe(80)
   })
 
+  it('格式化伤害为保留两位小数的W', () => {
+    expect(formatDamage(23823776.44)).toBe('2382.38W')
+    expect(formatDamage(600)).toBe('0.06W')
+    expect(formatDamage(0)).toBe('0W')
+  })
+
   it('生成总计和各伤害明细', () => {
     expect(buildDamageDetails(output, options)).toEqual([
-      { key: 'total', dps: 80, proportion: 100 },
-      { key: '连锁闪电-本体', dps: 60, proportion: 75 },
-      { key: '连锁闪电-紫电螭吻', dps: 40, proportion: 50 },
-      { key: '本体伤害扣减', dps: -20, proportion: -25 },
+      { key: 'total', damage: 800, dps: 80, proportion: 100 },
+      { key: '连锁闪电-本体', damage: 600, dps: 60, proportion: 75 },
+      { key: '连锁闪电-紫电螭吻', damage: 400, dps: 40, proportion: 50 },
+      { key: '本体伤害扣减', damage: -200, dps: -20, proportion: -25 },
     ])
   })
 
@@ -45,6 +52,7 @@ describe('模拟结果转换', () => {
     const detail = buildDamageDetails(output, options)
     expect(mergeDamageDetails(detail)).toContainEqual({
       key: '连锁闪电',
+      damage: 1000,
       dps: 100,
       proportion: 125,
     })
@@ -59,8 +67,8 @@ describe('模拟结果转换', () => {
     }
 
     expect(buildDamageDetails(emptyOutput, emptyOptions)).toEqual([
-      { key: 'total', dps: 0, proportion: 100 },
-      { key: '测试', dps: 0, proportion: 0 },
+      { key: 'total', damage: 0, dps: 0, proportion: 100 },
+      { key: '测试', damage: 0, dps: 0, proportion: 0 },
     ])
   })
 })

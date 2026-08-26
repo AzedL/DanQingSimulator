@@ -54,6 +54,7 @@ function formatAutoMockCard(card: CardOptions) {
 
 export interface AutoMockViewItem {
   cards: string
+  damage: number
   dps: number
   cardOptions: CardOptions[]
   skillGroup: CardGroup
@@ -95,6 +96,7 @@ export function useAutoMock(
           cards: item.cards
             .map(formatAutoMockCard)
             .join(' + '),
+          damage: item.damage,
           dps: item.dps,
           cardOptions: item.cards.filter(
             (card) => !skillIds.has(card.id),

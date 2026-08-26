@@ -28,6 +28,7 @@ const lang = {
 
   mergeSameNameDamage: '合并同名伤害',
   damageName: '伤害名称',
+  damage: '总伤',
   dps: '秒伤',
   proportion: '占比',
   cardsCombo: '天工机巧组合',

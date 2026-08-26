@@ -69,12 +69,14 @@ function runLegacyAutoMock(
     }
     const core = new Core(options)
     core.exec()
+    const output = core.damage.output()
     const item: AutoMockItem = {
       cards: cards.filter((card) =>
         resultIdSet.has(card.id),
       ),
+      damage: fixed(output.totalDamage),
       dps: fixed(
-        calculateDps(core.damage.output(), options),
+        calculateDps(output, options),
       ),
       combinationIndex,
     }
