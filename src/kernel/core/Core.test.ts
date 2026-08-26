@@ -127,4 +127,28 @@ describe('Core', () => {
     expect(core.damage.output().totalDamage).toBe(0)
     expect(events).toEqual(['reset-active', 'reset-passive'])
   })
+
+  it('根据 enhancementLevel 增加默认系别增强效果', () => {
+    const coreDefault = new Core({
+      cards: [],
+      duration: 1,
+      burstDps: 0,
+      sustainedDps: 0,
+      useRandom: false,
+    })
+    coreDefault.fire.add(100, 1, '测试')
+    expect(coreDefault.damage.output().totalDamage).toBe(100)
+
+    const coreWithEnhance = new Core({
+      cards: [],
+      duration: 1,
+      burstDps: 0,
+      sustainedDps: 0,
+      useRandom: false,
+      enhancementLevel: 3,
+    })
+    coreWithEnhance.fire.add(100, 1, '测试')
+    expect(coreWithEnhance.damage.output().totalDamage).toBeCloseTo(101.5)
+  })
 })
+

@@ -26,6 +26,7 @@ export interface CoreOptions {
   sustainedDps: number
   useRandom: boolean
   useLightMode?: boolean
+  enhancementLevel?: number
 }
 
 export class Core {

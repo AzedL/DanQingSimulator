@@ -135,6 +135,7 @@ export function useSimulation() {
       burstDps: toNumber(burstDps),
       sustainedDps: toNumber(sustainedDps),
       useRandom: isAutoMock ? false : useRandom,
+      enhancementLevel: 3,
     }),
     [
       burstDps,
@@ -287,6 +288,7 @@ export function useSimulation() {
       sustainedDps: toNumber(sustainedDps),
       useRandom,
       useLightMode: false,
+      enhancementLevel: 3,
     }
 
     setLingYunCards(nextLingYunCards)
