@@ -250,16 +250,16 @@ describe('玄冰丹青', () => {
     )
   })
 
-  it('上官策在激化期间再次触发的玄冰激化直接无效并保留溢出玄冰值', () => {
-    const core = createCore([{ id: CARD_IDS.shangGuanCe, level: 0 }], 3)
+  it('上官策保留溢出的玄冰值并允许玄冰激化多次触发', () => {
+    const core = createCore([{ id: CARD_IDS.shangGuanCe, level: 0 }], 2)
     const shangGuanCe = card<ShangGuanCe>(core, CARD_IDS.shangGuanCe)
 
     shangGuanCe.addIceValue(25000)
     core.exec()
 
     expect(shangGuanCe.iceValue).toBe(5000)
-    expect(damage(core, '玄冰激化')).toBe(43534 + 85327)
-    expect(count(core, '玄冰激化')).toBe(2)
+    expect(damage(core, '玄冰激化')).toBe((43534 + 85327) * 2)
+    expect(count(core, '玄冰激化')).toBe(4)
   })
 })
 
@@ -357,7 +357,7 @@ describe('玄冰灵韵', () => {
     expect(damage(core, '玄冰风暴-霜寒破裂')).toBe(128000)
   })
 
-  it('凛霜寒涌2提高玄冰激化两段伤害20%', () => {
+  it('凛霜寒涌2提高玄冰激化两段伤害15%', () => {
     const core = createCore(
       [
         { id: CARD_IDS.shangGuanCe, level: 0 },
@@ -369,7 +369,7 @@ describe('玄冰灵韵', () => {
     card<ShangGuanCe>(core, CARD_IDS.shangGuanCe).addIceValue(10000)
     core.exec()
 
-    expect(damage(core, '玄冰激化')).toBeCloseTo((43534 + 85327) * 1.2)
+    expect(damage(core, '玄冰激化')).toBeCloseTo((43534 + 85327) * 1.15)
     expect(damage(core, '凛霜寒涌')).toBe(75540 * 1.375)
   })
 
@@ -405,7 +405,7 @@ describe('玄冰灵韵', () => {
     expect(shangGuanCe.iceValue).toBe(3000)
   })
 
-  it('凛霜寒涌5级冻结回充3000玄冰值在锁释放后成功触发下一次激化', () => {
+  it('凛霜寒涌5级冻结回充3000玄冰值成功触发下一次激化', () => {
     const core = createCore(
       [
         { id: CARD_IDS.shangGuanCe, level: 0 },
