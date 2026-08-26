@@ -1,6 +1,10 @@
-export const updatedAt = '2026-08-26'
+export const updatedAt = '2026-08-26 13:00'
 
 export const changelog = [
+  {
+    date: '2026-08-26 13:00',
+    changes: ['更新：增加一列总伤显示。'],
+  },
   {
     date: '2026-08-26',
     changes: [
