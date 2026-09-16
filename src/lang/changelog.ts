@@ -1,6 +1,10 @@
-export const updatedAt = '2026-08-26 13:00'
+export const updatedAt = '2026-09-16'
 
 export const changelog = [
+  {
+    date: '2026-09-16',
+    changes: ['更新：灵韵增强效果由 0.5% 改为 1%。', '更新：更新部分页面默认值。'],
+  },
   {
     date: '2026-08-26 13:00',
     changes: [
