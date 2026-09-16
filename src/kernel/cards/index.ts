@@ -48,7 +48,7 @@ import { ShenMuTouLingYun } from './wood/ly/ShenMuTouLingYun'
 
 export type CardConstructor = new (core: Core, level: number) => Card
 
-export const TIAN_GONG_ENHANCEMENT_DAMAGE_BOOST_PER_LEVEL = 0.005
+export const TIAN_GONG_ENHANCEMENT_DAMAGE_BOOST_PER_LEVEL = 0.01
 export const TIAN_GONG_DAMAGE_BOOST_PER_LEVEL = 0.002
 export const TIAN_GONG_CARD_IDS = {
   fire: [

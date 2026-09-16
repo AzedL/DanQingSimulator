@@ -148,7 +148,7 @@ describe('Core', () => {
       enhancementLevel: 3,
     })
     coreWithEnhance.fire.add(100, 1, '测试')
-    expect(coreWithEnhance.damage.output().totalDamage).toBeCloseTo(101.5)
+    expect(coreWithEnhance.damage.output().totalDamage).toBeCloseTo(103)
   })
 })
 
