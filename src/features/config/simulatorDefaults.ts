@@ -41,7 +41,7 @@ export const SIMULATION_CONFIG_DEFAULTS: SimulationConfigDefaults = {
   currentTab: 'autoMock',
   skillGroup: '天火',
   skillUpgrade: SKILL_UPGRADES.benZhen,
-  skillUpgradeLevel: 2,
+  skillUpgradeLevel: 3,
   autoMockSkillUpgrade: AUTO_MOCK_SKILL_UPGRADES.both,
   duration: '510',
   useRandom: false,
